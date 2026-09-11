@@ -14,13 +14,13 @@ autonomous: true
 features:
   implements: ["F2"]
   depends_on: []
-  enables: ["F0", "F3", "F4", "F5"]
+  enables: ["F0", "F1", "F3", "F4", "F5"]
 
 must_haves:
   truths:
     - "SQLite database file is created automatically on first run"
     - "expenses table exists with correct schema and CHECK constraints"
-    - "Storage layer can insert an expense and retrieve all expenses"
+    - "Storage layer can insert an expense, update an expense, and retrieve all expenses"
     - "Server process starts, initializes DB, and logs readiness"
     - "Data persists across process restart"
   artifacts:
@@ -28,8 +28,8 @@ must_haves:
       provides: "Project manifest with express, better-sqlite3, helmet dependencies"
       contains: "better-sqlite3"
     - path: "db/database.js"
-      provides: "Storage layer with initialize, getAllExpenses, createExpense"
-      exports: ["initialize", "getAllExpenses", "createExpense"]
+      provides: "Storage layer with initialize, getAllExpenses, createExpense, updateExpense"
+      exports: ["initialize", "getAllExpenses", "createExpense", "updateExpense"]
     - path: "server.js"
       provides: "Entry point that initializes DB and starts Express on PORT"
       contains: "initialize"
@@ -59,12 +59,13 @@ integration_contracts:
         }
       verify: "grep -n 'better-sqlite3' package.json && grep -n 'express' package.json && grep -n 'helmet' package.json && echo CONTRACT_OK"
     - artifact: "db/database.js"
-      exports: ["initialize", "getAllExpenses", "createExpense"]
+      exports: ["initialize", "getAllExpenses", "createExpense", "updateExpense"]
       shape: |
         initialize() → void (creates table + index if not exists, enables WAL)
         getAllExpenses() → Array<{ id, amount, description, category, created_at, updated_at }>
         createExpense({ amount, description, category }) → { id, amount, description, category, created_at, updated_at }
-      verify: "grep -n 'function initialize\\|exports.initialize\\|module.exports' db/database.js && grep -n 'getAllExpenses' db/database.js && grep -n 'createExpense' db/database.js && echo CONTRACT_OK"
+        updateExpense(id, { amount, description, category }) → { id, amount, description, category, created_at, updated_at } | null
+      verify: "grep -n 'function initialize\\|exports.initialize\\|module.exports' db/database.js && grep -n 'getAllExpenses' db/database.js && grep -n 'createExpense' db/database.js && grep -n 'updateExpense' db/database.js && echo CONTRACT_OK"
     - artifact: "server.js"
       exports: ["HTTP server on PORT", "express app"]
       shape: |
@@ -78,13 +79,13 @@ Create the project scaffold, SQLite database schema, and storage layer for the E
 
 Purpose: Establish the persistent storage foundation (F2) that all subsequent waves (API, UI, integration) depend on. The database schema, storage functions, and project entry point must exist and be proven correct before any API routes or UI can be built.
 
-Output: A runnable Node.js project with `package.json`, a storage layer (`db/database.js`) exposing `initialize`, `getAllExpenses`, and `createExpense`, a server entry point (`server.js`) that boots the DB and starts Express, and the `data/` directory for the SQLite file.
+Output: A runnable Node.js project with `package.json`, a storage layer (`db/database.js`) exposing `initialize`, `getAllExpenses`, `createExpense`, and `updateExpense`, a server entry point (`server.js`) that boots the DB and starts Express, and the `data/` directory for the SQLite file.
 </objective>
 
 <feature_dependencies>
 Implements: F2: Persistent Storage — SQLite schema, storage layer, automatic initialization
 Depends on: None
-Enables: F0: Expense Entry (needs createExpense), F3: Expense List Display (needs getAllExpenses), F4: Total Amount Display (needs getAllExpenses data), F5: Web-Based UI (needs server.js running Express)
+Enables: F0: Expense Entry (needs createExpense), F1: Expense Editing (needs updateExpense), F3: Expense List Display (needs getAllExpenses), F4: Total Amount Display (needs getAllExpenses data), F5: Web-Based UI (needs server.js running Express)
 </feature_dependencies>
 
 <context>
@@ -172,9 +173,18 @@ CREATE INDEX IF NOT EXISTS idx_expenses_created_at ON expenses (created_at DESC)
 
 All queries MUST use parameterized statements (prepared statements via `db.prepare()`). NEVER use string concatenation for SQL. This is the SQL injection prevention mandated by TechArch §5.
 
-**Important — NO `updateExpense` function.** F1 (Expense Editing) is deferred per SCOPE-DECISION.md. Do not implement `updateExpense`, do not add a PUT-related query.
+- **`updateExpense(id, { amount, description, category })`**: Updates an existing record. Steps:
+  1. Generate `updated_at` as `new Date().toISOString()` (ISO 8601 UTC). Do NOT modify `created_at`.
+  2. Use a prepared statement:
+  ```sql
+  UPDATE expenses SET amount = ?, description = ?, category = ?, updated_at = ?
+  WHERE id = ?;
+  ```
+  3. After `stmt.run(...)`, check `info.changes` — if 0, the expense was not found; return `null`
+  4. If `info.changes === 1`, fetch and return the full updated row (using a prepared `SELECT ... WHERE id = ?`)
+  5. On error, throw with context for `ERR_STORAGE_WRITE`
 
-Module pattern: Use `module.exports = { initialize, getAllExpenses, createExpense }`.
+Module pattern: Use `module.exports = { initialize, getAllExpenses, createExpense, updateExpense }`.
   </action>
   <verify>
 ```bash
@@ -182,7 +192,7 @@ Module pattern: Use `module.exports = { initialize, getAllExpenses, createExpens
 node -e "require('better-sqlite3'); require('express'); console.log('DEPS OK')"
 
 # Storage layer loads without error
-node -e "const db = require('./db/database'); console.log(typeof db.initialize, typeof db.getAllExpenses, typeof db.createExpense); console.log('MODULE OK')"
+node -e "const db = require('./db/database'); console.log(typeof db.initialize, typeof db.getAllExpenses, typeof db.createExpense, typeof db.updateExpense); console.log('MODULE OK')"
 
 # Initialize creates DB and table
 node -e "
@@ -197,12 +207,27 @@ console.log('INDEX:', idx ? 'OK' : 'MISSING');
 d.close();
 "
 
-# Create and retrieve an expense
+# Create, update, and retrieve an expense
 node -e "
 const db = require('./db/database');
 db.initialize();
 const created = db.createExpense({ amount: 1050, description: 'Test lunch', category: 'Food' });
 console.log('CREATED:', JSON.stringify(created));
+
+// Test updateExpense
+const updated = db.updateExpense(created.id, { amount: 2000, description: 'Updated lunch', category: 'Dining' });
+console.log('UPDATED:', JSON.stringify(updated));
+if (updated && updated.amount === 2000 && updated.description === 'Updated lunch' && updated.category === 'Dining' && updated.created_at === created.created_at && updated.updated_at !== created.updated_at) {
+  console.log('UPDATE CONTRACT OK');
+}
+
+// Test updateExpense with non-existent ID
+const notFound = db.updateExpense(99999, { amount: 100, description: 'nope', category: 'nope' });
+console.log('NOT FOUND:', notFound);
+if (notFound === null) {
+  console.log('UPDATE NOT FOUND CONTRACT OK');
+}
+
 const all = db.getAllExpenses();
 console.log('ALL COUNT:', all.length);
 console.log('FIRST:', JSON.stringify(all[0]));
@@ -221,19 +246,21 @@ rm -f ./data/expenses.db
   <done>
 - `package.json` exists with express, better-sqlite3, helmet as dependencies
 - `npm install` succeeds, `node_modules/` populated
-- `db/database.js` exports `initialize`, `getAllExpenses`, `createExpense` (no `updateExpense`)
+- `db/database.js` exports `initialize`, `getAllExpenses`, `createExpense`, `updateExpense`
 - `initialize()` creates `data/expenses.db` with `expenses` table matching TechArch DDL exactly (CHECK constraints, AUTOINCREMENT, index)
 - WAL mode enabled
 - `createExpense` inserts a row and returns the full record with server-generated `id`, `created_at`, `updated_at`
 - `getAllExpenses` returns rows ordered by `created_at DESC`
 - All SQL uses parameterized prepared statements (no string concatenation)
+- `updateExpense` updates a row by ID and returns the full updated record with new `updated_at`; returns `null` if ID not found
+- `updateExpense` does NOT modify `created_at` (immutable)
 - `data/.gitkeep` exists; `data/expenses.db` is in `.gitignore`
   </done>
 
   <feature_dependencies>
   Implements: F2: Persistent Storage — SQLite schema with CHECK constraints, storage layer functions, automatic initialization
   Depends on: None
-  Enables: F0 (createExpense), F3 (getAllExpenses), F4 (data for total calculation)
+  Enables: F0 (createExpense), F1 (updateExpense), F3 (getAllExpenses), F4 (data for total calculation)
   </feature_dependencies>
 </task>
 
@@ -337,13 +364,12 @@ echo "VERIFY COMPLETE"
 - `data/expenses.db` is created on first run and persists after server stops
 - `.gitignore` excludes `node_modules/`, `data/expenses.db`, and WAL files
 - No API routes, no helmet, no error handler (those are Wave 2)
-- No PUT endpoint, no updateExpense usage (F1 deferred)
   </done>
 
   <feature_dependencies>
   Implements: F2: Persistent Storage — server-side initialization, automatic schema creation on first run, process exits on storage failure
   Depends on: None (Task 1 creates db/database.js, but both tasks are in the same plan/wave)
-  Enables: F5 (server entry point for Express app, static serving ready), F0/F3 (server ready for API route mounting in Wave 2)
+  Enables: F5 (server entry point for Express app, static serving ready), F0/F1/F3 (server ready for API route mounting in Wave 2)
   </feature_dependencies>
 </task>
 
@@ -370,17 +396,26 @@ echo "VERIFY COMPLETE"
 # Full integration check: install, start, create, retrieve, restart-persist
 npm install
 
-# Start server, create an expense via storage layer, verify persistence
+# Start server, create/update an expense via storage layer, verify persistence
 node -e "
 const db = require('./db/database');
 db.initialize();
 const e1 = db.createExpense({ amount: 2500, description: 'Coffee', category: 'Food' });
 const e2 = db.createExpense({ amount: 15000, description: 'Book', category: 'Education' });
 console.log('Created:', e1.id, e2.id);
+
+// Update e1
+const u1 = db.updateExpense(e1.id, { amount: 3000, description: 'Latte', category: 'Drinks' });
+console.log('Updated:', u1.amount === 3000, u1.description === 'Latte');
+
+// Update non-existent
+const nf = db.updateExpense(99999, { amount: 100, description: 'x', category: 'x' });
+console.log('Not found:', nf === null);
+
 const all = db.getAllExpenses();
 console.log('Count:', all.length);
 console.log('Order OK:', all[0].id === e2.id && all[1].id === e1.id);
-console.log('Amounts OK:', all[0].amount === 15000 && all[1].amount === 2500);
+console.log('Updated amount OK:', all[1].amount === 3000);
 "
 
 # Verify data persists by reopening
@@ -406,14 +441,14 @@ rm -f data/expenses.db data/expenses.db-wal data/expenses.db-shm
 <success_criteria>
 1. `npm install` completes without errors
 2. `node server.js` starts, creates `data/expenses.db`, logs initialization and listening messages, and exits cleanly on SIGTERM
-3. `db/database.js` exports exactly three functions: `initialize`, `getAllExpenses`, `createExpense` — no `updateExpense`
+3. `db/database.js` exports exactly four functions: `initialize`, `getAllExpenses`, `createExpense`, `updateExpense`
 4. The `expenses` table has the exact schema from TechArch DDL: `id INTEGER PRIMARY KEY AUTOINCREMENT`, `amount INTEGER NOT NULL CHECK(amount > 0 AND amount <= 99999999)`, `description TEXT NOT NULL CHECK(...)`, `category TEXT NOT NULL CHECK(...)`, `created_at TEXT NOT NULL`, `updated_at TEXT NOT NULL`
 5. The `idx_expenses_created_at` index exists on `created_at DESC`
 6. `createExpense` returns a complete row with server-generated `id`, `created_at`, `updated_at`
 7. `getAllExpenses` returns rows ordered by `created_at DESC`
 8. Data survives `initialize()` being called again (idempotent — `CREATE TABLE IF NOT EXISTS`)
 9. All SQL uses parameterized prepared statements
-10. No Expense Editing artifacts (deferred, out of scope): no `updateExpense`, no PUT-related code
+10. `updateExpense(id, data)` updates the record with the given ID, returns the full updated row or `null` if not found; `created_at` is immutable, `updated_at` is set to current UTC time
 </success_criteria>
 
 <output>

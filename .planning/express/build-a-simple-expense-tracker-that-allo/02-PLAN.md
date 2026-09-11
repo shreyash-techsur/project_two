@@ -13,9 +13,9 @@ files_modified:
 autonomous: true
 
 features:
-  implements: ["F0", "F2", "F3", "F4", "F5"]
+  implements: ["F0", "F1", "F2", "F3", "F4", "F5"]
   depends_on: ["F2"]
-  enables: ["F0", "F3", "F4", "F5"]
+  enables: ["F0", "F1", "F3", "F4", "F5"]
 
 must_haves:
   truths:
@@ -23,15 +23,18 @@ must_haves:
     - "GET /api/expenses returns all expenses ordered by created_at DESC"
     - "POST /api/expenses with valid body returns 201 with { expense: {...} } including server-generated id, created_at, updated_at"
     - "POST /api/expenses converts dollar amount to integer cents before storage"
-    - "POST /api/expenses with invalid body returns 400 with structured error codes matching FRD Y2"
+    - "PUT /api/expenses/:id with valid body returns 200 with { expense: {...} } including updated updated_at"
+    - "PUT /api/expenses/:id converts dollar amount to integer cents before storage"
+    - "PUT /api/expenses/:id with non-existent ID returns 404 with ERR_EXPENSE_NOT_FOUND"
+    - "PUT /api/expenses/:id with invalid ID returns 400 with ERR_EXPENSE_INVALID_ID"
+    - "POST and PUT with invalid body return 400 with structured error codes matching FRD Y2"
     - "Multiple validation errors returned simultaneously in errors array"
     - "Server errors return 500 with sanitized message, no stack traces"
     - "Security headers are set via helmet middleware"
     - "Static files are served from public/ on the root path"
-    - "No PUT endpoint exists (F1 deferred)"
   artifacts:
     - path: "routes/expenses.js"
-      provides: "Express router with GET /api/expenses and POST /api/expenses"
+      provides: "Express router with GET /api/expenses, POST /api/expenses, and PUT /api/expenses/:id"
       exports: ["router"]
     - path: "middleware/validate.js"
       provides: "Validation middleware for expense input (amount, description, category)"
@@ -67,8 +70,8 @@ integration_contracts:
   requires:
     - from_plan: "01"
       artifact: "db/database.js"
-      exports: ["initialize", "getAllExpenses", "createExpense"]
-      verify: "grep -n 'getAllExpenses' db/database.js && grep -n 'createExpense' db/database.js && echo CONTRACT_OK"
+      exports: ["initialize", "getAllExpenses", "createExpense", "updateExpense"]
+      verify: "grep -n 'getAllExpenses' db/database.js && grep -n 'createExpense' db/database.js && grep -n 'updateExpense' db/database.js && echo CONTRACT_OK"
     - from_plan: "01"
       artifact: "server.js"
       exports: ["HTTP server on PORT", "express app"]
@@ -84,8 +87,8 @@ integration_contracts:
         Express.Router with:
           GET  / → calls getAllExpenses(), returns { expenses: [...] } (200)
           POST / → uses validateExpenseInput middleware, converts amount dollars→cents, calls createExpense(), returns { expense: {...} } (201)
-        No PUT route.
-      verify: "grep -n 'router.get' routes/expenses.js && grep -n 'router.post' routes/expenses.js && ! grep -n 'router.put' routes/expenses.js && echo CONTRACT_OK"
+          PUT  /:id → validates ID, uses validateExpenseInput middleware, converts amount dollars→cents, calls updateExpense(), returns { expense: {...} } (200) or 404/400
+      verify: "grep -n 'router.get' routes/expenses.js && grep -n 'router.post' routes/expenses.js && grep -n 'router.put' routes/expenses.js && echo CONTRACT_OK"
     - artifact: "middleware/validate.js"
       exports: ["validateExpenseInput"]
       shape: |
@@ -115,17 +118,17 @@ integration_contracts:
 ---
 
 <objective>
-Build the Express.js REST API layer: GET /api/expenses (list) and POST /api/expenses (create) with full validation, error handling, security headers, and integration tests.
+Build the Express.js REST API layer: GET /api/expenses (list), POST /api/expenses (create), and PUT /api/expenses/:id (update) with full validation, error handling, security headers, and integration tests.
 
-Purpose: Implement the backend API surface (F0, F3, F4, F5) on top of the storage foundation (F2 from Wave 1). After this wave, the server accepts HTTP requests to create and list expenses with complete validation matching the FRD error catalog, sanitized error responses, and security headers. This is the contract the frontend (Wave 3) will consume.
+Purpose: Implement the backend API surface (F0, F1, F3, F4, F5) on top of the storage foundation (F2 from Wave 1). After this wave, the server accepts HTTP requests to create, update, and list expenses with complete validation matching the FRD error catalog, sanitized error responses, and security headers. This is the contract the frontend (Wave 3) will consume.
 
-Output: `routes/expenses.js` (API router), `middleware/validate.js` (input validation), `middleware/errorHandler.js` (global error handler), updated `server.js` (mounts all middleware and routes), and `tests/api.test.js` (integration tests proving the API contract).
+Output: `routes/expenses.js` (API router with GET, POST, PUT), `middleware/validate.js` (input validation), `middleware/errorHandler.js` (global error handler), updated `server.js` (mounts all middleware and routes), and `tests/api.test.js` (integration tests proving the API contract).
 </objective>
 
 <feature_dependencies>
-Implements: F0: Expense Entry (POST /api/expenses with dollar-to-cents conversion and full validation), F2: Persistent Storage (write-before-acknowledge pattern via storage layer), F3: Expense List Display (GET /api/expenses ordered by created_at DESC), F4: Total Amount Display (amounts in cents returned via GET for client-side summing), F5: Web-Based UI (helmet security headers, static serving, same-origin API)
-Depends on: F2: Persistent Storage (db/database.js with initialize, getAllExpenses, createExpense from Wave 1)
-Enables: F0 (frontend can POST expenses), F3 (frontend can GET expenses), F4 (frontend can sum amounts), F5 (frontend served from same origin with security headers)
+Implements: F0: Expense Entry (POST /api/expenses with dollar-to-cents conversion and full validation), F1: Expense Editing (PUT /api/expenses/:id with ID validation, not-found handling, dollar-to-cents conversion), F2: Persistent Storage (write-before-acknowledge pattern via storage layer), F3: Expense List Display (GET /api/expenses ordered by created_at DESC), F4: Total Amount Display (amounts in cents returned via GET for client-side summing), F5: Web-Based UI (helmet security headers, static serving, same-origin API)
+Depends on: F2: Persistent Storage (db/database.js with initialize, getAllExpenses, createExpense, updateExpense from Wave 1)
+Enables: F0 (frontend can POST expenses), F1 (frontend can PUT expenses), F3 (frontend can GET expenses), F4 (frontend can sum amounts), F5 (frontend served from same origin with security headers)
 </feature_dependencies>
 
 <context>
@@ -212,7 +215,7 @@ module.exports = { validateExpenseInput };
 
 The validation collects ALL errors and returns them in a single response (FRD Y1 §Create Expense: "Multiple validation errors may be returned as an array"). The error codes and messages match FRD Y2 EXACTLY — do NOT paraphrase.
 
-**IMPORTANT — NO PUT/ID validation (deferred, out of scope).** Do not implement `ERR_EXPENSE_INVALID_ID` or `ERR_EXPENSE_NOT_FOUND` handling. Editing is deferred, out of scope.
+**ID Validation for PUT route:** Also implement ID path parameter validation for the PUT endpoint. The `:id` must be a positive integer. If not, return 400 with `ERR_EXPENSE_INVALID_ID`. This can be a separate middleware or inline in the route handler.
 
 **2. Create `middleware/errorHandler.js`** — global Express error-handling middleware.
 
@@ -290,6 +293,46 @@ router.post('/', validateExpenseInput, (req, res, next) => {
   }
 });
 
+// PUT /api/expenses/:id — Update an existing expense
+// FRD F1: Request { amount (dollars), description, category }
+// Response 200 OK with { expense: {...} } or 404 if not found
+router.put('/:id', validateExpenseInput, (req, res, next) => {
+  try {
+    // Validate ID parameter
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id) || id <= 0 || String(id) !== req.params.id) {
+      return res.status(400).json({
+        error: { code: 'ERR_EXPENSE_INVALID_ID', message: 'Invalid expense ID' }
+      });
+    }
+
+    const { amount, description, category } = req.body;
+
+    // Convert dollar amount to integer cents
+    const amountCents = Math.round(parseFloat(amount) * 100);
+
+    // Trim description and category before storage
+    const trimmedDescription = description.trim();
+    const trimmedCategory = category.trim();
+
+    const expense = database.updateExpense(id, {
+      amount: amountCents,
+      description: trimmedDescription,
+      category: trimmedCategory
+    });
+
+    if (expense === null) {
+      return res.status(404).json({
+        error: { code: 'ERR_EXPENSE_NOT_FOUND', message: 'Expense not found' }
+      });
+    }
+
+    res.status(200).json({ expense });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
 ```
 
@@ -297,9 +340,10 @@ Key contract points:
 - GET returns `{ expenses: [...] }` (TechArch §4 ListExpensesResponse interface). Empty array when no expenses, NOT null.
 - POST accepts `amount` as **dollars** (e.g., `10.50`), converts to **cents** (`1050`) via `Math.round(parseFloat(amount) * 100)`. This is the dollar-to-cents conversion from FRD F0 step 9 and TechArch §3.
 - POST returns `{ expense: {...} }` (TechArch §4 ExpenseResponse interface) with status 201.
+- PUT accepts `amount` as **dollars**, converts to **cents**, validates `:id` as positive integer, returns 200 with updated expense or 404 if not found, or 400 if ID is invalid.
+- PUT does NOT modify `created_at` — only `updated_at` is set to current UTC time.
 - Description and category are trimmed before storage (FRD Y0 Data Integrity Rules).
 - Errors are forwarded to `next(err)` for the global error handler.
-- **NO `router.put` — F1 is deferred.**
 
 **4. Update `server.js`** — mount helmet, API routes, and error handler.
 
@@ -357,7 +401,6 @@ Middleware order matters (TechArch §2):
 Bind to `0.0.0.0` (not just localhost) per constraints for sandbox accessibility.
 
 **Do NOT add:**
-- Any PUT-related route or middleware (F1 deferred)
 - Any authentication middleware (out of scope per TechArch §5)
   </action>
   <verify>
@@ -365,8 +408,8 @@ Bind to `0.0.0.0` (not just localhost) per constraints for sandbox accessibility
 # Verify files exist
 test -f middleware/validate.js && test -f middleware/errorHandler.js && test -f routes/expenses.js && echo "FILES OK"
 
-# Verify no PUT route
-! grep -n 'router\.put\|app\.put' routes/expenses.js server.js && echo "NO PUT OK"
+# Verify PUT route exists
+grep -n 'router\.put' routes/expenses.js && echo "PUT ROUTE OK"
 
 # Verify validation error codes match FRD Y2 exactly
 grep -c 'ERR_EXPENSE_AMOUNT_REQUIRED' middleware/validate.js && \
@@ -447,18 +490,19 @@ echo "VERIFY COMPLETE"
 - All error codes match FRD Y2 EXACTLY: ERR_EXPENSE_AMOUNT_REQUIRED, ERR_EXPENSE_INVALID_AMOUNT, ERR_EXPENSE_AMOUNT_POSITIVE, ERR_EXPENSE_AMOUNT_TOO_LARGE, ERR_EXPENSE_AMOUNT_PRECISION, ERR_EXPENSE_DESC_REQUIRED, ERR_EXPENSE_DESC_TOO_LONG, ERR_EXPENSE_CAT_REQUIRED, ERR_EXPENSE_CAT_TOO_LONG
 - Multiple validation errors returned simultaneously in `{ errors: [...] }` array format
 - `middleware/errorHandler.js` exports `errorHandler` that logs full error server-side, returns sanitized 500 with ERR_STORAGE_READ or ERR_STORAGE_WRITE — no stack traces
-- `routes/expenses.js` exports Express router with GET / and POST / (mounted at /api/expenses)
+- `routes/expenses.js` exports Express router with GET /, POST /, and PUT /:id (mounted at /api/expenses)
 - GET returns `{ expenses: [...] }` with 200, expenses ordered by created_at DESC
 - POST accepts amount in dollars, converts to cents via `Math.round(parseFloat(amount) * 100)`, trims description/category, returns `{ expense: {...} }` with 201
+- PUT accepts amount in dollars, converts to cents, validates :id as positive integer, trims description/category, returns `{ expense: {...} }` with 200, or 404 with ERR_EXPENSE_NOT_FOUND, or 400 with ERR_EXPENSE_INVALID_ID
+- PUT does NOT modify created_at — only updated_at is set to current UTC time
 - `server.js` updated with helmet(), /api/expenses route, errorHandler middleware in correct order
 - Server binds to 0.0.0.0 on PORT (default 3000)
-- No PUT endpoint, no F1-related code anywhere
   </done>
 
   <feature_dependencies>
-  Implements: F0: Expense Entry (POST /api/expenses with validation and dollar-to-cents conversion), F2: Persistent Storage (write-before-acknowledge via createExpense), F3: Expense List Display (GET /api/expenses returning ordered expenses), F4: Total Amount Display (amounts in cents via GET response for client-side summing), F5: Web-Based UI (helmet security headers, static serving, same-origin API)
+  Implements: F0: Expense Entry (POST /api/expenses with validation and dollar-to-cents conversion), F1: Expense Editing (PUT /api/expenses/:id with ID validation, not-found handling), F2: Persistent Storage (write-before-acknowledge via createExpense/updateExpense), F3: Expense List Display (GET /api/expenses returning ordered expenses), F4: Total Amount Display (amounts in cents via GET response for client-side summing), F5: Web-Based UI (helmet security headers, static serving, same-origin API)
   Depends on: F2 (db/database.js from Wave 1)
-  Enables: F0, F3, F4, F5 (frontend in Wave 3 consumes these endpoints)
+  Enables: F0, F1, F3, F4, F5 (frontend in Wave 3 consumes these endpoints)
   </feature_dependencies>
 </task>
 
@@ -503,13 +547,25 @@ Test cases covering the API contract:
 16. Non-numeric amount (e.g., "abc") returns ERR_EXPENSE_INVALID_AMOUNT
 17. Whitespace-only description returns ERR_EXPENSE_DESC_REQUIRED
 
+**PUT /api/expenses/:id — happy path:**
+18. Returns 200 with `{ expense: {...} }` for valid update
+19. Amount is converted from dollars to cents (send 15.00, get back 1500)
+20. Description and category are trimmed before storage
+21. `created_at` is unchanged after update; `updated_at` is updated
+22. Response includes the full updated expense object
+
+**PUT /api/expenses/:id — error cases:**
+23. Non-existent ID returns 404 with ERR_EXPENSE_NOT_FOUND
+24. Invalid ID (e.g., "abc", "-1", "0") returns 400 with ERR_EXPENSE_INVALID_ID
+25. Validation errors (empty body) returns 400 with errors array (same as POST)
+
 **Security:**
-18. Response headers include security headers from helmet (X-Content-Type-Options: nosniff at minimum)
-19. No PUT endpoint exists — PUT /api/expenses/1 returns 404 (Express default for unmatched routes)
+26. Response headers include security headers from helmet (X-Content-Type-Options: nosniff at minimum)
 
 **Error response format:**
-20. Validation errors use `{ errors: [...] }` format (array)
-21. Each error object has `code` and `message` fields
+27. Validation errors use `{ errors: [...] }` format (array)
+28. Each error object has `code` and `message` fields
+29. Not-found and invalid-ID errors use `{ error: { code, message } }` format (singular object)
 
 Use `process.env.DB_PATH` set to a test-specific path (e.g., `./data/test-expenses.db`) so tests don't interfere with development data. Clean up the test DB file after tests complete.
 
@@ -534,16 +590,16 @@ rm -f ./data/test-expenses.db ./data/test-expenses.db-wal ./data/test-expenses.d
 ```
   </verify>
   <done>
-- `tests/api.test.js` exists with integration tests covering GET, POST, validation, error format, and security headers
+- `tests/api.test.js` exists with integration tests covering GET, POST, PUT, validation, error format, and security headers
 - Tests use a separate test database (DB_PATH=./data/test-expenses.db)
 - `npm test` runs all tests and they pass (0 failures)
-- Tests cover: empty list, create expense, dollar-to-cents conversion, trimming, all 9 validation error codes, multiple errors in array, security headers, no PUT endpoint
+- Tests cover: empty list, create expense, update expense, dollar-to-cents conversion, trimming, all 9 validation error codes, multiple errors in array, ERR_EXPENSE_NOT_FOUND (404), ERR_EXPENSE_INVALID_ID (400), security headers
 - Test DB is cleaned up after test run
 - `package.json` has `"test"` script configured
   </done>
 
   <feature_dependencies>
-  Implements: F0: Expense Entry (tests verify POST creates expenses correctly), F2: Persistent Storage (tests verify data persists across requests), F3: Expense List Display (tests verify GET returns correct data), F4: Total Amount Display (tests verify amounts in cents), F5: Web-Based UI (tests verify security headers)
+  Implements: F0: Expense Entry (tests verify POST creates expenses correctly), F1: Expense Editing (tests verify PUT updates expenses correctly, 404 on not found, 400 on invalid ID), F2: Persistent Storage (tests verify data persists across requests), F3: Expense List Display (tests verify GET returns correct data), F4: Total Amount Display (tests verify amounts in cents), F5: Web-Based UI (tests verify security headers)
   Depends on: F2 (storage layer from Wave 1), routes/expenses.js (Task 1 of this plan)
   Enables: Regression safety for Wave 3 and Wave 4 — tests become permanent verification assets
   </feature_dependencies>
@@ -563,12 +619,12 @@ rm -f ./data/test-expenses.db ./data/test-expenses.db-wal ./data/test-expenses.d
 
 | Threat ID | Category | Component | Disposition | Mitigation Plan |
 |-----------|----------|-----------|-------------|-----------------|
-| T-02-01 | Tampering (SQL Injection) | routes/expenses.js → db/database.js | mitigate | Route handler passes only validated, typed values (amountCents as integer, trimmed strings) to `createExpense()`. Storage layer uses `db.prepare()` with `?` parameters exclusively (inherited from Wave 1). No user input reaches SQL via string interpolation. |
+| T-02-01 | Tampering (SQL Injection) | routes/expenses.js → db/database.js | mitigate | Route handler passes only validated, typed values (amountCents as integer, trimmed strings) to `createExpense()` and `updateExpense()`. Storage layer uses `db.prepare()` with `?` parameters exclusively (inherited from Wave 1). No user input reaches SQL via string interpolation. The `:id` parameter is parsed via `parseInt()` and validated as a positive integer before use. |
 | T-02-02 | Tampering (Input Manipulation) | middleware/validate.js | mitigate | `validateExpenseInput` validates ALL fields server-side before any mutation. Amount checked for type, range, precision. Description/category checked for presence, type, length. Client validation is convenience only — server validation is authoritative (TechArch §1, FRD Y2). |
 | T-02-03 | Information Disclosure (Stack Traces) | middleware/errorHandler.js | mitigate | `errorHandler` logs `err` (with stack) to `console.error` server-side only. HTTP 500 response contains only `{ error: { code, message } }` — no stack traces, no file paths, no internal details (TechArch §5). |
 | T-02-04 | Information Disclosure (Security Headers) | server.js — helmet middleware | mitigate | `helmet()` sets X-Content-Type-Options: nosniff, X-Frame-Options: DENY, CSP: default-src 'self', and disables legacy X-XSS-Protection. Mounted first in middleware chain so all responses get headers. |
 | T-02-05 | Denial of Service (Large Payloads) | server.js — express.json() | mitigate | Express.json() has a default body size limit of 100KB. For this single-user app with max field sizes (500 chars + 100 chars + number), this is more than adequate. No additional limit needed for MVP. |
-| T-02-06 | Elevation of Privilege | routes/expenses.js — no PUT endpoint | accept | No PUT endpoint exists (F1 deferred). The only mutation is POST (create). Risk of unauthorized modification is zero because the modification endpoint doesn't exist. Owner: scope decision (SCOPE-DECISION.md). |
+| T-02-06 | Tampering (ID manipulation on PUT) | routes/expenses.js — PUT /:id | mitigate | The `:id` parameter is validated as a positive integer via `parseInt()` with strict comparison against the original string. Non-integer, negative, or zero IDs return 400 with `ERR_EXPENSE_INVALID_ID`. Non-existent IDs return 404 with `ERR_EXPENSE_NOT_FOUND`. No authorization check needed (single-user app per TechArch §5). |
 </threat_model>
 
 <verification>
@@ -627,9 +683,25 @@ console.log('5b. Multiple errors: PASS');
 HEADERS=$(curl -sI http://localhost:3000/api/expenses)
 echo "$HEADERS" | grep -qi "x-content-type-options" && echo "6. Security headers: PASS" || echo "6. Security headers: FAIL"
 
-# 7. No PUT endpoint
-PUT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X PUT http://localhost:3000/api/expenses/1 -H 'Content-Type: application/json' -d '{"amount":5,"description":"test","category":"test"}')
-test "$PUT_STATUS" = "404" && echo "7. No PUT: PASS" || echo "7. No PUT: FAIL (got $PUT_STATUS)"
+# 7. PUT endpoint works — update the first expense
+PUT_RESPONSE=$(curl -s -X PUT http://localhost:3000/api/expenses/1 -H 'Content-Type: application/json' -d '{"amount":15.00,"description":"Updated Lunch","category":"Dining"}')
+echo "$PUT_RESPONSE" | node -e "
+const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+const e=d.expense;
+if(e.amount===1500 && e.description==='Updated Lunch') {
+  console.log('7a. PUT update: PASS');
+} else {
+  console.log('7a. PUT update: FAIL');
+}
+"
+
+# 7b. PUT with non-existent ID returns 404
+PUT_404=$(curl -s -o /dev/null -w "%{http_code}" -X PUT http://localhost:3000/api/expenses/99999 -H 'Content-Type: application/json' -d '{"amount":5,"description":"test","category":"test"}')
+test "$PUT_404" = "404" && echo "7b. PUT 404: PASS" || echo "7b. PUT 404: FAIL (got $PUT_404)"
+
+# 7c. PUT with invalid ID returns 400
+PUT_400=$(curl -s -o /dev/null -w "%{http_code}" -X PUT http://localhost:3000/api/expenses/abc -H 'Content-Type: application/json' -d '{"amount":5,"description":"test","category":"test"}')
+test "$PUT_400" = "400" && echo "7c. PUT invalid ID: PASS" || echo "7c. PUT invalid ID: FAIL (got $PUT_400)"
 
 kill $SERVER_PID 2>/dev/null
 wait $SERVER_PID 2>/dev/null
@@ -654,8 +726,10 @@ rm -f data/test-expenses.db data/test-expenses.db-wal data/test-expenses.db-shm
 7. Server errors return 500 with `{ error: { code, message } }` — no stack traces
 8. Helmet security headers present on all responses
 9. `npm test` passes all integration tests
-10. No PUT endpoint — `PUT /api/expenses/:id` returns 404
-11. Server binds to 0.0.0.0 on PORT (default 3000)
+10. `PUT /api/expenses/:id` with valid body returns 200 with updated expense (amount in cents, updated_at changed, created_at unchanged)
+11. `PUT /api/expenses/:id` with non-existent ID returns 404 with `ERR_EXPENSE_NOT_FOUND`
+12. `PUT /api/expenses/:id` with invalid ID returns 400 with `ERR_EXPENSE_INVALID_ID`
+13. Server binds to 0.0.0.0 on PORT (default 3000)
 </success_criteria>
 
 <output>
