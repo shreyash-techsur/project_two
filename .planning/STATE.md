@@ -3,7 +3,7 @@
 **Workflow Mode:** spec-express
 **Current Milestone:** v1
 **Status:** in-progress
-**Last activity:** 2026-09-11 - Completed express task: Build a simple expense tracker
+**Last activity:** 2026-09-11 - UAT verified express task build-a-simple-expense-tracker-that-allo (41/41 passed, 2 fix cycles)
 
 ---
 
@@ -42,9 +42,9 @@ Spec documents were generated in `project_specs/` during initialization. Use `/p
 
 ### Express Tasks Completed
 
-| # | Description | Date | Commit | Scope | Directory |
-|---|-------------|------|--------|-------|-----------|
-| build-a-simple-expense-tracker-that-allo | Build a simple expense tracker with add, view, and total features | 2026-09-11 | cdbdaf6 | mvp 5/6 | [build-a-simple-expense-tracker-that-allo](./express/build-a-simple-expense-tracker-that-allo/) |
+| # | Description | Date | Commit | Scope | UAT | Directory |
+|---|-------------|------|--------|-------|-----|-----------|
+| build-a-simple-expense-tracker-that-allo | Build a simple expense tracker with add, view, and total features | 2026-09-11 | cdbdaf6 | mvp 5/6 | 41/41 | [build-a-simple-expense-tracker-that-allo](./express/build-a-simple-expense-tracker-that-allo/) |
 
 ## Blockers/Concerns
 
