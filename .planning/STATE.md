@@ -44,7 +44,7 @@ Spec documents were generated in `project_specs/` during initialization. Use `/p
 
 | # | Description | Date | Commit | Scope | UAT | Directory |
 |---|-------------|------|--------|-------|-----|-----------|
-| build-a-simple-expense-tracker-that-allo | Build a simple expense tracker with add, view, and total features | 2026-09-11 | cdbdaf6 | mvp 5/6 | 41/41 | [build-a-simple-expense-tracker-that-allo](./express/build-a-simple-expense-tracker-that-allo/) |
+| build-a-simple-expense-tracker-that-allo | Build a simple expense tracker with add, view, and total features | 2026-09-11 | cdbdaf6 | full | 41/41 | [build-a-simple-expense-tracker-that-allo](./express/build-a-simple-expense-tracker-that-allo/) |
 
 ## Blockers/Concerns
 
