@@ -3,7 +3,7 @@
 **Workflow Mode:** spec-express
 **Current Milestone:** v1
 **Status:** in-progress
-**Last activity:** 2026-09-11 - Completed express plan 02 (REST API layer with validation and tests)
+**Last activity:** 2026-09-11 - Completed express plan 03 (Frontend UI with form, validation, list, total)
 
 ---
 
@@ -17,6 +17,7 @@ Spec documents were generated in `project_specs/` during initialization. Use `/p
 |------|-------------|------|---------|----------|
 | 01 | Project scaffold & SQLite storage layer | 2026-09-11 | 836389b, af5a968 | 2 min |
 | 02 | REST API layer with validation and integration tests | 2026-09-11 | 64f5c9a, 560a494 | 3 min |
+| 03 | Frontend UI with form, validation, list, and total | 2026-09-11 | bf6c2bd, 897255e | 3 min |
 
 ## Decisions
 
@@ -26,6 +27,9 @@ Spec documents were generated in `project_specs/` during initialization. Use `/p
 - Helmet configured with frameguard:false, contentSecurityPolicy:false for iframe preview
 - Used node:test built-in runner — no extra test dependencies
 - server.js uses require.main guard for test importability
+- All user text rendered via textContent (XSS prevention) — never innerHTML
+- Total uses integer cents arithmetic; Intl.NumberFormat for display
+- Client validation mirrors FRD Y2 error catalog; server is authoritative
 
 ## Quick Tasks Completed
 
