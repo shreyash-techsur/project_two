@@ -35,8 +35,11 @@ app.use('/api/expenses', expensesRouter);
 app.use(errorHandler);
 
 // Start server — bind to 0.0.0.0 for container/sandbox access
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Expense Tracker running on http://localhost:${PORT}`);
-});
+// Only auto-listen when run directly (not when required by tests)
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Expense Tracker running on http://localhost:${PORT}`);
+  });
+}
 
 module.exports = app;
