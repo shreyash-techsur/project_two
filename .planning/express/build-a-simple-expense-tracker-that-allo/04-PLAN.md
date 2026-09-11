@@ -11,7 +11,7 @@ files_modified:
 autonomous: true
 
 features:
-  implements: ["F0", "F2", "F3", "F4", "F5"]
+  implements: ["F0", "F1", "F2", "F3", "F4", "F5"]
   depends_on: ["F2"]
   enables: []
 
@@ -19,20 +19,22 @@ must_haves:
   truths:
     - "npm start boots the server and serves the app at http://localhost:3000 in under 10 seconds"
     - "User can add an expense via the form and see it appear in the list with correct currency formatting"
-    - "Total updates immediately after adding an expense"
+    - "User can click Edit on an expense, modify values, save, and see the row update in-place with recalculated total"
+    - "User can cancel an edit and see no changes to the expense or total"
+    - "Total updates immediately after adding or editing an expense"
     - "Form clears after successful submission and focus returns to amount field"
-    - "Multiple expenses can be entered in sequence (batch flow) without page reload"
+    - "Multiple expenses can be entered and edited in sequence without page reload"
     - "Expenses persist across page refresh — all entries remain after reload"
     - "Expenses persist across server restart — all entries survive stop/start cycle"
     - "Empty state shows friendly message and $0.00 total when no expenses exist"
     - "Validation errors display inline when submitting invalid data"
-    - "Playwright E2E tests pass covering the full add-and-view journey"
+    - "Playwright E2E tests pass covering the full add-edit-and-view journey"
   artifacts:
     - path: "playwright.config.js"
       provides: "Playwright configuration targeting http://localhost:3000"
       contains: "baseURL"
     - path: "e2e/expense-tracker.spec.js"
-      provides: "End-to-end tests for the full Daily Expense Capture journey (JRN-01.1)"
+      provides: "End-to-end tests for the full Daily Expense Capture (JRN-01.1) and Correcting a Mistaken Entry (JRN-01.2) journeys"
       contains: "test"
     - path: "package.json"
       provides: "Updated with Playwright devDependency and e2e test script"
@@ -79,8 +81,8 @@ integration_contracts:
       verify: "grep -n 'expense-form' public/index.html && grep -n 'expense-list' public/index.html && grep -n 'total-amount' public/index.html && echo CONTRACT_OK"
     - from_plan: "03"
       artifact: "public/app.js"
-      exports: ["loadExpenses()", "handleSubmit()", "renderExpenses()", "updateTotal()", "validateForm()"]
-      verify: "grep -n 'loadExpenses' public/app.js && grep -n 'handleSubmit' public/app.js && grep -n 'fetch.*api/expenses' public/app.js && echo CONTRACT_OK"
+      exports: ["loadExpenses()", "handleSubmit()", "renderExpenses()", "updateTotal()", "validateForm()", "enterEditMode()", "exitEditMode()"]
+      verify: "grep -n 'loadExpenses' public/app.js && grep -n 'handleSubmit' public/app.js && grep -n 'enterEditMode' public/app.js && grep -n 'fetch.*api/expenses' public/app.js && echo CONTRACT_OK"
     - from_plan: "03"
       artifact: "public/style.css"
       exports: ["Responsive layout styles"]
@@ -92,11 +94,14 @@ integration_contracts:
         Playwright test file with test cases covering:
         - Empty state (page load, $0.00 total, empty state message)
         - Add expense flow (form fill → submit → list update → total update → form clear)
+        - Edit expense flow (Edit button → form populate → modify → save → row update → total update)
+        - Cancel edit flow (Edit button → form populate → Cancel → no changes)
         - Batch entry (add multiple, verify ordering and total accuracy)
-        - Persistence (page refresh retains all data)
-        - Validation errors (inline error display on invalid submit)
+        - Sequential edits (edit multiple expenses in sequence)
+        - Persistence (page refresh retains all data including edits)
+        - Validation errors (inline error display on invalid submit, including during edit)
         - Cents arithmetic accuracy (no floating-point drift)
-      verify: "grep -n 'test.*empty\\|test.*add\\|test.*persist\\|test.*valid' e2e/expense-tracker.spec.js && echo CONTRACT_OK"
+      verify: "grep -n 'test.*empty\\|test.*add\\|test.*edit\\|test.*cancel\\|test.*persist\\|test.*valid' e2e/expense-tracker.spec.js && echo CONTRACT_OK"
     - artifact: "playwright.config.js"
       exports: ["Playwright config with webServer and baseURL"]
       shape: |
@@ -108,15 +113,15 @@ integration_contracts:
 ---
 
 <objective>
-End-to-end integration verification: install Playwright, configure it to launch the app via `npm start`, and write E2E tests that verify the complete Daily Expense Capture journey (JRN-01.1) — single-command startup, add expense flow (form → POST → list → total), batch entry, persistence across page refresh, empty state, validation error display, and cents arithmetic accuracy.
+End-to-end integration verification: install Playwright, configure it to launch the app via `npm start`, and write E2E tests that verify the complete Daily Expense Capture journey (JRN-01.1) and Correcting a Mistaken Entry journey (JRN-01.2) — single-command startup, add expense flow, edit expense flow (Edit button → form populate → save → row update → total recalc), cancel edit flow, batch entry, sequential edits, persistence across page refresh, empty state, validation error display, and cents arithmetic accuracy.
 
-Purpose: Prove that all three prior waves (database, API, frontend) integrate correctly into a working application. The Playwright tests become permanent regression assets that validate the primary user journey end-to-end in a real browser.
+Purpose: Prove that all three prior waves (database, API, frontend) integrate correctly into a working application including the edit workflow. The Playwright tests become permanent regression assets that validate both the add and edit user journeys end-to-end in a real browser.
 
 Output: `playwright.config.js` (configuration), `e2e/expense-tracker.spec.js` (E2E test suite), updated `package.json` (Playwright devDependency and e2e script).
 </objective>
 
 <feature_dependencies>
-Implements: F0: Expense Entry (E2E test proves form → POST → list works), F2: Persistent Storage (E2E test proves data survives page refresh), F3: Expense List Display (E2E test proves list renders with correct data and ordering), F4: Total Amount Display (E2E test proves total accuracy with cents arithmetic), F5: Web-Based UI (E2E test proves single-command startup and full page functionality)
+Implements: F0: Expense Entry (E2E test proves form → POST → list works), F1: Expense Editing (E2E test proves Edit → PUT → row update → total recalc, cancel flow, sequential edits, 404 handling), F2: Persistent Storage (E2E test proves data survives page refresh including edits), F3: Expense List Display (E2E test proves list renders with correct data, ordering, and Edit buttons), F4: Total Amount Display (E2E test proves total accuracy with cents arithmetic after both add and edit), F5: Web-Based UI (E2E test proves single-command startup and full page functionality)
 Depends on: F2: Persistent Storage (database, API, and frontend from Waves 1-3 must all exist)
 Enables: None (final wave — this is the verification capstone)
 </feature_dependencies>
@@ -128,7 +133,7 @@ Enables: None (final wave — this is the verification capstone)
 @.planning/express/build-a-simple-expense-tracker-that-allo/01-PLAN.md (Wave 1 contracts — db/database.js, server.js, package.json)
 @.planning/express/build-a-simple-expense-tracker-that-allo/02-PLAN.md (Wave 2 contracts — API routes, validation, error handling)
 @.planning/express/build-a-simple-expense-tracker-that-allo/03-PLAN.md (Wave 3 contracts — HTML structure, app.js, CSS)
-@.planning/express/build-a-simple-expense-tracker-that-allo/SCOPE-DECISION.md (editing deferred, out of scope — no edit tests)
+@.planning/express/build-a-simple-expense-tracker-that-allo/SCOPE-DECISION.md (F1 included — edit tests required)
 </context>
 
 <tasks>
@@ -201,7 +206,6 @@ Key configuration decisions:
 
 **Do NOT configure:**
 - Multiple browser projects (cross-browser is R2 scope via US-5.4)
-- Any edit-related test patterns (deferred, out of scope)
   </action>
   <verify>
 ```bash
@@ -371,6 +375,145 @@ test('batch entry: add two expenses in sequence, verify ordering and total accur
 });
 ```
 
+**Group 3b: Edit Expense Flow (JRN-01.2 — Correcting a Mistaken Entry)**
+
+```javascript
+test('edit expense: clicking Edit populates form, saving updates row and total', async ({ page }) => {
+  await page.goto('/');
+
+  // First, add an expense
+  await page.locator('#amount').fill('18.50');
+  await page.locator('#description').fill('Pad Thai takeout');
+  await page.locator('#category').fill('Food');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(1);
+  await expect(page.locator('#total-amount')).toContainText('$18.50');
+
+  // Click Edit on the expense
+  await page.locator('.expense-edit-btn').click();
+
+  // Form should be populated with current values
+  await expect(page.locator('#amount')).toHaveValue('18.50');
+  await expect(page.locator('#description')).toHaveValue('Pad Thai takeout');
+  await expect(page.locator('#category')).toHaveValue('Food');
+
+  // UI should be in edit mode
+  await expect(page.locator('#submit-btn')).toHaveText('Save Changes');
+  await expect(page.locator('#cancel-btn')).toBeVisible();
+  await expect(page.locator('#edit-indicator')).toBeVisible();
+
+  // Modify the amount and category (JRN-01.2: correct the mistake)
+  await page.locator('#amount').fill('5.80');
+  await page.locator('#category').fill('Coffee');
+
+  // Save
+  await page.locator('#submit-btn').click();
+
+  // Row should update in-place with new values
+  await expect(page.locator('.expense-amount')).toContainText('$5.80');
+  await expect(page.locator('.expense-category')).toContainText('Coffee');
+  await expect(page.locator('.expense-description')).toContainText('Pad Thai takeout'); // unchanged
+
+  // Total should reflect the edit ($18.50 → $5.80)
+  await expect(page.locator('#total-amount')).toContainText('$5.80');
+
+  // Form should exit edit mode
+  await expect(page.locator('#submit-btn')).toHaveText('Add Expense');
+  await expect(page.locator('#cancel-btn')).not.toBeVisible();
+
+  // Success toast
+  await expect(page.locator('.toast.success')).toContainText('Expense updated');
+});
+
+test('cancel edit: clicking Cancel discards changes, no server call', async ({ page }) => {
+  await page.goto('/');
+
+  // Add an expense
+  await page.locator('#amount').fill('25.00');
+  await page.locator('#description').fill('Grocery shopping');
+  await page.locator('#category').fill('Groceries');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(1);
+
+  // Click Edit
+  await page.locator('.expense-edit-btn').click();
+
+  // Modify the amount
+  await page.locator('#amount').fill('99.99');
+
+  // Click Cancel
+  await page.locator('#cancel-btn').click();
+
+  // Form should return to add mode
+  await expect(page.locator('#submit-btn')).toHaveText('Add Expense');
+  await expect(page.locator('#cancel-btn')).not.toBeVisible();
+  await expect(page.locator('#amount')).toHaveValue('');
+
+  // Original expense unchanged
+  await expect(page.locator('.expense-amount')).toContainText('$25.00');
+  await expect(page.locator('#total-amount')).toContainText('$25.00');
+});
+
+test('sequential edits: edit multiple expenses in sequence', async ({ page }) => {
+  await page.goto('/');
+
+  // Add two expenses
+  await page.locator('#amount').fill('10.00');
+  await page.locator('#description').fill('Coffee');
+  await page.locator('#category').fill('Drinks');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(1);
+
+  await page.locator('#amount').fill('20.00');
+  await page.locator('#description').fill('Lunch');
+  await page.locator('#category').fill('Food');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(2);
+
+  // Total should be $30.00
+  await expect(page.locator('#total-amount')).toContainText('$30.00');
+
+  // Edit first expense (Lunch — most recent, shown first)
+  await page.locator('.expense-edit-btn').first().click();
+  await page.locator('#amount').fill('25.00');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('#submit-btn')).toHaveText('Add Expense'); // exited edit mode
+
+  // Edit second expense (Coffee)
+  await page.locator('.expense-edit-btn').last().click();
+  await page.locator('#amount').fill('15.00');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('#submit-btn')).toHaveText('Add Expense');
+
+  // Total should be $25.00 + $15.00 = $40.00
+  await expect(page.locator('#total-amount')).toContainText('$40.00');
+});
+```
+
+**Group 3c: Edit Mode UI Elements**
+
+```javascript
+test('edit mode: Edit button visible on every expense row', async ({ page }) => {
+  await page.goto('/');
+
+  // Add two expenses
+  await page.locator('#amount').fill('10.00');
+  await page.locator('#description').fill('Coffee');
+  await page.locator('#category').fill('Drinks');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(1);
+
+  await page.locator('#amount').fill('20.00');
+  await page.locator('#description').fill('Lunch');
+  await page.locator('#category').fill('Food');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(2);
+
+  // Both rows should have Edit buttons
+  await expect(page.locator('.expense-edit-btn')).toHaveCount(2);
+});
+```
+
 **Group 4: Persistence Across Page Refresh (F2 verification)**
 
 ```javascript
@@ -395,6 +538,33 @@ test('persistence: expenses survive page refresh', async ({ page }) => {
 
   // Total still correct
   await expect(page.locator('#total-amount')).toContainText('$25.00');
+});
+
+test('persistence: edited expenses survive page refresh', async ({ page }) => {
+  await page.goto('/');
+
+  // Add an expense
+  await page.locator('#amount').fill('50.00');
+  await page.locator('#description').fill('Original');
+  await page.locator('#category').fill('Test');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(1);
+
+  // Edit it
+  await page.locator('.expense-edit-btn').click();
+  await page.locator('#amount').fill('75.00');
+  await page.locator('#description').fill('Edited');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-amount')).toContainText('$75.00');
+
+  // Refresh
+  await page.reload();
+
+  // Edited values persist
+  await expect(page.locator('.expense-row')).toHaveCount(1);
+  await expect(page.locator('.expense-amount')).toContainText('$75.00');
+  await expect(page.locator('.expense-description')).toContainText('Edited');
+  await expect(page.locator('#total-amount')).toContainText('$75.00');
 });
 ```
 
@@ -496,13 +666,9 @@ test('security headers: response includes helmet security headers', async ({ pag
 });
 ```
 
-**What NOT to test (deferred, out of scope):**
-- No edit button tests
-- No edit mode tests
-- No PUT request tests
-- No cancel edit tests
-- No "Total Updates After Editing" tests
-- No test for ERR_EXPENSE_NOT_FOUND or ERR_EXPENSE_INVALID_ID
+**What NOT to test (out of scope):**
+- No authentication tests (auth is out of scope per TechArch §5)
+- No cross-browser tests (Chromium only for MVP)
 
 **Important implementation notes:**
 - Use `page.locator()` (not deprecated `page.$()`) for all element selection
@@ -521,14 +687,14 @@ test -f e2e/expense-tracker.spec.js && echo "TEST FILE EXISTS OK"
 grep -c "test(" e2e/expense-tracker.spec.js | xargs -I{} echo "TEST COUNT: {}"
 grep -n "empty state" e2e/expense-tracker.spec.js && echo "EMPTY STATE TEST OK"
 grep -n "add expense" e2e/expense-tracker.spec.js && echo "ADD EXPENSE TEST OK"
+grep -n "edit expense" e2e/expense-tracker.spec.js && echo "EDIT EXPENSE TEST OK"
+grep -n "cancel edit" e2e/expense-tracker.spec.js && echo "CANCEL EDIT TEST OK"
+grep -n "sequential edits" e2e/expense-tracker.spec.js && echo "SEQUENTIAL EDITS TEST OK"
 grep -n "batch entry" e2e/expense-tracker.spec.js && echo "BATCH TEST OK"
 grep -n "persist" e2e/expense-tracker.spec.js && echo "PERSISTENCE TEST OK"
 grep -n "validation" e2e/expense-tracker.spec.js && echo "VALIDATION TEST OK"
 grep -n "cents arithmetic" e2e/expense-tracker.spec.js && echo "CENTS TEST OK"
 grep -n "security headers" e2e/expense-tracker.spec.js && echo "SECURITY TEST OK"
-
-# Verify NO edit/PUT test references (deferred, out of scope)
-! grep -i 'edit\|PUT\|update.*expense' e2e/expense-tracker.spec.js && echo "NO EDIT TESTS OK" || echo "WARNING: edit reference in tests"
 
 # Ensure DB is clean before running tests
 rm -f data/expenses.db data/expenses.db-wal data/expenses.db-shm
@@ -538,18 +704,17 @@ npx playwright test e2e/expense-tracker.spec.js --reporter=list 2>&1 | tail -30 
 ```
   </verify>
   <done>
-- `e2e/expense-tracker.spec.js` exists with 8+ test cases covering the Daily Expense Capture journey (JRN-01.1)
-- Tests cover: empty state (title, $0.00, message, auto-focus), add expense (form → list → total → form clear → focus return → toast), batch entry (two expenses, ordering, total accuracy), persistence (page refresh retains data), validation (empty form shows inline errors, negative amount rejected), cents arithmetic accuracy (0.10 + 0.20 = $0.30 exactly), submit button state (disabled during request), security headers (X-Content-Type-Options: nosniff)
+- `e2e/expense-tracker.spec.js` exists with 12+ test cases covering the Daily Expense Capture (JRN-01.1) and Correcting a Mistaken Entry (JRN-01.2) journeys
+- Tests cover: empty state (title, $0.00, message, auto-focus), add expense (form → list → total → form clear → focus return → toast), edit expense (Edit button → form populate → modify → save → row update → total recalc → exit edit mode → toast), cancel edit (Edit → modify → Cancel → no changes), sequential edits (edit multiple expenses in sequence), batch entry (two expenses, ordering, total accuracy), persistence (page refresh retains data including edits), edit mode UI (Edit buttons on every row, Save Changes/Cancel buttons, edit indicator), validation (empty form shows inline errors, negative amount rejected), cents arithmetic accuracy (0.10 + 0.20 = $0.30 exactly), submit button state (disabled during request), security headers (X-Content-Type-Options: nosniff)
 - Database cleaned before each test via `beforeEach` hook removing SQLite files
 - Tests use `page.locator()` with Playwright auto-retry assertions
 - All tests pass via `npx playwright test` with 0 failures
-- **No edit/PUT/update tests** (deferred, out of scope per SCOPE-DECISION.md)
 - CommonJS module style (require, not import)
-- Tests verify the INTEGRATION of all prior waves: DB (Wave 1) ↔ API (Wave 2) ↔ UI (Wave 3)
+- Tests verify the INTEGRATION of all prior waves: DB (Wave 1) ↔ API (Wave 2) ↔ UI (Wave 3) including the full edit workflow
   </done>
 
   <feature_dependencies>
-  Implements: F0: Expense Entry (tests prove form → POST → list works end-to-end), F2: Persistent Storage (tests prove data survives page refresh), F3: Expense List Display (tests prove list renders correctly with ordering and empty state), F4: Total Amount Display (tests prove total accuracy with cents arithmetic and $0.00 default), F5: Web-Based UI (tests prove single-command startup, page loads, security headers, form keyboard flow)
+  Implements: F0: Expense Entry (tests prove form → POST → list works end-to-end), F1: Expense Editing (tests prove Edit → PUT → row update → total recalc, cancel flow, sequential edits), F2: Persistent Storage (tests prove data survives page refresh including edits), F3: Expense List Display (tests prove list renders correctly with ordering, empty state, and Edit buttons), F4: Total Amount Display (tests prove total accuracy with cents arithmetic after both add and edit), F5: Web-Based UI (tests prove single-command startup, page loads, security headers, form keyboard flow, edit mode UI)
   Depends on: F2 (all three prior waves must be complete — database, API, and frontend)
   Enables: None (final verification wave)
   </feature_dependencies>
@@ -644,11 +809,11 @@ rm -f data/test-expenses.db data/test-expenses.db-wal data/test-expenses.db-shm
 <success_criteria>
 1. `npm start` boots the server and serves the app at http://localhost:3000 within 10 seconds
 2. `npx playwright test` runs all E2E tests with 0 failures
-3. E2E tests cover: empty state ($0.00, message, auto-focus), add expense (form → list → total → clear → focus → toast), batch entry (ordering + total), persistence (page refresh), validation (inline errors), cents arithmetic ($0.10 + $0.20 = $0.30), submit button state, security headers
-4. Data persists across a full server stop/start cycle (verified by restart test in verification block)
+3. E2E tests cover: empty state ($0.00, message, auto-focus), add expense (form → list → total → clear → focus → toast), edit expense (Edit → populate → modify → save → row update → total recalc → exit edit mode → toast), cancel edit (no changes), sequential edits, batch entry (ordering + total), persistence (page refresh, including edits), edit mode UI (Edit buttons, Save Changes/Cancel), validation (inline errors), cents arithmetic ($0.10 + $0.20 = $0.30), submit button state, security headers
+4. Data persists across a full server stop/start cycle (verified by restart test in verification block), including edited data
 5. Existing `npm test` (API integration tests from Wave 2) still passes — no regression
 6. All test files use CommonJS module style consistent with the project
-7. No edit/PUT-related test code anywhere (deferred, out of scope)
+7. Edit/PUT tests included: edit expense, cancel edit, sequential edits, edit persistence, edit mode UI elements
 8. Database is cleaned before each test for isolation
 9. `playwright.config.js` uses `webServer` to auto-start the app — no manual server startup needed for tests
 10. Single `npx playwright test` command runs the full E2E suite end-to-end

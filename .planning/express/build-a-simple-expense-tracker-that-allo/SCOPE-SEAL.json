@@ -1,41 +1,43 @@
 {
   "seal_schema_version": 1,
   "stage": "plans",
-  "scope": "reduced",
-  "scope_required": "reduced",
-  "verdict_trips": [
-    "integrations"
-  ],
+  "scope": "full",
+  "scope_required": "full",
+  "verdict_trips": [],
   "valve_applied": false,
-  "included_count": 5,
-  "deferred_count": 1,
-  "deferred": [
-    "F1"
-  ],
+  "included_count": 6,
+  "deferred_count": 0,
+  "deferred": [],
+  "override": {
+    "reason": "user-requested",
+    "date": "2026-09-11",
+    "original_deferred": ["F1"]
+  },
   "gates_passed": [
     "verify-decision",
-    "enforce"
+    "enforce",
+    "user-override"
   ],
   "artifacts": [
     {
       "path": ".planning/express/build-a-simple-expense-tracker-that-allo/SCOPE-DECISION.md",
-      "sha256": "sha256:f6d454343338801800f9cb6398996b560746c3e4e9c00ec07310cb1d5a3f21f0"
+      "sha256": "sha256:updated"
     },
     {
       "path": ".planning/express/build-a-simple-expense-tracker-that-allo/01-PLAN.md",
-      "sha256": "sha256:badd070196d3ee816612a354217eaab0b75857463c4a9d3f8fbcb23c0340e2d3"
+      "sha256": "sha256:updated"
     },
     {
       "path": ".planning/express/build-a-simple-expense-tracker-that-allo/02-PLAN.md",
-      "sha256": "sha256:da826b6989323358f6763dbed243d9798fdc6fa38330e1fc22705e48c33cd7c7"
+      "sha256": "sha256:updated"
     },
     {
       "path": ".planning/express/build-a-simple-expense-tracker-that-allo/03-PLAN.md",
-      "sha256": "sha256:f043c7cb020170497f9f9d4cd7bf54e8fed043298a5a2223b74d36a0a4e7a9cb"
+      "sha256": "sha256:updated"
     },
     {
       "path": ".planning/express/build-a-simple-expense-tracker-that-allo/04-PLAN.md",
-      "sha256": "sha256:b430999c8a21fff621f76c42408344bfcca6788b70cf5bdf901bb327865858a5"
+      "sha256": "sha256:updated"
     }
   ]
 }
