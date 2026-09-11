@@ -313,7 +313,6 @@ Key points per TechArch:
 - `helmet` middleware yet (Wave 2 task — it belongs with API security headers)
 - API routes (Wave 2)
 - Error handler middleware (Wave 2)
-- Any PUT endpoint or edit-related code (F1 deferred)
 
 **2. Create/update `.gitignore`**:
 ```

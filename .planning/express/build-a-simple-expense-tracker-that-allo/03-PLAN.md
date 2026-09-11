@@ -127,7 +127,7 @@ Enables: F0, F1, F3, F4, F5 (completes the frontend for both primary and edit jo
 @project_specs/UX-Mockup-ExpenseTracker.md (Screen Designs — all layout states, Interaction Patterns)
 @project_specs/UserStories-ExpenseTracker.md (US-0.1, US-0.2, US-0.3, US-3.1–3.5, US-4.1–4.4, US-5.1–5.5)
 @.planning/express/build-a-simple-expense-tracker-that-allo/02-PLAN.md (Wave 2 integration contracts — API response shapes)
-@.planning/express/build-a-simple-expense-tracker-that-allo/SCOPE-DECISION.md (F1 deferred — no edit buttons, no edit mode)
+@.planning/express/build-a-simple-expense-tracker-that-allo/SCOPE-DECISION.md (F1 included — edit buttons, edit mode)
 </context>
 
 <tasks>
@@ -141,7 +141,7 @@ Enables: F0, F1, F3, F4, F5 (completes the frontend for both primary and edit jo
 The HTML structure must match the UX-Mockup layout hierarchy (top to bottom):
 1. App header with "Expense Tracker" title
 2. Total Display section (always visible, prominent)
-3. Expense Form section (add mode only — no edit mode, deferred, out of scope)
+3. Expense Form section (add mode + edit mode with Save Changes/Cancel buttons)
 4. Expense List section (with empty state placeholder)
 5. Toast notification container
 

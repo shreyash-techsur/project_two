@@ -135,7 +135,7 @@ Enables: F0 (frontend can POST expenses), F1 (frontend can PUT expenses), F3 (fr
 @project_specs/FRD-ExpenseTracker.md (F0 process steps 7-13, Y1 endpoint specs, Y2 error catalog)
 @project_specs/TechArch-ExpenseTracker.md (Section 2: API Router, Validation Middleware, Error Handler; Section 4: API Design with TypeScript interfaces; Section 5: Security headers)
 @.planning/express/build-a-simple-expense-tracker-that-allo/01-PLAN.md (Wave 1 integration contracts — db/database.js exports, server.js structure)
-@.planning/express/build-a-simple-expense-tracker-that-allo/SCOPE-DECISION.md (F1 deferred — no PUT endpoint)
+@.planning/express/build-a-simple-expense-tracker-that-allo/SCOPE-DECISION.md (F1 included — PUT endpoint for editing)
 </context>
 
 <tasks>

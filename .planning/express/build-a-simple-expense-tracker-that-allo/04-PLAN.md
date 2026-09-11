@@ -133,7 +133,7 @@ Enables: None (final wave — this is the verification capstone)
 @.planning/express/build-a-simple-expense-tracker-that-allo/01-PLAN.md (Wave 1 contracts — db/database.js, server.js, package.json)
 @.planning/express/build-a-simple-expense-tracker-that-allo/02-PLAN.md (Wave 2 contracts — API routes, validation, error handling)
 @.planning/express/build-a-simple-expense-tracker-that-allo/03-PLAN.md (Wave 3 contracts — HTML structure, app.js, CSS)
-@.planning/express/build-a-simple-expense-tracker-that-allo/SCOPE-DECISION.md (editing deferred, out of scope — no edit tests)
+@.planning/express/build-a-simple-expense-tracker-that-allo/SCOPE-DECISION.md (F1 included — edit tests required)
 </context>
 
 <tasks>
@@ -206,7 +206,6 @@ Key configuration decisions:
 
 **Do NOT configure:**
 - Multiple browser projects (cross-browser is R2 scope via US-5.4)
-- Any edit-related test patterns (deferred, out of scope)
   </action>
   <verify>
 ```bash
