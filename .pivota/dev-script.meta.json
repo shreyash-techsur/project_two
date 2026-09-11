@@ -1,0 +1,16 @@
+{
+  "generator_version": "init-dev-server@1",
+  "catalog_entry": "node-express",
+  "generated_at": "2026-09-11T12:15:00Z",
+  "inspection_inputs_hash": "accaa4e7d3935c3deea153924e006b6c5b836b98b4a1453882bc4c04aa54729e",
+  "inspection_inputs": {
+    "matched_globs": [
+      "package.json"
+    ],
+    "manifest_signatures": [
+      "package.json:dep:express@^4.18.0",
+      "package.json:dev-script:nodemon server.js"
+    ],
+    "existing_scripts": []
+  }
+}
