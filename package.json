@@ -1,0 +1,18 @@
+{
+  "name": "expense-tracker",
+  "version": "1.0.0",
+  "description": "Simple web-based expense tracker with persistent storage",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "better-sqlite3": "^9.0.0",
+    "helmet": "^7.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
