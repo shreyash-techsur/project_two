@@ -5,7 +5,7 @@ deferred_features: [F1]
 stories_excluded_deferred: 4
 flow_steps_verified: 8
 flow_steps_total: 8
-verified: 2026-09-11T12:28:00Z
+verified: 2026-09-11T12:28:29Z
 build: passed
 app_url: http://localhost:3000
 smoke: passed
@@ -19,8 +19,8 @@ playwright_skip: 0
 
 # UAT — Express Task: build-a-simple-expense-tracker-that-allo
 
-**Verified:** 2026-09-11T12:28:00Z
-**Build:** Passed (no build step — plain Express/Node app)
+**Verified:** 2026-09-11T12:28:29Z
+**Build:** Passed
 **Application:** http://localhost:3000
 
 ## Test Results
@@ -32,11 +32,11 @@ playwright_skip: 0
 | Skip | 0 |
 | **Total** | **41** |
 
-**Fix cycles used:** 2/10 (1 cycle to fix waitForResponse timing pattern in generated tests)
+**Fix cycles used:** 2/10
 
 ## User Flow Coverage
 
-Primary flow: JRN-01.1 Daily Expense Capture
+Primary flow: JRN-01.1: Daily Expense Capture
 
 | # | Step (what the user does) | Evidence (file:line) | Status |
 |---|---------------------------|----------------------|--------|
@@ -96,9 +96,9 @@ Results: `playwright-results.json`
 ## Build Log
 
 Build system: npm
-Build attempts: 0/10 (no build step required for plain Express app)
-Build status: Passed
+Build attempts: 1/10
+Build status: Passed (no build script — app runs directly via `node server.js`)
 
 ## Next Steps
 
-All acceptance criteria **of the built scope** verified — 18 of 22 in-scope stories tested (4 stories not UI-testable: US-2.2 server restart, US-3.4 error injection, US-3.5 scale performance, US-4.4 error state); 4 deferred (see `## Deferred by scope decision`). Express task build-a-simple-expense-tracker-that-allo is production-ready **for that scope**, not for the full spec.
+All acceptance criteria **of the built scope** verified — 18 of 22 non-deferred stories tested; 4 deferred (see `## Deferred by scope decision`). Express task build-a-simple-expense-tracker-that-allo is production-ready **for that scope**, not for the full spec.

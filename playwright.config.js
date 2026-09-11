@@ -5,7 +5,7 @@ module.exports = defineConfig({
   timeout: 30000,
   retries: 0,
   workers: 1,  // Serial execution — single SQLite DB
-  reporter: 'list',
+  reporter: [['json', { outputFile: 'playwright-results.json' }], ['list']],
 
   use: {
     baseURL: 'http://localhost:3000',
