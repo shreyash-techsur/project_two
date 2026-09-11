@@ -413,7 +413,7 @@ rm -f data/expenses.db data/expenses.db-wal data/expenses.db-shm
 7. `getAllExpenses` returns rows ordered by `created_at DESC`
 8. Data survives `initialize()` being called again (idempotent — `CREATE TABLE IF NOT EXISTS`)
 9. All SQL uses parameterized prepared statements
-10. No F1 (Expense Editing) artifacts: no `updateExpense`, no PUT-related code
+10. No Expense Editing artifacts (deferred, out of scope): no `updateExpense`, no PUT-related code
 </success_criteria>
 
 <output>
