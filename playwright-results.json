@@ -3,7 +3,9 @@
     "argv": [
       "/usr/local/bin/node",
       "/home/daytona/project/node_modules/.bin/playwright",
-      "test"
+      "test",
+      "e2e/uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+      "--list"
     ],
     "configFile": "/home/daytona/project/playwright.config.js",
     "rootDir": "/home/daytona/project/e2e",
@@ -16,18 +18,14 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 1
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "/home/daytona/project/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "",
         "name": "",
         "testDir": "/home/daytona/project/e2e",
@@ -73,626 +71,6 @@
   },
   "suites": [
     {
-      "title": "expense-tracker.spec.js",
-      "file": "expense-tracker.spec.js",
-      "column": 0,
-      "line": 0,
-      "specs": [
-        {
-          "title": "empty state: page loads with title, $0.00 total, and empty state message",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 155,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:35.149Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-202b31de7cde3b142f8b",
-          "file": "expense-tracker.spec.js",
-          "line": 23,
-          "column": 1
-        },
-        {
-          "title": "empty state: amount field is auto-focused on page load",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 92,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:35.355Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-cec56529e7f3db7c3264",
-          "file": "expense-tracker.spec.js",
-          "line": 43,
-          "column": 1
-        },
-        {
-          "title": "add expense: form submit creates expense, updates list and total, clears form",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 179,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:35.454Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-98b0430c6fc30059b8a7",
-          "file": "expense-tracker.spec.js",
-          "line": 51,
-          "column": 1
-        },
-        {
-          "title": "batch entry: add two expenses in sequence, verify ordering and total accuracy",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 245,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:35.638Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-e7448b69081e4f4eb2e9",
-          "file": "expense-tracker.spec.js",
-          "line": 88,
-          "column": 1
-        },
-        {
-          "title": "persistence: expenses survive page refresh",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 177,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:35.889Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-da62527270cfe0a9a956",
-          "file": "expense-tracker.spec.js",
-          "line": 120,
-          "column": 1
-        },
-        {
-          "title": "validation: empty form shows inline errors for all three fields",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 146,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:36.070Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-7acdad08815d62a99909",
-          "file": "expense-tracker.spec.js",
-          "line": 145,
-          "column": 1
-        },
-        {
-          "title": "validation: negative amount shows error, form retains input",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 129,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:36.221Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-3004ca453c2855402498",
-          "file": "expense-tracker.spec.js",
-          "line": 161,
-          "column": 1
-        },
-        {
-          "title": "cents arithmetic: total is accurate with values that cause floating-point drift",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 230,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:36.354Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-fbb893d07d776695138e",
-          "file": "expense-tracker.spec.js",
-          "line": 178,
-          "column": 1
-        },
-        {
-          "title": "submit button shows saving state during request",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 162,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:36.588Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-31442b0c6982d151916d",
-          "file": "expense-tracker.spec.js",
-          "line": 203,
-          "column": 1
-        },
-        {
-          "title": "security headers: response includes helmet security headers",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 78,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:36.755Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-87f27468b6a18805ec48",
-          "file": "expense-tracker.spec.js",
-          "line": 224,
-          "column": 1
-        },
-        {
-          "title": "edit: each expense row shows an Edit button",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 162,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:36.838Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-c28b9def00113dec2311",
-          "file": "expense-tracker.spec.js",
-          "line": 243,
-          "column": 1
-        },
-        {
-          "title": "edit: clicking Edit populates the form with current values and enters edit mode",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 196,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:37.005Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-30fe9e55d4bb30e4d198",
-          "file": "expense-tracker.spec.js",
-          "line": 251,
-          "column": 1
-        },
-        {
-          "title": "edit: saving changes updates the list and the total",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 244,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:37.205Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-207bb35f0a40070ddfdb",
-          "file": "expense-tracker.spec.js",
-          "line": 269,
-          "column": 1
-        },
-        {
-          "title": "edit: form returns to add mode after a successful save",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 247,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:37.453Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-7cfc95513d583e773408",
-          "file": "expense-tracker.spec.js",
-          "line": 287,
-          "column": 1
-        },
-        {
-          "title": "edit: cancel discards changes and leaves the expense untouched",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 212,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:37.705Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-c47eff991c20b8d441ef",
-          "file": "expense-tracker.spec.js",
-          "line": 304,
-          "column": 1
-        },
-        {
-          "title": "edit: validation errors block the save and keep edit mode active",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 213,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:37.921Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-e4bf8a3119a515b45fc0",
-          "file": "expense-tracker.spec.js",
-          "line": 324,
-          "column": 1
-        },
-        {
-          "title": "edit: changes persist across a page refresh",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 245,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:38.138Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-d6bd5c8c727543aecee4",
-          "file": "expense-tracker.spec.js",
-          "line": 341,
-          "column": 1
-        },
-        {
-          "title": "edit: editing one of several expenses leaves the others unchanged",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 296,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-09-14T07:14:38.387Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "8b186b73b402ce4a8b3c-6fce7311236e5290f6b6",
-          "file": "expense-tracker.spec.js",
-          "line": 358,
-          "column": 1
-        }
-      ]
-    },
-    {
       "title": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
       "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
       "column": 0,
@@ -702,11 +80,11 @@
         {
           "title": "1. Primary user flow — JRN-01.1: Daily Expense Capture",
           "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-          "line": 23,
+          "line": 103,
           "column": 6,
           "specs": [
             {
-              "title": "Opens the Expense Tracker application",
+              "title": "Maya opens the expense tracker in her browser",
               "ok": true,
               "tags": [],
               "tests": [
@@ -716,31 +94,17 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 91,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-14T07:14:38.693Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "ad27cec2d1576e77b369-a0eacfbf27efd8cb83b8",
+              "id": "ad27cec2d1576e77b369-b0aa66f247075e3f2900",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 25,
+              "line": 109,
               "column": 7
             },
             {
-              "title": "Sees the expense form with amount, description, and category fields",
+              "title": "She sees an empty list inviting her to add her first expense",
               "ok": true,
               "tags": [],
               "tests": [
@@ -750,31 +114,17 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 96,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-14T07:14:38.787Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "ad27cec2d1576e77b369-efe0eddde82fb1d327c0",
+              "id": "ad27cec2d1576e77b369-4614ab1252c5ad830fde",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 33,
+              "line": 118,
               "column": 7
             },
             {
-              "title": "Sees the total displayed in currency format",
+              "title": "She sees the entry form with amount, description and category fields",
               "ok": true,
               "tags": [],
               "tests": [
@@ -784,31 +134,17 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 96,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-14T07:14:38.888Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "ad27cec2d1576e77b369-dafb97b446904dad8aa7",
+              "id": "ad27cec2d1576e77b369-2a0aee3b8f2e4534fb1c",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 42,
+              "line": 126,
               "column": 7
             },
             {
-              "title": "Fills the form with amount, description, and category",
+              "title": "She types the amount, what she bought, and the category",
               "ok": true,
               "tags": [],
               "tests": [
@@ -818,31 +154,17 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 95,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-14T07:14:38.988Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "ad27cec2d1576e77b369-81671a53ec0e85e87462",
+              "id": "ad27cec2d1576e77b369-78f83a976b08def316af",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 48,
+              "line": 138,
               "column": 7
             },
             {
-              "title": "Submits the form and sees the new expense in the list",
+              "title": "She clicks Add Expense and her latte appears in the list",
               "ok": true,
               "tags": [],
               "tests": [
@@ -852,31 +174,17 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 147,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-14T07:14:39.087Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "ad27cec2d1576e77b369-dc2b9bae001b1bc811b0",
+              "id": "ad27cec2d1576e77b369-526a4e063ea7cf361bfd",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 58,
+              "line": 150,
               "column": 7
             },
             {
-              "title": "Sees a success toast after adding an expense",
+              "title": "She sees the running total pick up the new expense",
               "ok": true,
               "tags": [],
               "tests": [
@@ -886,31 +194,17 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 161,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-14T07:14:39.240Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "ad27cec2d1576e77b369-e0bd11addc2b137e95ee",
+              "id": "ad27cec2d1576e77b369-88a5a868dacb36a0620d",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 69,
+              "line": 164,
               "column": 7
             },
             {
-              "title": "Form clears after successful submission and focus returns to amount",
+              "title": "She gets a confirmation and a cleared form ready for the next entry",
               "ok": true,
               "tags": [],
               "tests": [
@@ -920,31 +214,17 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 162,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-14T07:14:39.405Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "ad27cec2d1576e77b369-3f1f60d8b2fe6901c503",
+              "id": "ad27cec2d1576e77b369-9f0158fae190016c0b78",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 76,
+              "line": 174,
               "column": 7
             },
             {
-              "title": "Total updates immediately after adding an expense",
+              "title": "Spotting a typo, she clicks Edit and the form fills with the current values",
               "ok": true,
               "tags": [],
               "tests": [
@@ -954,27 +234,93 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 162,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-14T07:14:39.573Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "ad27cec2d1576e77b369-85707633df1682171cd7",
+              "id": "ad27cec2d1576e77b369-ad12c16e13ff2ddabf86",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 86,
+              "line": 186,
+              "column": 7
+            },
+            {
+              "title": "She can tell she is editing — the button says Save Changes and Cancel appears",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ad27cec2d1576e77b369-d909df08e803550b2f9f",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 197,
+              "column": 7
+            },
+            {
+              "title": "She corrects the amount, saves, and the row shows the corrected value",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ad27cec2d1576e77b369-21b7513e297a856b2293",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 209,
+              "column": 7
+            },
+            {
+              "title": "She sees the total recalculate to match the correction",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ad27cec2d1576e77b369-967c7d14be4b0c02ec0d",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 225,
+              "column": 7
+            },
+            {
+              "title": "After saving she is confirmed and the form is back to adding new expenses",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ad27cec2d1576e77b369-89c23b4de249870c0295",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 237,
               "column": 7
             }
           ]
@@ -982,18 +328,18 @@
         {
           "title": "2. Secondary flows",
           "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-          "line": 98,
+          "line": 259,
           "column": 6,
           "specs": [],
           "suites": [
             {
-              "title": "US-0.2: Batch-Enter Multiple Expenses",
+              "title": "US-0.1: Add a New Expense",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 100,
+              "line": 262,
               "column": 8,
               "specs": [
                 {
-                  "title": "Enters multiple expenses in sequence and all appear in the list",
+                  "title": "The form offers amount, description, category and a submit button",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1003,27 +349,181 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 262,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:39.739Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-67565e546fed90210204",
+                  "id": "ad27cec2d1576e77b369-3b046970a07425c82f02",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 101,
+                  "line": 263,
+                  "column": 9
+                },
+                {
+                  "title": "The amount field accepts a value with two decimal places",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-9aec679e7ae6702b01c2",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 271,
+                  "column": 9
+                },
+                {
+                  "title": "Description accepts up to 500 characters and category up to 100",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-d2790f0762f694bb35f0",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 278,
+                  "column": 9
+                },
+                {
+                  "title": "The form cannot be submitted with any field empty",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-a7067f4cb235990d8acc",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 291,
+                  "column": 9
+                },
+                {
+                  "title": "A success indicator confirms the expense was saved",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-01918bda7ea96e05c89d",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 317,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-0.2: Batch-Enter Multiple Expenses",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 324,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "After each submission the form clears and focus returns to amount",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-960f51d27a5dcb6552f2",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 325,
+                  "column": 9
+                },
+                {
+                  "title": "Twenty expenses entered in sequence all appear in the list with an accurate total",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-444994e8211fe05e731e",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 334,
+                  "column": 9
+                },
+                {
+                  "title": "Each expense is persisted server-side before success is shown (no client-only cache)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-a134863196219a472f0d",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 350,
+                  "column": 9
+                },
+                {
+                  "title": "Closing the tab mid-session loses nothing already submitted",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-d5487630d7e6c7046a6c",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 363,
                   "column": 9
                 }
               ]
@@ -1031,11 +531,11 @@
             {
               "title": "US-0.3: Receive Validation Feedback on Expense Entry",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 123,
+              "line": 384,
               "column": 8,
               "specs": [
                 {
-                  "title": "Shows error when submitting with empty fields",
+                  "title": "An empty amount shows \"Amount is required\"",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1045,31 +545,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 129,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.005Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-f40f4a28be5442aea8be",
+                  "id": "ad27cec2d1576e77b369-c005f7b14b900972a4c8",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 124,
+                  "line": 385,
                   "column": 9
                 },
                 {
-                  "title": "Shows error for negative amount",
+                  "title": "A non-numeric amount shows \"Amount must be a valid number\"",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1079,31 +565,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 130,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.139Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-c3c085e8542643661fcc",
+                  "id": "ad27cec2d1576e77b369-34cbef2c762472dffd42",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 132,
+                  "line": 393,
                   "column": 9
                 },
                 {
-                  "title": "Shows error for amount exceeding maximum",
+                  "title": "A zero or negative amount shows \"Amount must be greater than zero\"",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1113,31 +585,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 145,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.272Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-4f375f633d12eff61220",
+                  "id": "ad27cec2d1576e77b369-5e29f352b177895a61ea",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 141,
+                  "line": 405,
                   "column": 9
                 },
                 {
-                  "title": "Retains user input when validation fails",
+                  "title": "An amount above 999,999.99 shows \"Amount must not exceed 999,999.99\"",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1147,27 +605,153 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 146,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.422Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-1cf07bca1156d1983e57",
+                  "id": "ad27cec2d1576e77b369-35eb6abd6ad37bd9ba77",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 150,
+                  "line": 419,
+                  "column": 9
+                },
+                {
+                  "title": "An amount with three decimals shows \"Amount must have at most two decimal places\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-c30f508645bbb7fe1cc9",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 428,
+                  "column": 9
+                },
+                {
+                  "title": "An empty description shows \"Description is required\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-7fb754971e621cb98426",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 437,
+                  "column": 9
+                },
+                {
+                  "title": "A description over 500 characters shows \"Description must not exceed 500 characters\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-47a10f5d2a2156342fa5",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 445,
+                  "column": 9
+                },
+                {
+                  "title": "An empty category shows \"Category is required\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-8cfec855193ac50bb972",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 457,
+                  "column": 9
+                },
+                {
+                  "title": "A category over 100 characters shows \"Category must not exceed 100 characters\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-b4e7bcdf9d4719a779ca",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 465,
+                  "column": 9
+                },
+                {
+                  "title": "The form keeps what the user typed when validation fails",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-92a0765a5d3246d23ccc",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 476,
+                  "column": 9
+                },
+                {
+                  "title": "Several invalid fields show all their errors at once",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-282ffb99c86a189f30a0",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 491,
                   "column": 9
                 }
               ]
@@ -1175,11 +759,11 @@
             {
               "title": "US-0.4: Server-Side Validation of Expense Data",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 162,
+              "line": 501,
               "column": 8,
               "specs": [
                 {
-                  "title": "Server returns 400 with structured errors for invalid data",
+                  "title": "The server applies the same rules the client does, even when the client is bypassed",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1189,31 +773,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 12,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.572Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-c2209f8d7d4037d73987",
+                  "id": "ad27cec2d1576e77b369-44999931c90e7cc10a0f",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 163,
+                  "line": 502,
                   "column": 9
                 },
                 {
-                  "title": "Server does not expose stack traces in error responses",
+                  "title": "Invalid requests get a 400 with structured error codes",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1223,27 +793,445 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 3,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.587Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-544e335277c821dc71ad",
+                  "id": "ad27cec2d1576e77b369-d977d957e1cf98bfd8b8",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 178,
+                  "line": 524,
+                  "column": 9
+                },
+                {
+                  "title": "Multiple bad fields come back together in one errors array",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-6330f179b5b29e6e4502",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 540,
+                  "column": 9
+                },
+                {
+                  "title": "Error responses never leak stack traces or internal details",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-7e89c72cfe6a6ea729f9",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 551,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-1.1: Edit an Existing Expense",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 570,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "Every expense row offers an Edit button",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-e9a3d017c695beac796a",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 571,
+                  "column": 9
+                },
+                {
+                  "title": "Clicking Edit populates the form with that expense's current values",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-380ee8a6c42e8f1dc257",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 586,
+                  "column": 9
+                },
+                {
+                  "title": "Edit mode is clearly signalled — Save Changes label, Cancel button, indicator",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-bb7bdf58aa802f0137da",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 598,
+                  "column": 9
+                },
+                {
+                  "title": "Any combination of the three fields can be changed",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-1d02d12c2e246ae957ab",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 615,
+                  "column": 9
+                },
+                {
+                  "title": "Saving an edit applies the same validation rules as adding",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-6b54a877df55e450f723",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 656,
+                  "column": 9
+                },
+                {
+                  "title": "On save the row updates immediately and the total recalculates",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-c9530b6d73e844c2522b",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 686,
+                  "column": 9
+                },
+                {
+                  "title": "A success indicator confirms the edit and the form leaves edit mode",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-c528ff7480109f0671f7",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 705,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-1.2: Cancel Editing Without Saving",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 724,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "A Cancel button is visible whenever the form is in edit mode",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-c662af16f3620d1721d4",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 725,
+                  "column": 9
+                },
+                {
+                  "title": "Cancel discards the pending changes without any server request",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-657edbde160943b2abf1",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 735,
+                  "column": 9
+                },
+                {
+                  "title": "The form returns to its add-new state after cancelling",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-8f030cfea98ed2a0154b",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 760,
+                  "column": 9
+                },
+                {
+                  "title": "The list and total are unchanged and the original values stay intact",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-53dc3e7d2cd0769dea9a",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 778,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-1.3: Edit Multiple Expenses in Sequence",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 808,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "After saving one edit the user can immediately edit another expense",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-079f96ca62198713694f",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 809,
+                  "column": 9
+                },
+                {
+                  "title": "Each edit is persisted independently and the list reflects them all",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-16ab81ab6f18bcde574c",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 827,
+                  "column": 9
+                },
+                {
+                  "title": "The running total is correct after several sequential edits",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-82432791f7a02bcc96a5",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 850,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-1.4: Handle Editing a Non-Existent Expense",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 879,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "Saving an edit for a vanished expense returns 404 ERR_EXPENSE_NOT_FOUND",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-e24420d1299f5d9cd69a",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 880,
+                  "column": 9
+                },
+                {
+                  "title": "The user sees a clear \"Expense not found\" message",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-77889ade6920594df4b0",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 891,
+                  "column": 9
+                },
+                {
+                  "title": "The form keeps the typed data on a 404 so it can be re-entered as a new expense",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-d1795d2e0119bc5c5f84",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 911,
+                  "column": 9
+                },
+                {
+                  "title": "A malformed expense ID returns 400 ERR_EXPENSE_INVALID_ID",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-d7ee187666b56a5400f1",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 938,
                   "column": 9
                 }
               ]
@@ -1251,11 +1239,11 @@
             {
               "title": "US-2.1: Data Survives Page Refresh",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 189,
+              "line": 951,
               "column": 8,
               "specs": [
                 {
-                  "title": "Expenses persist after page refresh",
+                  "title": "Refreshing the browser still shows every previously entered expense",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1265,27 +1253,161 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 159,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.594Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-dcd6b8af0d6b7678b77e",
+                  "id": "ad27cec2d1576e77b369-737de1366fd622abf258",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 190,
+                  "line": 952,
+                  "column": 9
+                },
+                {
+                  "title": "The list is fetched from the server with GET /api/expenses on page load",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-1a09849d6afaba119ab7",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 970,
+                  "column": 9
+                },
+                {
+                  "title": "The total after a refresh equals the sum of everything persisted",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-bc57ce836de11c955107",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 982,
+                  "column": 9
+                },
+                {
+                  "title": "No expense data is kept in localStorage or sessionStorage",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-03b519360d0d24ca7883",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 998,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-2.2: Data Survives Server Restart",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 1017,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "Everything submitted is written to the on-disk SQLite file, not held in memory",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-a86cfa303287fba9b69b",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1021,
+                  "column": 9
+                },
+                {
+                  "title": "An edit is written through to disk, so a restart would recover the corrected value",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-177d42bb4754886643a7",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1033,
+                  "column": 9
+                },
+                {
+                  "title": "A fresh GET returns exactly what is on disk — the store is the source of truth",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-d353f1a5f3d72d330fca",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1047,
+                  "column": 9
+                },
+                {
+                  "title": "No data corruption — every stored row satisfies the schema constraints",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-080d224b65aaa281d127",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1064,
                   "column": 9
                 }
               ]
@@ -1293,11 +1415,11 @@
             {
               "title": "US-2.3: Automatic Storage Initialization",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 203,
+              "line": 1079,
               "column": 8,
               "specs": [
                 {
-                  "title": "GET /api/expenses works without manual DB setup",
+                  "title": "The storage file was created automatically — no manual DB setup happened",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1307,27 +1429,53 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 5,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.757Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-d4c147b95970168d681d",
+                  "id": "ad27cec2d1576e77b369-a99adaaab78dda98fe59",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 204,
+                  "line": 1080,
+                  "column": 9
+                },
+                {
+                  "title": "The schema — expenses table plus its created_at index — exists",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-162ee29b97968a610b76",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1090,
+                  "column": 9
+                },
+                {
+                  "title": "The running server detected the existing store rather than re-creating it",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-94718dedbc3cb0951a5e",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1113,
                   "column": 9
                 }
               ]
@@ -1335,11 +1483,11 @@
             {
               "title": "US-2.4: Write-Before-Acknowledge Guarantee",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 213,
+              "line": 1126,
               "column": 8,
               "specs": [
                 {
-                  "title": "POST /api/expenses returns 201 with the created expense",
+                  "title": "A 201 is only returned once the expense is readable from storage",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1349,27 +1497,53 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 4,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.766Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-1fd9c5dd103b969a64af",
+                  "id": "ad27cec2d1576e77b369-9b85c30921083d7c8387",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 214,
+                  "line": 1127,
+                  "column": 9
+                },
+                {
+                  "title": "A 200 on update is only returned once the change is readable from storage",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-4e2643f4839b319374af",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1142,
+                  "column": 9
+                },
+                {
+                  "title": "A failed save shows \"Failed to save expense\" and keeps the user's input",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-5533c0f855f989b08b27",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1162,
                   "column": 9
                 }
               ]
@@ -1377,11 +1551,11 @@
             {
               "title": "US-2.5: Inspect Storage Directly",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 226,
+              "line": 1199,
               "column": 8,
               "specs": [
                 {
-                  "title": "Expense records contain required fields",
+                  "title": "Data is stored in a standard, directly-queryable SQLite database",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1391,27 +1565,93 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 4,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.774Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-f26c3bdd8492a4ee4d0a",
+                  "id": "ad27cec2d1576e77b369-201215895bb8cd9aa2fd",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 227,
+                  "line": 1200,
+                  "column": 9
+                },
+                {
+                  "title": "The storage file can be copied for backup and the copy still reads",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-d51836724c01ca36947c",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1216,
+                  "column": 9
+                },
+                {
+                  "title": "Each record holds id, amount, description, category, created_at and updated_at",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-e59d98374a7ecd2e4ced",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1246,
+                  "column": 9
+                },
+                {
+                  "title": "Amounts are stored as integer cents (10.50 becomes 1050)",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-7820b7dcf36069a7d2d2",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1258,
+                  "column": 9
+                },
+                {
+                  "title": "Timestamps are stored in ISO 8601 UTC format",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-48a1c3e516088beb45b1",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1268,
                   "column": 9
                 }
               ]
@@ -1419,11 +1659,11 @@
             {
               "title": "US-3.1: View All Expenses on Page Load",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 241,
+              "line": 1281,
               "column": 8,
               "specs": [
                 {
-                  "title": "Expenses are visible in the list on page load",
+                  "title": "Opening the page fetches all expenses from the server",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1433,31 +1673,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 87,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.782Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-ca0f47656b7b3768148c",
+                  "id": "ad27cec2d1576e77b369-3811231a130ed1e3e3bc",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 242,
+                  "line": 1282,
                   "column": 9
                 },
                 {
-                  "title": "Each expense row shows amount, description, and category",
+                  "title": "Each row shows the amount as currency plus description and category",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1467,31 +1693,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 96,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.872Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-13e693beca9c11428ae5",
+                  "id": "ad27cec2d1576e77b369-3b64c886b827b1698a52",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 248,
+                  "line": 1300,
                   "column": 9
                 },
                 {
-                  "title": "Amount is formatted as currency",
+                  "title": "Expenses are listed most recent first",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1501,27 +1713,53 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 96,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:40.972Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-d697bcd591de4d404dfe",
+                  "id": "ad27cec2d1576e77b369-2ba0ef90633cac796ad9",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 256,
+                  "line": 1311,
+                  "column": 9
+                },
+                {
+                  "title": "Every row carries an Edit button as the entry point for editing",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-c2c06cfc021501a97789",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1329,
+                  "column": 9
+                },
+                {
+                  "title": "The list is on the main page — no navigation to a separate screen",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-9b0b1e58dfd2bb660cc4",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1340,
                   "column": 9
                 }
               ]
@@ -1529,11 +1767,11 @@
             {
               "title": "US-3.2: See Empty State When No Expenses Exist",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 263,
+              "line": 1352,
               "column": 8,
               "specs": [
                 {
-                  "title": "Empty state element exists in the HTML structure",
+                  "title": "With no expenses a friendly, non-technical message is shown",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1543,27 +1781,73 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 95,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.072Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-7a18f79419310be150b0",
+                  "id": "ad27cec2d1576e77b369-f6812ac9cdedb68a50f0",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 264,
+                  "line": 1357,
+                  "column": 9
+                },
+                {
+                  "title": "The form stays visible and usable during the empty state",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-04e977f26135781e4a29",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1372,
+                  "column": 9
+                },
+                {
+                  "title": "The total reads $0.00 during the empty state",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-07d9a1cfb7d35a918758",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1382,
+                  "column": 9
+                },
+                {
+                  "title": "Adding the first expense replaces the empty state with the list",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-b3a70fb65284ff86c3bc",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1387,
                   "column": 9
                 }
               ]
@@ -1571,11 +1855,11 @@
             {
               "title": "US-3.3: List Updates Immediately After Mutations",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 272,
+              "line": 1400,
               "column": 8,
               "specs": [
                 {
-                  "title": "New expense appears in list without page reload",
+                  "title": "A new expense appears without any page reload",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1585,27 +1869,229 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 162,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.172Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-c62158280ca6d060c156",
+                  "id": "ad27cec2d1576e77b369-15e50ffe481e0a35e787",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 273,
+                  "line": 1401,
+                  "column": 9
+                },
+                {
+                  "title": "An edited expense shows its new values in the correct row without a reload",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-2305de0bed9a43650e56",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1418,
+                  "column": 9
+                },
+                {
+                  "title": "Ordering stays most-recent-first after mutations",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-e70eb87bd2a0fed04c8c",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1438,
+                  "column": 9
+                },
+                {
+                  "title": "No duplicate rows appear after add or edit",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-eab077045b127a7089da",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1461,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-3.4: Handle List Loading Errors Gracefully",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 1483,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "A server 500 shows \"Failed to load expenses. Please try again.\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-5b4c73db1efbf994dca8",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1484,
+                  "column": 9
+                },
+                {
+                  "title": "An unreachable network shows \"Unable to connect to the server.\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-6888ce6f238e2d534473",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1505,
+                  "column": 9
+                },
+                {
+                  "title": "A Retry option is offered and actually reloads the list",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-ac8602a1f929eb05f58a",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1522,
+                  "column": 9
+                },
+                {
+                  "title": "The error state is explicit — not a silently broken or empty list",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-f1cdc5c92ddb5608bc59",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1552,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-3.5: Expense List Performance at Scale",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 1571,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "A list of 500 expenses renders in under a second with correct amounts",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-7767547173cee99fe8e7",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1572,
+                  "column": 9
+                },
+                {
+                  "title": "Description and category text is escaped, never executed as HTML",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-9b65c8cb577f73176c7f",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1604,
+                  "column": 9
+                },
+                {
+                  "title": "Many entries stay scrollable without breaking the page layout",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-fbd775c1bf81ece4dfbb",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1630,
                   "column": 9
                 }
               ]
@@ -1613,11 +2099,11 @@
             {
               "title": "US-4.1: View Running Total of All Expenses",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 284,
+              "line": 1665,
               "column": 8,
               "specs": [
                 {
-                  "title": "Total is displayed as currency format",
+                  "title": "The total is prominent and visible without scrolling",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1627,31 +2113,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 97,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.338Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-7e652bf4d05e0bdc7a54",
+                  "id": "ad27cec2d1576e77b369-c245a530e07d71c35275",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 285,
+                  "line": 1666,
                   "column": 9
                 },
                 {
-                  "title": "Total is always visible without scrolling",
+                  "title": "The total is formatted as currency with a dollar sign and two decimals",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1661,27 +2133,53 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 95,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.439Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-b22be6647ffaf79cab92",
+                  "id": "ad27cec2d1576e77b369-326162de7077c1070b65",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 291,
+                  "line": 1684,
+                  "column": 9
+                },
+                {
+                  "title": "The total is the integer-cents sum of every expense, divided by 100 for display",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-f48241e273511f9407dc",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1693,
+                  "column": 9
+                },
+                {
+                  "title": "The total shows $0.00 when no expenses exist",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-5e73dfff47e04d773b4c",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1708,
                   "column": 9
                 }
               ]
@@ -1689,11 +2187,11 @@
             {
               "title": "US-4.2: Total Updates After Adding an Expense",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 298,
+              "line": 1715,
               "column": 8,
               "specs": [
                 {
-                  "title": "Total increases after adding a new expense",
+                  "title": "The total increases by exactly the new expense amount, without a reload",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1703,27 +2201,189 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 162,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.538Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-3d0c719f222d06defe60",
+                  "id": "ad27cec2d1576e77b369-2c2093a05774fafaf47b",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 299,
+                  "line": 1716,
+                  "column": 9
+                },
+                {
+                  "title": "The updated total is accurate to the cent across repeated adds",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-624000346bb67d6c5518",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1731,
+                  "column": 9
+                },
+                {
+                  "title": "The currency format is unchanged after an update",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-077fe65f0b64e53e47e3",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1747,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-4.3: Total Updates After Editing an Expense",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 1754,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "Editing an amount swaps the old value out and the new value in, no reload",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-37fb89c137b8448ee803",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1755,
+                  "column": 9
+                },
+                {
+                  "title": "Editing only the description or category leaves the total untouched",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-cdbf4e0c750cbcabef00",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1774,
+                  "column": 9
+                },
+                {
+                  "title": "The total stays correct through several sequential edits",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-f8b25a5b614ea7d48ad6",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1788,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "US-4.4: Total Error State",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 1814,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "When the list fails to load the total shows a dash, not a number",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-3fb5144c139d61aa51c5",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1815,
+                  "column": 9
+                },
+                {
+                  "title": "No stale total is left behind after a failed refresh",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-a99bc8b8143b12bfca3b",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1831,
+                  "column": 9
+                },
+                {
+                  "title": "After a successful retry the total displays correctly again",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-f0c7f3177e0b8bdf45ea",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1854,
                   "column": 9
                 }
               ]
@@ -1731,11 +2391,11 @@
             {
               "title": "US-5.1: Access Application via Browser",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 310,
+              "line": 1879,
               "column": 8,
               "specs": [
                 {
-                  "title": "Application is accessible at the base URL",
+                  "title": "The app opens at its URL with no plugin or install step",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1745,31 +2405,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 79,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.705Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-fa276fa623584f056be3",
+                  "id": "ad27cec2d1576e77b369-5fe9778a2a95676ad27c",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 311,
+                  "line": 1880,
                   "column": 9
                 },
                 {
-                  "title": "Page renders form, list, and total in a single-page layout",
+                  "title": "The page renders form, list and total together in one layout",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1779,27 +2425,53 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 96,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.789Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-db6a2ab90d1bd0345ee4",
+                  "id": "ad27cec2d1576e77b369-51667ac567aa2af79c67",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 316,
+                  "line": 1887,
+                  "column": 9
+                },
+                {
+                  "title": "Only standard web platform features are used — no plugins or embeds",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-6512ca60d2cdc3d08f92",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1894,
+                  "column": 9
+                },
+                {
+                  "title": "The app works end to end in this browser engine",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-7a4ae6d1f52a1769f7c4",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1908,
                   "column": 9
                 }
               ]
@@ -1807,11 +2479,11 @@
             {
               "title": "US-5.2: Single-Page Layout with Clear Hierarchy",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 324,
+              "line": 1917,
               "column": 8,
               "specs": [
                 {
-                  "title": "Form, list, and total sections are all visible on a single page",
+                  "title": "The form sits prominently near the top of the page",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1821,27 +2493,93 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 96,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.889Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-86e2126093b12527464e",
+                  "id": "ad27cec2d1576e77b369-8d00c39d7d0b31e96939",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 325,
+                  "line": 1918,
+                  "column": 9
+                },
+                {
+                  "title": "The list sits below the form",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-d7117716c96207e6d513",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1928,
+                  "column": 9
+                },
+                {
+                  "title": "The total is visible at the initial scroll position, above the form",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-e585c59f8dce9c61804d",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1938,
+                  "column": 9
+                },
+                {
+                  "title": "Form, list and total are reachable with no tabs, menus or page transitions",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-61a3bdc99fd39b02404e",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1950,
+                  "column": 9
+                },
+                {
+                  "title": "Each section is a distinct, labelled region",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-d720ec203264b2070c44",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1963,
                   "column": 9
                 }
               ]
@@ -1849,11 +2587,11 @@
             {
               "title": "US-5.3: Single-Command Server Startup",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 333,
+              "line": 1973,
               "column": 8,
               "specs": [
                 {
-                  "title": "Server responds on configured port",
+                  "title": "`npm start` is the single documented command and it runs the server",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1863,31 +2601,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 4,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.989Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-1d4c326d099f4402336f",
+                  "id": "ad27cec2d1576e77b369-740fa971d2875ad17adc",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 334,
+                  "line": 1974,
                   "column": 9
                 },
                 {
-                  "title": "Server serves both static assets and API on same origin",
+                  "title": "One origin serves both the static UI and the API",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1897,27 +2621,73 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 5,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:41.996Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-f8843914a456df3d7856",
+                  "id": "ad27cec2d1576e77b369-4ef31218df4e0c2e798d",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 339,
+                  "line": 1982,
+                  "column": 9
+                },
+                {
+                  "title": "No build step, migration command or config file is needed first",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-73616d51255325225fa0",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 1998,
+                  "column": 9
+                },
+                {
+                  "title": "Navigating to the URL immediately shows a working application",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-29891250f1ba814cba08",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2008,
+                  "column": 9
+                },
+                {
+                  "title": "PORT is configurable via environment variable and defaults to 3000",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-15c50247132593ee5a04",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2015,
                   "column": 9
                 }
               ]
@@ -1925,11 +2695,11 @@
             {
               "title": "US-5.4: Responsive and Keyboard-Accessible Interface",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 352,
+              "line": 2023,
               "column": 8,
               "specs": [
                 {
-                  "title": "Form can be submitted by pressing Enter",
+                  "title": "The layout is usable at desktop size",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1939,31 +2709,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 130,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:42.004Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-0b12b4eea4a25a1cfdda",
+                  "id": "ad27cec2d1576e77b369-bdd6243dcbb81addd8fc",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 353,
+                  "line": 2024,
                   "column": 9
                 },
                 {
-                  "title": "All form fields are accessible via keyboard tab",
+                  "title": "The layout stays functional on tablet and phone widths",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -1973,27 +2729,93 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 96,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:42.139Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-5cb809440fa033f408c4",
+                  "id": "ad27cec2d1576e77b369-a743e57c994f6e1cb8ae",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 368,
+                  "line": 2039,
+                  "column": 9
+                },
+                {
+                  "title": "Focus order runs amount, description, category, then submit",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-4ba0096208102411f9ee",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2066,
+                  "column": 9
+                },
+                {
+                  "title": "The whole add flow can be driven from the keyboard alone",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-91be8d44d048536e399e",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2078,
+                  "column": 9
+                },
+                {
+                  "title": "Pressing Enter in a field submits the form",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-058a81cce828781c0a3a",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2098,
+                  "column": 9
+                },
+                {
+                  "title": "The Edit and Cancel buttons are reachable and operable by keyboard",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-04a9c2c751be9b1ce304",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2115,
                   "column": 9
                 }
               ]
@@ -2001,11 +2823,11 @@
             {
               "title": "US-5.5: Graceful Error Handling in the UI",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 378,
+              "line": 2136,
               "column": 8,
               "specs": [
                 {
-                  "title": "Validation errors appear inline next to form fields",
+                  "title": "Validation errors appear inline next to the field they concern",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -2015,27 +2837,93 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 146,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:42.239Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-a6a6921bddf7c24837b0",
+                  "id": "ad27cec2d1576e77b369-1c69b31b654f82791956",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 379,
+                  "line": 2137,
+                  "column": 9
+                },
+                {
+                  "title": "A server 500 shows \"Failed to save expense. Please try again.\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-9eb5303e3c2d18279049",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2157,
+                  "column": 9
+                },
+                {
+                  "title": "A network failure shows \"Unable to connect to the server.\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-8bd3eabfe89c86dbcf58",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2179,
+                  "column": 9
+                },
+                {
+                  "title": "An unexpected script error shows \"Something went wrong. Please refresh the page.\"",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-48c02ff3b73b0e2a09b1",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2201,
+                  "column": 9
+                },
+                {
+                  "title": "No error message shown to the user exposes technical details",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-ece35470ce5c76fb1517",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2216,
                   "column": 9
                 }
               ]
@@ -2045,18 +2933,18 @@
         {
           "title": "3. Technical checks",
           "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-          "line": 389,
+          "line": 2260,
           "column": 6,
           "specs": [],
           "suites": [
             {
-              "title": "API response structure",
+              "title": "API response schemas",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 391,
+              "line": 2262,
               "column": 8,
               "specs": [
                 {
-                  "title": "GET /api/expenses returns { expenses: [...] }",
+                  "title": "GET /api/expenses returns 200 with { expenses: [...] }",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -2066,31 +2954,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 5,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:42.389Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-b79f1d32723d8ca2ba2b",
+                  "id": "ad27cec2d1576e77b369-c9f402d67ebb646d78b7",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 392,
+                  "line": 2263,
                   "column": 9
                 },
                 {
-                  "title": "POST /api/expenses returns { expense: {...} } on success",
+                  "title": "POST /api/expenses returns 201 with a fully-shaped { expense: {...} }",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -2100,115 +2974,17 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 4,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:42.398Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-7a466f53c0e5ca7e8692",
+                  "id": "ad27cec2d1576e77b369-5dd2fae2e7571aa31b00",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 400,
-                  "column": 9
-                }
-              ]
-            },
-            {
-              "title": "Amount stored as integer cents",
-              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 415,
-              "column": 8,
-              "specs": [
-                {
-                  "title": "Amount 10.50 is stored as 1050 cents",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
-                    {
-                      "timeout": 30000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "",
-                      "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 3,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:42.405Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
-                    }
-                  ],
-                  "id": "ad27cec2d1576e77b369-66143b817fed1abf3b7c",
-                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 416,
-                  "column": 9
-                }
-              ]
-            },
-            {
-              "title": "Validation error codes",
-              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 426,
-              "column": 8,
-              "specs": [
-                {
-                  "title": "Missing amount returns ERR_EXPENSE_AMOUNT_REQUIRED",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
-                    {
-                      "timeout": 30000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "",
-                      "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 3,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:42.412Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
-                    }
-                  ],
-                  "id": "ad27cec2d1576e77b369-3c4a5d409ab07e08966a",
-                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 427,
+                  "line": 2273,
                   "column": 9
                 },
                 {
-                  "title": "Multiple validation errors returned together",
+                  "title": "PUT /api/expenses/:id returns 200 with the updated { expense: {...} }",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -2218,39 +2994,45 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 3,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:42.418Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-896e6c21be1b5fb46693",
+                  "id": "ad27cec2d1576e77b369-bc0bcf120a1b4bdb07f4",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 437,
+                  "line": 2294,
+                  "column": 9
+                },
+                {
+                  "title": "Error responses use { errors: [...] } for validation and { error: {...} } otherwise",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-59d5285f1cabac766217",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2319,
                   "column": 9
                 }
               ]
             },
             {
-              "title": "XSS prevention",
+              "title": "Error codes",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 447,
+              "line": 2336,
               "column": 8,
               "specs": [
                 {
-                  "title": "HTML tags in description are rendered as text, not HTML",
+                  "title": "Every field rule maps to its documented ERR_EXPENSE_* code",
                   "ok": true,
                   "tags": [],
                   "tests": [
@@ -2260,27 +3042,385 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 93,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-09-14T07:14:42.424Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "id": "ad27cec2d1576e77b369-3981254d7bb879cbcb53",
+                  "id": "ad27cec2d1576e77b369-427cc0e022b1963ebf51",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 448,
+                  "line": 2337,
+                  "column": 9
+                },
+                {
+                  "title": "404 ERR_EXPENSE_NOT_FOUND for a well-formed but unknown id",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-e6b4e8b2d4706a3d70b7",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2358,
+                  "column": 9
+                },
+                {
+                  "title": "400 ERR_EXPENSE_INVALID_ID takes precedence over body validation",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-6621b0e49b75f02fd887",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2366,
+                  "column": 9
+                },
+                {
+                  "title": "All validation failures come back in one pass, not one at a time",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-38cb1a03786904de9f3c",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2375,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Integer cents storage",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 2389,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "Dollar amounts convert to integer cents without floating-point drift",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-a988e99a870990a00a6f",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2390,
+                  "column": 9
+                },
+                {
+                  "title": "The maximum allowed amount stores as 99,999,999 cents",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-65040852ed205341e987",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2417,
+                  "column": 9
+                },
+                {
+                  "title": "Stored cents round-trip back to the same dollars on the API and on disk",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-16448ba205cd01ae3bbf",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2425,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Input normalisation",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 2445,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "Description and category are trimmed before storage",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-5ae99d1302941ffe2f2b",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2446,
+                  "column": 9
+                },
+                {
+                  "title": "A whitespace-only description or category is rejected, not trimmed into empty",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-5ac037901272dd7831bc",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2458,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "XSS sanitization",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 2470,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "Script and image payloads in stored text render as inert text",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-9d30eb78d541e90263e4",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2471,
+                  "column": 9
+                },
+                {
+                  "title": "A payload entered through the form is equally inert",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-af62a79d811cc9df427f",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2511,
+                  "column": 9
+                },
+                {
+                  "title": "Security headers are present on the served page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-d1c95561fafa77f20aa1",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2522,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Edge cases and scale",
+              "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+              "line": 2528,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "An empty store returns an empty array rather than null or an error",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-f6412777b8639de70019",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2529,
+                  "column": 9
+                },
+                {
+                  "title": "Boundary lengths and amounts are accepted at the limit and rejected past it",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-b7bf5df2b20276bd063e",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2538,
+                  "column": 9
+                },
+                {
+                  "title": "Unicode and emoji survive a round trip intact",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-57d6f73554f24e809817",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2567,
+                  "column": 9
+                },
+                {
+                  "title": "A malformed JSON body does not crash the server",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-39b0160a1921a9906a49",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2580,
+                  "column": 9
+                },
+                {
+                  "title": "Concurrent creates are all persisted with distinct ids",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-14a90dcb71faad2c11d8",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2592,
+                  "column": 9
+                },
+                {
+                  "title": "1,000 expenses are served and rendered without breaking",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "ad27cec2d1576e77b369-fd7a02e66e4aae967a6e",
+                  "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
+                  "line": 2615,
                   "column": 9
                 }
               ]
@@ -2292,10 +3432,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-14T07:14:34.816Z",
-    "duration": 7731.263,
-    "expected": 59,
-    "skipped": 0,
+    "startTime": "2026-09-14T07:58:20.243Z",
+    "duration": 275.953,
+    "expected": 0,
+    "skipped": 153,
     "unexpected": 0,
     "flaky": 0
   }

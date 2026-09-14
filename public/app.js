@@ -26,8 +26,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Attach form submit handler
   form.addEventListener('submit', handleSubmit);
 
-  // Cancel discards pending edits with no server call (FRD F01 step 7)
-  cancelBtn.addEventListener('click', exitEditMode);
+  // Cancel discards pending edits with no server call (FRD F01 step 7).
+  // Wrapped so the click Event is not passed through as `preserveInput`.
+  cancelBtn.addEventListener('click', function () { exitEditMode(); });
 
   // --- API Communication ---
 
@@ -135,9 +136,11 @@ document.addEventListener('DOMContentLoaded', function () {
           // Server validation errors — display inline
           displayServerErrors(result.data.errors);
         } else if (result.status === 404) {
-          // Expense vanished between load and save (FRD F01 outputs: not-found)
+          // Expense vanished between load and save (FRD F01 outputs: not-found).
+          // Return to add-new state but keep the typed values so the user can
+          // re-submit them as a new expense (US-1.4 AC).
           showToast('Expense not found. It may have been removed.', 'error');
-          exitEditMode();
+          exitEditMode(true); // preserve input
           loadExpenses();
         } else {
           // Unexpected error
@@ -175,9 +178,11 @@ document.addEventListener('DOMContentLoaded', function () {
     amountInput.focus();
   }
 
-  function exitEditMode() {
+  // preserveInput=true leaves the typed field values in place while still
+  // returning the form to add-new state (US-1.4: 404 must not clear the form).
+  function exitEditMode(preserveInput) {
     editingId = null;
-    form.reset();
+    if (!preserveInput) form.reset();
     clearErrors();
 
     submitBtn.textContent = 'Add Expense';

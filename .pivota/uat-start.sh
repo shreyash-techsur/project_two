@@ -12,7 +12,14 @@ if [ -n "$PRIOR_PID" ] && kill -0 "$PRIOR_PID" 2>/dev/null; then
   kill -TERM "$PRIOR_PID" 2>/dev/null || true
 fi
 fuser -k "${PORT}/tcp" 2>/dev/null || true
+pkill -f 'next (dev|start)' 2>/dev/null || true
 sleep 1
+if [ "$BS" = "docker-compose" ] || ls docker-compose.y*ml compose.y*ml >/dev/null 2>&1; then
+  COMPOSE_CMD="${COMPOSE:-docker compose}"
+  $COMPOSE_CMD up -d
+  echo "[uat] ${COMPOSE_CMD} up -d"
+  exit 0
+fi
 if [ ! -f package.json ]; then
   echo "[uat] no compose file or package.json found — start the app manually" >&2
   exit 1
@@ -20,7 +27,7 @@ fi
 if grep -qE '"start"[[:space:]]*:' package.json 2>/dev/null; then
   RUN_CMD='npm start'
 else
-  RUN_CMD='npm run dev'
+  RUN_CMD='WATCHPACK_POLLING=true npm run dev'
 fi
 setsid bash -c "$RUN_CMD" > "$LOG" 2>&1 < /dev/null &
 echo "$!" > /tmp/pivota-uat-app.pid
