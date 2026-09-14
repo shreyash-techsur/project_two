@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- App Header -->
+    <header class="app-header">
+      <h1>Expense Tracker</h1>
+    </header>
+
+    <!-- Total Display — US-4.1: always visible, prominent -->
+    <section class="total-display" aria-label="Total expenses">
+      <span class="total-label">Total Expenses</span>
+      <span class="total-amount" id="total-amount">$0.00</span>
+    </section>
+
+    <!-- Expense Form — US-0.1: add mode, US-1.1: edit mode -->
+    <section class="form-section" aria-label="Add or edit expense">
+      <!-- Edit mode indicator — hidden by default, shown when editing -->
+      <div class="edit-indicator" id="edit-indicator" aria-live="polite" style="display: none;">
+        <span>Editing expense</span>
+      </div>
+      <form id="expense-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="amount">Amount ($)</label>
+            <input type="number" id="amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required autocomplete="off">
+            <span class="error-message" id="amount-error" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" id="description" name="description" maxlength="500" placeholder="What did you spend on?" required autocomplete="off">
+            <span class="error-message" id="description-error" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label for="category">Category</label>
+            <input type="text" id="category" name="category" maxlength="100" placeholder="e.g., Food, Transport" required autocomplete="off">
+            <span class="error-message" id="category-error" role="alert"></span>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="submit-btn">Add Expense</button>
+          <button type="button" id="cancel-btn" aria-label="Cancel editing" style="display: none;">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Expense List — US-3.1, US-3.2 -->
+    <section class="list-section" aria-label="Expense list">
+      <div id="expense-list">
+        <!-- Populated by app.js; shows empty state or expense rows -->
+        <p class="empty-state" id="empty-state">No expenses yet. Add your first expense above!</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Toast notifications — positioned fixed, top-right -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
