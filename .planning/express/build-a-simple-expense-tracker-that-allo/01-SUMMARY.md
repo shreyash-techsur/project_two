@@ -29,7 +29,7 @@ key-files:
 
 key-decisions:
   - "Bound server to 0.0.0.0 for sandbox accessibility"
-  - "No updateExpense function — F1 (Expense Editing) deferred per SCOPE-DECISION.md"
+  - "updateExpense added for F1 (Expense Editing) — scope override 2026-09-14"
   - "All SQL uses db.prepare() with positional parameters — no string concatenation"
 
 patterns-established:
@@ -78,7 +78,7 @@ Each task was committed atomically:
 
 ## Decisions Made
 - Bound server to `0.0.0.0:3000` (not `localhost`) to ensure accessibility from sandbox preview iframe
-- No `updateExpense` function implemented — F1 (Expense Editing) is deferred per SCOPE-DECISION.md
+- `updateExpense(id, {...})` implemented for F1 (Expense Editing); returns the updated row or `null` when the ID does not exist. `created_at` is immutable; `updated_at` is refreshed.
 - All SQL uses `db.prepare()` with positional `?` parameters for SQL injection prevention
 - WAL mode enabled for better read/write concurrency
 - Error codes (`ERR_STORAGE_READ`, `ERR_STORAGE_WRITE`) embedded in thrown errors for future error handler mapping

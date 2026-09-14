@@ -30,7 +30,7 @@ key-decisions:
   - "All user text rendered via textContent (never innerHTML) for XSS prevention"
   - "Total uses integer cents arithmetic (sum in cents, divide by 100 only for display) to avoid floating-point drift"
   - "Client validation mirrors FRD Y2 error catalog exactly; server validation is authoritative"
-  - "No edit buttons, edit mode, or PUT calls — F1 deferred per SCOPE-DECISION.md"
+  - "Edit button per row, edit mode with Save Changes/Cancel, and PUT calls — F1 built per scope override 2026-09-14"
 
 patterns-established:
   - "XSS prevention: createElement + textContent for all user-provided data"
@@ -78,7 +78,7 @@ Each task was committed atomically:
 - All user text rendered via textContent (never innerHTML) for XSS prevention per TechArch §5
 - Total uses integer cents arithmetic (sum all amounts in cents, divide by 100 only for display)
 - Client validation mirrors all 9 FRD Y2 error messages exactly; server validation remains authoritative
-- No edit functionality (F1 deferred per SCOPE-DECISION.md)
+- Edit mode implemented (F1): per-row Edit button, form pre-population, Save Changes/Cancel, `.editing-row` highlight, and an `#edit-indicator` banner
 - Used `novalidate` on form to provide custom JS validation messages instead of browser defaults
 - Toast auto-dismisses after 2 seconds without stealing focus
 

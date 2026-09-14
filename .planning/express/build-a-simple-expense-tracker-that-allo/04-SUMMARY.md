@@ -48,7 +48,7 @@ completed: 2026-09-11
 
 # Plan 04: E2E Integration Tests Summary
 
-**Playwright E2E test suite with 10 tests covering the full Daily Expense Capture journey — empty state, add flow, batch entry, persistence, validation, cents arithmetic, and security headers**
+**Playwright E2E test suite with 18 tests covering the full Daily Expense Capture journey — empty state, add flow, edit flow, batch entry, persistence, validation, cents arithmetic, and security headers**
 
 ## Performance
 
@@ -60,9 +60,9 @@ completed: 2026-09-11
 
 ## Accomplishments
 - Installed Playwright with Chromium and configured webServer auto-start
-- Created 10 E2E tests covering the complete JRN-01.1 Daily Expense Capture journey
-- All 10 E2E tests pass with 0 failures in 3.5 seconds
-- Existing 21 API integration tests still pass — no regression
+- Created 18 E2E tests covering the complete JRN-01.1 Daily Expense Capture journey (10 original + 8 for the F1 edit flow)
+- All 18 E2E tests pass with 0 failures (59 passed across the whole Playwright run, including the UAT spec)
+- All 31 API integration tests pass — no regression
 - Tests verify integration of all three prior waves: DB (Wave 1) ↔ API (Wave 2) ↔ UI (Wave 3)
 
 ## Task Commits
@@ -74,7 +74,7 @@ Each task was committed atomically:
 
 ## Files Created/Modified
 - `playwright.config.js` - Playwright configuration with webServer, baseURL, chromium-only, serial workers
-- `e2e/expense-tracker.spec.js` - 10 E2E test cases for the full expense tracker journey
+- `e2e/expense-tracker.spec.js` - 18 E2E test cases for the full expense tracker journey, including edit
 - `package.json` - Added @playwright/test devDependency and test:e2e script
 - `package-lock.json` - Lock file updated with Playwright dependency tree
 

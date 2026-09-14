@@ -66,7 +66,7 @@ completed: 2026-09-11
 - Implemented all 9 FRD Y2 validation error codes with simultaneous multi-error response
 - Added dollar-to-cents conversion (Math.round) and description/category trimming
 - Configured helmet security headers (with iframe-friendly settings for sandbox preview)
-- Created 21 integration tests covering happy paths, all validation codes, error format, security headers, and PUT-absent verification
+- Created 31 integration tests covering happy paths, all validation codes, error format, security headers, and the full PUT /api/expenses/:id contract (200/400/404)
 
 ## Task Commits
 

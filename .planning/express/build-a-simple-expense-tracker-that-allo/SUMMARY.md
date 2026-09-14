@@ -1,113 +1,98 @@
 ---
 slug: build-a-simple-expense-tracker-that-allo
-description: Build a simple expense tracker with add, view, and total features
+description: Build a simple expense tracker with add, edit, view, and total features
 scope: full
 deferred_features: []
-date: 2026-09-11
+date: 2026-09-14
 total_plans: 4
 total_waves: 4
 ---
 
-# Express Task: Build a simple expense tracker with add, view, and total features — Summary
+# Express Task: Build a simple expense tracker — Summary
 
 ## Execution Overview
 
-**Scope:** Full — nothing cut  
-**Plans:** 4 across 4 waves  
-**Date:** 2026-09-11
+**Scope:** Full — nothing cut. All 6 P0 features (F0–F5) are built, including F1 (Expense Editing), which was restored by the user scope override recorded in `SCOPE-DECISION.md`.
+**Plans:** 4 across 4 waves
+**Date:** 2026-09-14
 
 ### Wave Breakdown
 
-| Wave | Domain | Plans | Status |
-|------|--------|-------|--------|
-| 1 | database | 01 | ✓ Complete |
-| 2 | backend | 02 | ✓ Complete |
-| 3 | frontend | 03 | ✓ Complete |
-| 4 | integration | 04 | ✓ Complete |
+| Wave | Plans | Domain | Status |
+|------|-------|--------|--------|
+| 1 | 01 | database | ✓ Complete |
+| 2 | 02 | backend | ✓ Complete |
+| 3 | 03 | frontend | ✓ Complete |
+| 4 | 04 | integration | ✓ Complete |
+
+### Execution Note — F1 delta run (2026-09-14)
+
+Waves 1–4 were originally executed on 2026-09-11 against a plan set in which F1
+(Expense Editing) was **deferred**. The plans and `SCOPE-DECISION.md` were then
+rewritten (commit `d3bc25c`) to **include** F1, but no execution followed, so the
+committed code did not implement the plans on disk.
+
+The resume gate could not detect this: every plan had both a summary and a matching
+commit, so a re-run would have skipped all four waves and reported success against a
+build that was missing a feature. This run closed that gap by implementing only the
+F1 delta, leaving the already-verified F0/F2/F3/F4/F5 work untouched.
+
+| Wave | F1 delta applied | Commit |
+|------|------------------|--------|
+| 1 | `updateExpense(id, {...})` in `db/database.js` | `f8a07b4` |
+| 2 | `PUT /api/expenses/:id` + ID validation; replaced the obsolete "PUT returns 404" test with 11 PUT tests | `012719a` |
+| 3 | Edit button per row, form pre-population, Save Changes/Cancel, edit indicator | `c051800` |
+| 4 | 8 E2E tests for the edit journey | `e6302ea` |
 
 ### Per-Plan Details
 
-**01:** Project Scaffold & SQLite Storage Layer
-- Tasks: 2/2 completed
-- Commits: 836389b, af5a968
-- Files created: package.json, db/database.js, server.js, data/.gitkeep, .gitignore
-- Summary: SQLite database schema with expenses table (CHECK constraints, WAL mode, created_at DESC index), three-function API (initialize, getAllExpenses, createExpense), and Express server entry point
+**01 (wave 1, database):** SQLite schema, storage layer, and project scaffold.
+- `db/database.js` exports `initialize`, `getAllExpenses`, `createExpense`, `updateExpense`
+- `updateExpense` returns the updated row, or `null` when the ID does not exist
+- `created_at` is immutable on update; `updated_at` is refreshed
 
-**02:** Express REST API Layer
-- Tasks: 2/2 completed
-- Commits: 64f5c9a, 560a494
-- Files created: middleware/validate.js, middleware/errorHandler.js, routes/expenses.js, tests/api.test.js
-- Summary: GET/POST /api/expenses endpoints with 9-code FRD Y2 validation, dollar-to-cents conversion, helmet security headers, and 21 integration tests
+**02 (wave 2, backend):** Express REST API with validation and error handling.
+- `GET /api/expenses`, `POST /api/expenses`, `PUT /api/expenses/:id`
+- ID validation runs before body validation, so a malformed ID reports
+  `ERR_EXPENSE_INVALID_ID` rather than being masked by body errors
+- 31 integration tests passing
 
-**03:** Frontend UI
-- Tasks: 2/2 completed
-- Commits: bf6c2bd, 897255e
-- Files created: public/index.html, public/style.css, public/app.js
-- Summary: Single-page expense tracker UI with form, validation, expense list, running total, and responsive layout using vanilla JS and fetch API
+**03 (wave 3, frontend):** Single-page UI with add and edit modes.
+- Per-row Edit button; form pre-populates with current values (cents → dollars)
+- `Save Changes` / `Cancel`; Cancel makes no server call
+- `.editing-row` highlight and `#edit-indicator` banner mark edit mode
+- All user text rendered via `textContent` (XSS prevention)
 
-**04:** E2E Integration Tests
-- Tasks: 2/2 completed
-- Commits: 11fdca6, db8f98f
-- Files created: playwright.config.js, e2e/expense-tracker.spec.js
-- Summary: Playwright E2E test suite with 10 tests covering the full Daily Expense Capture journey — empty state, add flow, batch entry, persistence, validation, cents arithmetic, and security headers
+**04 (wave 4, integration):** Playwright E2E coverage.
+- 18 tests in `e2e/expense-tracker.spec.js`, including 8 for the edit flow
+- 59 tests passing across the full Playwright run (includes the UAT spec)
 
 ### Aggregated Stats
 
-- **Total tasks:** 8/8 completed
-- **Total commits:** 8 (836389b, af5a968, 64f5c9a, 560a494, bf6c2bd, 897255e, 11fdca6, db8f98f)
-- **Key files created:** 13 (package.json, db/database.js, server.js, middleware/validate.js, middleware/errorHandler.js, routes/expenses.js, tests/api.test.js, public/index.html, public/style.css, public/app.js, playwright.config.js, e2e/expense-tracker.spec.js, and supporting configuration files)
-- **Test coverage:** 31 tests total (21 API integration tests + 10 E2E tests, all passing)
-
-### Feature Coverage
-
-| Feature | Wave 1 (DB) | Wave 2 (API) | Wave 3 (UI) | Wave 4 (E2E) | Status |
-|---------|-------------|--------------|-------------|--------------|--------|
-| F0: Expense Entry | | POST /api/expenses | Entry form + validation | Add flow | ✓ |
-| F1: Expense Editing | updateExpense function | PUT /api/expenses/:id | Edit mode (buttons, form toggle, cancel) | Edit flow | ✓ |
-| F2: Persistent Storage | Schema + storage layer | Write-before-acknowledge | | Restart persistence | ✓ |
-| F3: Expense List Display | | GET /api/expenses | List rendering + empty state + Edit buttons | List verification | ✓ |
-| F4: Total Amount Display | | (data via GET) | Cents sum + currency format + recalc on edit | Total accuracy | ✓ |
-| F5: Web-Based UI | | Static serving + helmet | HTML/CSS/JS layout | Single-command startup | ✓ |
+- **API integration tests:** 31 passing
+- **E2E tests:** 59 passing (18 in the main spec + UAT spec)
+- **Total commits (F1 delta):** 4
 
 ### Deviations
 
-**Wave 1 (Plan 01):**
-- No updateExpense function initially — F1 (Expense Editing) deferred per initial SCOPE-DECISION.md
-- *Note: Later user override (SCOPE-DECISION v2) included F1 in full scope; updateExpense was added in Wave 2*
+1. **Plan 02 middleware order (Rule 1 — auto-fixed).** The plan placed
+   `validateExpenseInput` before the ID check on the PUT route, which would let body
+   errors mask an invalid ID and contradict the FRD's `ERR_EXPENSE_INVALID_ID` case.
+   ID validation was extracted into a `validateExpenseId` middleware that runs first.
+   Covered by the test "reports an invalid ID rather than body errors when both are invalid".
 
-**Wave 2 (Plan 02):**
-- Auto-fixed: Made server.js testable with require.main guard (Rule 3 - Blocking)
-- Impact: Essential for test isolation; already planned file change
+2. **Obsolete test replaced.** `tests/api.test.js` asserted `PUT /api/expenses/1`
+   returns 404 because no PUT endpoint existed. That assertion contradicts F1 and was
+   replaced by a `PUT /api/expenses/:id` suite.
 
-**Wave 3 (Plan 03):**
-- No edit buttons, edit mode, or PUT calls in initial UI (per original scope)
-- *Note: User override added these in full scope; edit UI was added separately*
-- No deviations from plan as executed
+3. **Contract verify commands — 2 spurious failures (not fixed, documented).**
+   The `verify:` commands in plans 03 and 04 grep `public/style.css` for
+   `#expense-form` / `#expense-list`. The stylesheet has always targeted
+   `.form-section` / `.list-section` instead, so these commands fail against correct
+   code. Pre-existing and cosmetic; the styling itself is correct.
 
-**Wave 4 (Plan 04):**
-- Auto-fixed: Installed missing Chromium system dependencies (Rule 3 - Blocking)
-- Auto-fixed: Changed DB cleanup from file deletion to SQL DELETE (Rule 1 - Bug)
-- Impact: Essential for test isolation; test coverage remains as planned (10/10 passing)
+### Environment notes
 
-**Total deviations:** 3 auto-fixed (2 blocking, 1 bug)  
-**Impact on plan:** No scope creep — all fixes were corrections to implementation approach, not feature additions.
-
----
-
-## Quality Gates Passed
-
-✓ All 4 waves completed successfully  
-✓ Shape contracts verified at wave boundaries  
-✓ Existence verification passed (all declared artifacts present)  
-✓ Consumer verification passed (all wave N+1 dependencies satisfied)  
-✓ 31 tests passing (21 API + 10 E2E, 0 failures)  
-✓ No blocking stubs found  
-✓ All 13 key files verified on disk  
-✓ Database persistence verified across restarts  
-✓ XSS prevention confirmed (textContent-only rendering)  
-✓ Security headers configured (helmet with iframe-friendly settings)  
-
----
-
-*Express Build Complete: 2026-09-11*
-*All waves executed, all tests passing, ready for UAT verification*
+This sandbox started without `node_modules`, the Playwright Chromium binary, or its
+system libraries. `npm install`, `npx playwright install chromium`, and
+`npx playwright install-deps chromium` were run to make verification possible.
