@@ -5,12 +5,17 @@ document.addEventListener('DOMContentLoaded', function () {
   var descriptionInput = document.getElementById('description');
   var categoryInput = document.getElementById('category');
   var submitBtn = document.getElementById('submit-btn');
+  var cancelBtn = document.getElementById('cancel-btn');
+  var editIndicator = document.getElementById('edit-indicator');
   var totalAmountEl = document.getElementById('total-amount');
   var expenseListEl = document.getElementById('expense-list');
   var toastContainer = document.getElementById('toast-container');
 
   // State — in-memory array of expenses (populated from API)
   var expenses = [];
+
+  // ID of the expense currently being edited, or null in add mode (US-1.1)
+  var editingId = null;
 
   // Auto-focus amount field on load (UX-Mockup Flow 2, US-5.2)
   amountInput.focus();
@@ -20,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Attach form submit handler
   form.addEventListener('submit', handleSubmit);
+
+  // Cancel discards pending edits with no server call (FRD F01 step 7)
+  cancelBtn.addEventListener('click', exitEditMode);
 
   // --- API Communication ---
 
@@ -83,12 +91,16 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
+    // Capture mode for this request — editingId can change while in flight
+    var isEdit = editingId !== null;
+    var targetId = editingId;
+
     // Disable button during request (UX-Mockup: "Saving..." label)
     submitBtn.disabled = true;
     submitBtn.textContent = 'Saving...';
 
-    fetch('/api/expenses', {
-      method: 'POST',
+    fetch(isEdit ? '/api/expenses/' + targetId : '/api/expenses', {
+      method: isEdit ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         amount: parseFloat(amountInput.value),
@@ -103,16 +115,30 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(function (result) {
         if (result.status === 201) {
-          // Success — FRD F0 step 12
+          // Created — FRD F0 step 12
           expenses.unshift(result.data.expense); // Prepend (most recent first)
           renderExpenses();
           updateTotal();
           form.reset(); // Clear all fields
           showToast('Expense added!', 'success');
           amountInput.focus(); // Return focus for batch entry (US-0.2)
+        } else if (result.status === 200) {
+          // Updated — FRD F01 step 6j–6m: replace row in place, recalc total, exit edit mode
+          var updated = result.data.expense;
+          var idx = expenses.findIndex(function (e) { return e.id === updated.id; });
+          if (idx !== -1) expenses[idx] = updated;
+          exitEditMode(); // clears form and re-renders
+          updateTotal();
+          showToast('Expense updated!', 'success');
+          amountInput.focus();
         } else if (result.status === 400 && result.data.errors) {
           // Server validation errors — display inline
           displayServerErrors(result.data.errors);
+        } else if (result.status === 404) {
+          // Expense vanished between load and save (FRD F01 outputs: not-found)
+          showToast('Expense not found. It may have been removed.', 'error');
+          exitEditMode();
+          loadExpenses();
         } else {
           // Unexpected error
           showToast('Failed to save expense. Please try again.', 'error');
@@ -124,8 +150,41 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .finally(function () {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Add Expense';
+        // Restore the label for whichever mode we are in now
+        submitBtn.textContent = editingId !== null ? 'Save Changes' : 'Add Expense';
       });
+  }
+
+  // --- Edit Mode (F1) ---
+
+  function enterEditMode(expense) {
+    editingId = expense.id;
+
+    // Populate form with current values (FRD F01 step 3); amount is cents -> dollars
+    amountInput.value = (expense.amount / 100).toFixed(2);
+    descriptionInput.value = expense.description;
+    categoryInput.value = expense.category;
+
+    // Visual edit-mode indicators (FRD F01 step 4)
+    submitBtn.textContent = 'Save Changes';
+    cancelBtn.style.display = '';
+    editIndicator.style.display = '';
+
+    clearErrors();
+    renderExpenses(); // re-render to highlight the row being edited
+    amountInput.focus();
+  }
+
+  function exitEditMode() {
+    editingId = null;
+    form.reset();
+    clearErrors();
+
+    submitBtn.textContent = 'Add Expense';
+    cancelBtn.style.display = 'none';
+    editIndicator.style.display = 'none';
+
+    renderExpenses(); // clears the row highlight
   }
 
   // --- Client-Side Validation ---
@@ -251,7 +310,20 @@ document.addEventListener('DOMContentLoaded', function () {
       row.appendChild(descEl);
       row.appendChild(catEl);
 
-      // NO Edit button — F1 deferred per SCOPE-DECISION.md
+      // Edit button (US-1.1, FRD F01 step 2)
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'expense-edit-btn';
+      editBtn.textContent = 'Edit';
+      editBtn.setAttribute('data-id', String(expense.id));
+      editBtn.setAttribute('aria-label', 'Edit ' + expense.description);
+      editBtn.addEventListener('click', function () { enterEditMode(expense); });
+      row.appendChild(editBtn);
+
+      // Highlight the row currently in edit mode
+      if (editingId === expense.id) {
+        row.classList.add('editing-row');
+      }
 
       expenseListEl.appendChild(row);
     });

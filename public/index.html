@@ -19,8 +19,12 @@
       <span class="total-amount" id="total-amount">$0.00</span>
     </section>
 
-    <!-- Expense Form — US-0.1: add mode only (no edit mode, F1 deferred) -->
-    <section class="form-section" aria-label="Add expense">
+    <!-- Expense Form — US-0.1: add mode, US-1.1: edit mode -->
+    <section class="form-section" aria-label="Add or edit expense">
+      <!-- Edit mode indicator — hidden by default, shown when editing -->
+      <div class="edit-indicator" id="edit-indicator" aria-live="polite" style="display: none;">
+        <span>Editing expense</span>
+      </div>
       <form id="expense-form" novalidate>
         <div class="form-row">
           <div class="form-group">
@@ -39,7 +43,10 @@
             <span class="error-message" id="category-error" role="alert"></span>
           </div>
         </div>
-        <button type="submit" id="submit-btn">Add Expense</button>
+        <div class="form-actions">
+          <button type="submit" id="submit-btn">Add Expense</button>
+          <button type="button" id="cancel-btn" aria-label="Cancel editing" style="display: none;">Cancel</button>
+        </div>
       </form>
     </section>
 
