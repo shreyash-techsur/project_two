@@ -228,3 +228,157 @@ test('security headers: response includes helmet security headers', async ({ pag
   // Helmet sets X-Content-Type-Options: nosniff
   expect(headers['x-content-type-options']).toBe('nosniff');
 });
+
+// ── Group 9: Edit Expense (F1, JRN-01.1 edit flow) ──
+
+/** Adds one expense through the UI so a row exists to edit. */
+async function addExpense(page, amount, description, category) {
+  await page.locator('#amount').fill(amount);
+  await page.locator('#description').fill(description);
+  await page.locator('#category').fill(category);
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(1);
+}
+
+test('edit: each expense row shows an Edit button', async ({ page }) => {
+  await page.goto('/');
+  await addExpense(page, '18.50', 'Pad Thai takeout', 'Food');
+
+  await expect(page.locator('.expense-edit-btn')).toHaveCount(1);
+  await expect(page.locator('.expense-edit-btn')).toHaveText('Edit');
+});
+
+test('edit: clicking Edit populates the form with current values and enters edit mode', async ({ page }) => {
+  await page.goto('/');
+  await addExpense(page, '18.50', 'Pad Thai takeout', 'Food');
+
+  await page.locator('.expense-edit-btn').click();
+
+  // Form pre-populated with the row's current values (FRD F01 step 3)
+  await expect(page.locator('#amount')).toHaveValue('18.50');
+  await expect(page.locator('#description')).toHaveValue('Pad Thai takeout');
+  await expect(page.locator('#category')).toHaveValue('Food');
+
+  // Edit-mode affordances visible (FRD F01 step 4)
+  await expect(page.locator('#submit-btn')).toHaveText('Save Changes');
+  await expect(page.locator('#cancel-btn')).toBeVisible();
+  await expect(page.locator('#edit-indicator')).toBeVisible();
+  await expect(page.locator('.expense-row')).toHaveClass(/editing-row/);
+});
+
+test('edit: saving changes updates the list and the total', async ({ page }) => {
+  await page.goto('/');
+  await addExpense(page, '18.50', 'Pad Thai takeout', 'Food');
+  await expect(page.locator('#total-amount')).toContainText('$18.50');
+
+  await page.locator('.expense-edit-btn').click();
+  await page.locator('#amount').fill('25.75');
+  await page.locator('#description').fill('Pad Thai dinner');
+  await page.locator('#category').fill('Dining');
+  await page.locator('#submit-btn').click();
+
+  // Row reflects new values, total recalculated (FRD F01 steps 6j–6k)
+  await expect(page.locator('.expense-row')).toHaveCount(1);
+  await expect(page.locator('#expense-list')).toContainText('Pad Thai dinner');
+  await expect(page.locator('#expense-list')).toContainText('Dining');
+  await expect(page.locator('#total-amount')).toContainText('$25.75');
+});
+
+test('edit: form returns to add mode after a successful save', async ({ page }) => {
+  await page.goto('/');
+  await addExpense(page, '18.50', 'Pad Thai takeout', 'Food');
+
+  await page.locator('.expense-edit-btn').click();
+  await page.locator('#amount').fill('25.75');
+  await page.locator('#submit-btn').click();
+
+  // Edit mode exited, form cleared (FRD F01 step 6l)
+  await expect(page.locator('#submit-btn')).toHaveText('Add Expense');
+  await expect(page.locator('#cancel-btn')).toBeHidden();
+  await expect(page.locator('#edit-indicator')).toBeHidden();
+  await expect(page.locator('#amount')).toHaveValue('');
+  await expect(page.locator('#description')).toHaveValue('');
+  await expect(page.locator('#category')).toHaveValue('');
+});
+
+test('edit: cancel discards changes and leaves the expense untouched', async ({ page }) => {
+  await page.goto('/');
+  await addExpense(page, '18.50', 'Pad Thai takeout', 'Food');
+
+  await page.locator('.expense-edit-btn').click();
+  await page.locator('#amount').fill('99.99');
+  await page.locator('#description').fill('Should not be saved');
+  await page.locator('#cancel-btn').click();
+
+  // No server call — original values intact (FRD F01 step 7)
+  await expect(page.locator('#expense-list')).toContainText('Pad Thai takeout');
+  await expect(page.locator('#expense-list')).not.toContainText('Should not be saved');
+  await expect(page.locator('#total-amount')).toContainText('$18.50');
+
+  // Back in add mode with a cleared form
+  await expect(page.locator('#submit-btn')).toHaveText('Add Expense');
+  await expect(page.locator('#cancel-btn')).toBeHidden();
+  await expect(page.locator('#amount')).toHaveValue('');
+});
+
+test('edit: validation errors block the save and keep edit mode active', async ({ page }) => {
+  await page.goto('/');
+  await addExpense(page, '18.50', 'Pad Thai takeout', 'Food');
+
+  await page.locator('.expense-edit-btn').click();
+  await page.locator('#amount').fill('0');
+  await page.locator('#submit-btn').click();
+
+  // Inline error shown, still editing (FRD F01 step 6c)
+  await expect(page.locator('#amount-error')).toContainText('greater than zero');
+  await expect(page.locator('#submit-btn')).toHaveText('Save Changes');
+  await expect(page.locator('#edit-indicator')).toBeVisible();
+
+  // Stored value unchanged
+  await expect(page.locator('#total-amount')).toContainText('$18.50');
+});
+
+test('edit: changes persist across a page refresh', async ({ page }) => {
+  await page.goto('/');
+  await addExpense(page, '18.50', 'Pad Thai takeout', 'Food');
+
+  await page.locator('.expense-edit-btn').click();
+  await page.locator('#amount').fill('25.75');
+  await page.locator('#description').fill('Pad Thai dinner');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('#total-amount')).toContainText('$25.75');
+
+  await page.reload();
+
+  // Persisted to SQLite, not just in-memory (F2)
+  await expect(page.locator('#expense-list')).toContainText('Pad Thai dinner');
+  await expect(page.locator('#total-amount')).toContainText('$25.75');
+});
+
+test('edit: editing one of several expenses leaves the others unchanged', async ({ page }) => {
+  await page.goto('/');
+
+  await page.locator('#amount').fill('10.00');
+  await page.locator('#description').fill('Coffee');
+  await page.locator('#category').fill('Drinks');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(1);
+
+  await page.locator('#amount').fill('20.00');
+  await page.locator('#description').fill('Lunch');
+  await page.locator('#category').fill('Food');
+  await page.locator('#submit-btn').click();
+  await expect(page.locator('.expense-row')).toHaveCount(2);
+  await expect(page.locator('#total-amount')).toContainText('$30.00');
+
+  // Edit only the most recent row (Lunch, rendered first)
+  await page.locator('.expense-edit-btn').first().click();
+  await expect(page.locator('#description')).toHaveValue('Lunch');
+  await page.locator('#amount').fill('35.00');
+  await page.locator('#submit-btn').click();
+
+  // Coffee untouched, total reflects only the edited row
+  await expect(page.locator('.expense-row')).toHaveCount(2);
+  await expect(page.locator('#expense-list')).toContainText('Coffee');
+  await expect(page.locator('#total-amount')).toContainText('$45.00');
+});
