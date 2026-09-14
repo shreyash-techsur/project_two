@@ -102,4 +102,45 @@ function createExpense({ amount, description, category }) {
   }
 }
 
-module.exports = { initialize, getAllExpenses, createExpense };
+/**
+ * Update an existing expense record.
+ * `created_at` is immutable; `updated_at` is set to the current UTC time.
+ * @param {number} id - The ID of the expense to update
+ * @param {Object} data - The updated expense data
+ * @param {number} data.amount - Amount in cents (positive integer)
+ * @param {string} data.description - Expense description
+ * @param {string} data.category - Expense category
+ * @returns {Object|null} The complete updated record, or null if no expense has that ID
+ */
+function updateExpense(id, { amount, description, category }) {
+  try {
+    const updated_at = new Date().toISOString();
+
+    const updateStmt = db.prepare(`
+      UPDATE expenses
+      SET amount = ?, description = ?, category = ?, updated_at = ?
+      WHERE id = ?
+    `);
+
+    const info = updateStmt.run(amount, description, category, updated_at, id);
+
+    // No row matched the given ID — caller maps this to a 404
+    if (info.changes === 0) {
+      return null;
+    }
+
+    const selectStmt = db.prepare(`
+      SELECT id, amount, description, category, created_at, updated_at
+      FROM expenses
+      WHERE id = ?
+    `);
+
+    return selectStmt.get(id);
+  } catch (err) {
+    const error = new Error(`ERR_STORAGE_WRITE: Failed to update expense: ${err.message}`);
+    error.code = 'ERR_STORAGE_WRITE';
+    throw error;
+  }
+}
+
+module.exports = { initialize, getAllExpenses, createExpense, updateExpense };
