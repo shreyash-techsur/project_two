@@ -295,12 +295,169 @@ describe('Security', () => {
     assert.equal(res.headers['x-content-type-options'], 'nosniff');
   });
 
-  it('PUT /api/expenses/1 returns 404 (no PUT endpoint)', async () => {
-    const res = await request('PUT', '/api/expenses/1', {
+});
+
+// ============================================================
+// PUT /api/expenses/:id — F1 Expense Editing
+// ============================================================
+
+describe('PUT /api/expenses/:id', () => {
+  // Creates a fresh expense and returns it, so each test edits its own row
+  async function seedExpense() {
+    const res = await request('POST', '/api/expenses', {
+      amount: 10.0,
+      description: 'Original lunch',
+      category: 'Food'
+    });
+    assert.equal(res.status, 201);
+    return res.body.expense;
+  }
+
+  it('updates an existing expense and returns 200 with the updated record', async () => {
+    const created = await seedExpense();
+
+    const res = await request('PUT', `/api/expenses/${created.id}`, {
+      amount: 20.5,
+      description: 'Corrected lunch',
+      category: 'Dining'
+    });
+
+    assert.equal(res.status, 200);
+    assert.equal(res.body.expense.id, created.id);
+    assert.equal(res.body.expense.description, 'Corrected lunch');
+    assert.equal(res.body.expense.category, 'Dining');
+  });
+
+  it('converts the dollar amount to integer cents', async () => {
+    const created = await seedExpense();
+
+    const res = await request('PUT', `/api/expenses/${created.id}`, {
+      amount: 20.5,
+      description: 'Corrected lunch',
+      category: 'Dining'
+    });
+
+    assert.equal(res.body.expense.amount, 2050);
+  });
+
+  it('preserves created_at and advances updated_at', async () => {
+    const created = await seedExpense();
+
+    const res = await request('PUT', `/api/expenses/${created.id}`, {
+      amount: 33.0,
+      description: 'Later edit',
+      category: 'Food'
+    });
+
+    assert.equal(res.body.expense.created_at, created.created_at);
+    assert.ok(res.body.expense.updated_at >= created.created_at);
+  });
+
+  it('trims description and category before storage', async () => {
+    const created = await seedExpense();
+
+    const res = await request('PUT', `/api/expenses/${created.id}`, {
+      amount: 5.0,
+      description: '  Padded description  ',
+      category: '  Padded category  '
+    });
+
+    assert.equal(res.body.expense.description, 'Padded description');
+    assert.equal(res.body.expense.category, 'Padded category');
+  });
+
+  it('persists the update — a subsequent GET returns the new values', async () => {
+    const created = await seedExpense();
+
+    await request('PUT', `/api/expenses/${created.id}`, {
+      amount: 77.25,
+      description: 'Persisted edit',
+      category: 'Travel'
+    });
+
+    const res = await request('GET', '/api/expenses');
+    const found = res.body.expenses.find((e) => e.id === created.id);
+
+    assert.equal(found.amount, 7725);
+    assert.equal(found.description, 'Persisted edit');
+    assert.equal(found.category, 'Travel');
+  });
+
+  it('returns 404 ERR_EXPENSE_NOT_FOUND for a non-existent ID', async () => {
+    const res = await request('PUT', '/api/expenses/999999', {
+      amount: 5,
+      description: 'ghost',
+      category: 'none'
+    });
+
+    assert.equal(res.status, 404);
+    assert.equal(res.body.error.code, 'ERR_EXPENSE_NOT_FOUND');
+    assert.equal(res.body.error.message, 'Expense not found');
+  });
+
+  it('returns 400 ERR_EXPENSE_INVALID_ID for a non-numeric ID', async () => {
+    const res = await request('PUT', '/api/expenses/abc', {
       amount: 5,
       description: 'test',
       category: 'test'
     });
-    assert.equal(res.status, 404);
+
+    assert.equal(res.status, 400);
+    assert.equal(res.body.error.code, 'ERR_EXPENSE_INVALID_ID');
+  });
+
+  it('returns 400 ERR_EXPENSE_INVALID_ID for a zero or negative ID', async () => {
+    const zero = await request('PUT', '/api/expenses/0', {
+      amount: 5, description: 'test', category: 'test'
+    });
+    assert.equal(zero.status, 400);
+    assert.equal(zero.body.error.code, 'ERR_EXPENSE_INVALID_ID');
+
+    const negative = await request('PUT', '/api/expenses/-3', {
+      amount: 5, description: 'test', category: 'test'
+    });
+    assert.equal(negative.status, 400);
+    assert.equal(negative.body.error.code, 'ERR_EXPENSE_INVALID_ID');
+  });
+
+  it('reports an invalid ID rather than body errors when both are invalid', async () => {
+    const res = await request('PUT', '/api/expenses/abc', {
+      amount: -5,
+      description: '',
+      category: ''
+    });
+
+    assert.equal(res.status, 400);
+    assert.equal(res.body.error.code, 'ERR_EXPENSE_INVALID_ID');
+  });
+
+  it('applies the same body validation as create', async () => {
+    const created = await seedExpense();
+
+    const res = await request('PUT', `/api/expenses/${created.id}`, {
+      amount: -5,
+      description: '',
+      category: ''
+    });
+
+    assert.equal(res.status, 400);
+    const codes = res.body.errors.map((e) => e.code);
+    assert.ok(codes.includes('ERR_EXPENSE_AMOUNT_POSITIVE'));
+    assert.ok(codes.includes('ERR_EXPENSE_DESC_REQUIRED'));
+    assert.ok(codes.includes('ERR_EXPENSE_CAT_REQUIRED'));
+  });
+
+  it('does not change stored data when validation fails', async () => {
+    const created = await seedExpense();
+
+    await request('PUT', `/api/expenses/${created.id}`, {
+      amount: -5, description: '', category: ''
+    });
+
+    const res = await request('GET', '/api/expenses');
+    const found = res.body.expenses.find((e) => e.id === created.id);
+
+    assert.equal(found.description, 'Original lunch');
+    assert.equal(found.amount, 1000);
   });
 });
