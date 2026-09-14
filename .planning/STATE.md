@@ -3,7 +3,7 @@
 **Workflow Mode:** spec-express
 **Current Milestone:** v1
 **Status:** in-progress
-**Last activity:** 2026-09-14 - Built F1 (Expense Editing) delta for build-a-simple-expense-tracker-that-allo; scope now genuinely full (31 API + 59 E2E tests passing)
+**Last activity:** 2026-09-14 - UAT verified express task build-a-simple-expense-tracker-that-allo (153/153 passed, 2 fix cycles)
 
 ---
 
@@ -37,6 +37,7 @@ Spec documents were generated in `project_specs/` during initialization. Use `/p
 - Chromium-only E2E testing — cross-browser deferred to R2 scope
 - Direct SQLite DELETE in beforeEach for test isolation (not file deletion)
 - Serial Playwright execution (workers: 1) for shared SQLite DB
+- UAT (2026-09-14): 404 on PUT retains form input — exitEditMode(preserveInput) skips form.reset() so the user can re-submit as a new expense (US-1.4)
 
 ## Quick Tasks Completed
 
@@ -47,7 +48,7 @@ Spec documents were generated in `project_specs/` during initialization. Use `/p
 
 | # | Description | Date | Commit | Scope | UAT | Directory |
 |---|-------------|------|--------|-------|-----|-----------|
-| build-a-simple-expense-tracker-that-allo | Build a simple expense tracker with add, edit, view, and total features | 2026-09-14 | e6302ea | full (6/6) | 31 API + 59 E2E | [build-a-simple-expense-tracker-that-allo](./express/build-a-simple-expense-tracker-that-allo/) |
+| build-a-simple-expense-tracker-that-allo | Build a simple expense tracker with add, edit, view, and total features | 2026-09-14 | e6302ea | full (6/6) | ✓ 153/153 | [build-a-simple-expense-tracker-that-allo](./express/build-a-simple-expense-tracker-that-allo/) |
 
 ## Blockers/Concerns
 

@@ -4,8 +4,7 @@
       "/usr/local/bin/node",
       "/home/daytona/project/node_modules/.bin/playwright",
       "test",
-      "e2e/uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-      "--list"
+      "e2e/uat/build-a-simple-expense-tracker-that-allo.spec.ts"
     ],
     "configFile": "/home/daytona/project/playwright.config.js",
     "rootDir": "/home/daytona/project/e2e",
@@ -18,14 +17,18 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 1
+    },
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "/home/daytona/project/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "",
         "name": "",
         "testDir": "/home/daytona/project/e2e",
@@ -94,8 +97,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 143,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:40.594Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-b0aa66f247075e3f2900",
@@ -114,8 +131,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 93,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:40.788Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-4614ab1252c5ad830fde",
@@ -134,8 +165,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 111,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:40.887Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-2a0aee3b8f2e4534fb1c",
@@ -154,8 +199,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 113,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:41.002Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-78f83a976b08def316af",
@@ -174,8 +233,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 162,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:41.120Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-526a4e063ea7cf361bfd",
@@ -194,8 +267,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 162,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:41.287Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-88a5a868dacb36a0620d",
@@ -214,8 +301,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 164,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:41.453Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-9f0158fae190016c0b78",
@@ -234,8 +335,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 160,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:41.622Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-ad12c16e13ff2ddabf86",
@@ -254,8 +369,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 112,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:41.787Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-d909df08e803550b2f9f",
@@ -274,8 +403,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 179,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:41.904Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-21b7513e297a856b2293",
@@ -294,8 +437,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 161,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:42.087Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-967c7d14be4b0c02ec0d",
@@ -314,8 +471,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 163,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-14T08:03:42.253Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "ad27cec2d1576e77b369-89c23b4de249870c0295",
@@ -349,8 +520,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 110,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:42.421Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-3b046970a07425c82f02",
@@ -369,8 +554,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 164,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:42.536Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-9aec679e7ae6702b01c2",
@@ -389,8 +588,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 163,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:42.704Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d2790f0762f694bb35f0",
@@ -409,8 +622,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 195,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:42.870Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-a7067f4cb235990d8acc",
@@ -429,8 +656,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 146,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:43.069Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-01918bda7ea96e05c89d",
@@ -457,8 +698,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 164,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:43.219Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-960f51d27a5dcb6552f2",
@@ -477,8 +732,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1168,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:43.387Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-444994e8211fe05e731e",
@@ -497,8 +766,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 144,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:44.559Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-a134863196219a472f0d",
@@ -517,8 +800,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 295,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:44.707Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d5487630d7e6c7046a6c",
@@ -545,8 +842,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 128,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:45.006Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-c005f7b14b900972a4c8",
@@ -565,8 +876,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 96,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:45.139Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-34cbef2c762472dffd42",
@@ -585,8 +910,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 180,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:45.239Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-5e29f352b177895a61ea",
@@ -605,8 +944,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 146,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:45.422Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-35eb6abd6ad37bd9ba77",
@@ -625,8 +978,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 146,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:45.572Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-c30f508645bbb7fe1cc9",
@@ -645,8 +1012,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 130,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:45.722Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-7fb754971e621cb98426",
@@ -665,8 +1046,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 145,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:45.857Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-47a10f5d2a2156342fa5",
@@ -685,8 +1080,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 129,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.005Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-8cfec855193ac50bb972",
@@ -705,8 +1114,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 163,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.139Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-b4e7bcdf9d4719a779ca",
@@ -725,8 +1148,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 145,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.306Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-92a0765a5d3246d23ccc",
@@ -745,8 +1182,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 130,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.455Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-282ffb99c86a189f30a0",
@@ -773,8 +1224,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 16,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.589Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-44999931c90e7cc10a0f",
@@ -793,8 +1258,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 6,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.609Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d977d957e1cf98bfd8b8",
@@ -813,8 +1292,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.619Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-6330f179b5b29e6e4502",
@@ -833,8 +1326,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 6,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.627Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-7e89c72cfe6a6ea729f9",
@@ -861,8 +1368,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 113,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.636Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-e9a3d017c695beac796a",
@@ -881,8 +1402,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 114,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.753Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-380ee8a6c42e8f1dc257",
@@ -901,8 +1436,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 146,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:46.871Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-bb7bdf58aa802f0137da",
@@ -921,8 +1470,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 365,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:47.021Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-1d02d12c2e246ae957ab",
@@ -941,8 +1504,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 228,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:47.390Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-6b54a877df55e450f723",
@@ -961,8 +1538,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 180,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:47.623Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-c9530b6d73e844c2522b",
@@ -981,8 +1572,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 178,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:47.808Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-c528ff7480109f0671f7",
@@ -1009,8 +1614,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 129,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:47.990Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-c662af16f3620d1721d4",
@@ -1029,8 +1648,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 654,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:48.123Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-657edbde160943b2abf1",
@@ -1049,8 +1682,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 170,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:48.781Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-8f030cfea98ed2a0154b",
@@ -1069,8 +1716,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 196,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:48.955Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-53dc3e7d2cd0769dea9a",
@@ -1097,8 +1758,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 210,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:49.156Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-079f96ca62198713694f",
@@ -1117,8 +1792,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 181,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:49.370Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-16ab81ab6f18bcde574c",
@@ -1137,8 +1826,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 362,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:49.555Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-82432791f7a02bcc96a5",
@@ -1165,8 +1868,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:49.920Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-e24420d1299f5d9cd69a",
@@ -1185,8 +1902,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 155,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:49.928Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-77889ade6920594df4b0",
@@ -1205,8 +1936,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 180,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:50.087Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d1795d2e0119bc5c5f84",
@@ -1225,13 +1970,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 9,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:50.270Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d7ee187666b56a5400f1",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 938,
+                  "line": 944,
                   "column": 9
                 }
               ]
@@ -1239,7 +1998,7 @@
             {
               "title": "US-2.1: Data Survives Page Refresh",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 951,
+              "line": 957,
               "column": 8,
               "specs": [
                 {
@@ -1253,13 +2012,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 199,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:50.283Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-737de1366fd622abf258",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 952,
+                  "line": 958,
                   "column": 9
                 },
                 {
@@ -1273,13 +2046,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 79,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:50.486Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-1a09849d6afaba119ab7",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 970,
+                  "line": 976,
                   "column": 9
                 },
                 {
@@ -1293,13 +2080,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 246,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:50.570Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-bc57ce836de11c955107",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 982,
+                  "line": 988,
                   "column": 9
                 },
                 {
@@ -1313,13 +2114,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 148,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:50.820Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-03b519360d0d24ca7883",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 998,
+                  "line": 1004,
                   "column": 9
                 }
               ]
@@ -1327,7 +2142,7 @@
             {
               "title": "US-2.2: Data Survives Server Restart",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1017,
+              "line": 1023,
               "column": 8,
               "specs": [
                 {
@@ -1341,13 +2156,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 147,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:50.971Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-a86cfa303287fba9b69b",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1021,
+                  "line": 1027,
                   "column": 9
                 },
                 {
@@ -1361,13 +2190,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 180,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.122Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-177d42bb4754886643a7",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1033,
+                  "line": 1039,
                   "column": 9
                 },
                 {
@@ -1381,13 +2224,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 6,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.306Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d353f1a5f3d72d330fca",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1047,
+                  "line": 1053,
                   "column": 9
                 },
                 {
@@ -1401,13 +2258,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.316Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-080d224b65aaa281d127",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1064,
+                  "line": 1070,
                   "column": 9
                 }
               ]
@@ -1415,7 +2286,7 @@
             {
               "title": "US-2.3: Automatic Storage Initialization",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1079,
+              "line": 1085,
               "column": 8,
               "specs": [
                 {
@@ -1429,13 +2300,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.323Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-a99adaaab78dda98fe59",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1080,
+                  "line": 1086,
                   "column": 9
                 },
                 {
@@ -1449,13 +2334,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 0,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.330Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-162ee29b97968a610b76",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1090,
+                  "line": 1096,
                   "column": 9
                 },
                 {
@@ -1469,13 +2368,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 45,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.334Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-94718dedbc3cb0951a5e",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1113,
+                  "line": 1119,
                   "column": 9
                 }
               ]
@@ -1483,7 +2396,7 @@
             {
               "title": "US-2.4: Write-Before-Acknowledge Guarantee",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1126,
+              "line": 1132,
               "column": 8,
               "specs": [
                 {
@@ -1497,13 +2410,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.382Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-9b85c30921083d7c8387",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1127,
+                  "line": 1133,
                   "column": 9
                 },
                 {
@@ -1517,13 +2444,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.390Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-4e2643f4839b319374af",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1142,
+                  "line": 1148,
                   "column": 9
                 },
                 {
@@ -1537,13 +2478,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 153,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.398Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-5533c0f855f989b08b27",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1162,
+                  "line": 1168,
                   "column": 9
                 }
               ]
@@ -1551,7 +2506,7 @@
             {
               "title": "US-2.5: Inspect Storage Directly",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1199,
+              "line": 1205,
               "column": 8,
               "specs": [
                 {
@@ -1565,13 +2520,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 40,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.555Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-201215895bb8cd9aa2fd",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1200,
+                  "line": 1206,
                   "column": 9
                 },
                 {
@@ -1585,13 +2554,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 46,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.599Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d51836724c01ca36947c",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1216,
+                  "line": 1222,
                   "column": 9
                 },
                 {
@@ -1605,13 +2588,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 30,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.649Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-e59d98374a7ecd2e4ced",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1246,
+                  "line": 1252,
                   "column": 9
                 },
                 {
@@ -1625,13 +2622,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 29,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.683Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-7820b7dcf36069a7d2d2",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1258,
+                  "line": 1264,
                   "column": 9
                 },
                 {
@@ -1645,13 +2656,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 30,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.715Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-48a1c3e516088beb45b1",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1268,
+                  "line": 1274,
                   "column": 9
                 }
               ]
@@ -1659,7 +2684,7 @@
             {
               "title": "US-3.1: View All Expenses on Page Load",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1281,
+              "line": 1287,
               "column": 8,
               "specs": [
                 {
@@ -1673,13 +2698,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 101,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.749Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-3811231a130ed1e3e3bc",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1282,
+                  "line": 1288,
                   "column": 9
                 },
                 {
@@ -1693,13 +2732,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 97,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.854Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-3b64c886b827b1698a52",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1300,
+                  "line": 1306,
                   "column": 9
                 },
                 {
@@ -1713,13 +2766,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 128,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:51.955Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-2ba0ef90633cac796ad9",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1311,
+                  "line": 1317,
                   "column": 9
                 },
                 {
@@ -1733,13 +2800,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 79,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:52.087Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-c2c06cfc021501a97789",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1329,
+                  "line": 1335,
                   "column": 9
                 },
                 {
@@ -1753,13 +2834,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 96,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:52.171Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-9b0b1e58dfd2bb660cc4",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1340,
+                  "line": 1346,
                   "column": 9
                 }
               ]
@@ -1767,7 +2862,7 @@
             {
               "title": "US-3.2: See Empty State When No Expenses Exist",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1352,
+              "line": 1358,
               "column": 8,
               "specs": [
                 {
@@ -1781,13 +2876,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 95,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:52.271Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-f6812ac9cdedb68a50f0",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1357,
+                  "line": 1363,
                   "column": 9
                 },
                 {
@@ -1801,13 +2910,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 95,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:52.370Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-04e977f26135781e4a29",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1372,
+                  "line": 1378,
                   "column": 9
                 },
                 {
@@ -1821,13 +2944,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 94,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:52.471Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-07d9a1cfb7d35a918758",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1382,
+                  "line": 1388,
                   "column": 9
                 },
                 {
@@ -1841,13 +2978,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 163,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:52.570Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-b3a70fb65284ff86c3bc",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1387,
+                  "line": 1393,
                   "column": 9
                 }
               ]
@@ -1855,7 +3006,7 @@
             {
               "title": "US-3.3: List Updates Immediately After Mutations",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1400,
+              "line": 1406,
               "column": 8,
               "specs": [
                 {
@@ -1869,13 +3020,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 161,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:52.737Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-15e50ffe481e0a35e787",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1401,
+                  "line": 1407,
                   "column": 9
                 },
                 {
@@ -1889,13 +3054,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 197,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:52.903Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-2305de0bed9a43650e56",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1418,
+                  "line": 1424,
                   "column": 9
                 },
                 {
@@ -1909,13 +3088,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 295,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:53.104Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-e70eb87bd2a0fed04c8c",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1438,
+                  "line": 1444,
                   "column": 9
                 },
                 {
@@ -1929,13 +3122,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 228,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:53.404Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-eab077045b127a7089da",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1461,
+                  "line": 1467,
                   "column": 9
                 }
               ]
@@ -1943,7 +3150,7 @@
             {
               "title": "US-3.4: Handle List Loading Errors Gracefully",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1483,
+              "line": 1489,
               "column": 8,
               "specs": [
                 {
@@ -1957,13 +3164,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 96,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:53.636Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-5b4c73db1efbf994dca8",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1484,
+                  "line": 1490,
                   "column": 9
                 },
                 {
@@ -1977,13 +3198,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 96,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:53.735Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-6888ce6f238e2d534473",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1505,
+                  "line": 1511,
                   "column": 9
                 },
                 {
@@ -1997,13 +3232,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 130,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:53.836Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-ac8602a1f929eb05f58a",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1522,
+                  "line": 1528,
                   "column": 9
                 },
                 {
@@ -2017,13 +3266,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 95,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:53.970Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-f1cdc5c92ddb5608bc59",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1552,
+                  "line": 1558,
                   "column": 9
                 }
               ]
@@ -2031,7 +3294,7 @@
             {
               "title": "US-3.5: Expense List Performance at Scale",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1571,
+              "line": 1577,
               "column": 8,
               "specs": [
                 {
@@ -2045,13 +3308,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 147,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:54.069Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-7767547173cee99fe8e7",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1572,
+                  "line": 1578,
                   "column": 9
                 },
                 {
@@ -2065,13 +3342,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 93,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:54.222Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-9b65c8cb577f73176c7f",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1604,
+                  "line": 1610,
                   "column": 9
                 },
                 {
@@ -2085,13 +3376,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 151,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:54.319Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-fbd775c1bf81ece4dfbb",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1630,
+                  "line": 1636,
                   "column": 9
                 }
               ]
@@ -2099,7 +3404,7 @@
             {
               "title": "US-4.1: View Running Total of All Expenses",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1665,
+              "line": 1671,
               "column": 8,
               "specs": [
                 {
@@ -2113,13 +3418,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 127,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:54.473Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-c245a530e07d71c35275",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1666,
+                  "line": 1672,
                   "column": 9
                 },
                 {
@@ -2133,13 +3452,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 77,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:54.605Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-326162de7077c1070b65",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1684,
+                  "line": 1690,
                   "column": 9
                 },
                 {
@@ -2153,13 +3486,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 80,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:54.686Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-f48241e273511f9407dc",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1693,
+                  "line": 1699,
                   "column": 9
                 },
                 {
@@ -2173,13 +3520,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 95,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:54.770Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-5e73dfff47e04d773b4c",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1708,
+                  "line": 1714,
                   "column": 9
                 }
               ]
@@ -2187,7 +3548,7 @@
             {
               "title": "US-4.2: Total Updates After Adding an Expense",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1715,
+              "line": 1721,
               "column": 8,
               "specs": [
                 {
@@ -2201,13 +3562,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 146,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:54.868Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-2c2093a05774fafaf47b",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1716,
+                  "line": 1722,
                   "column": 9
                 },
                 {
@@ -2221,13 +3596,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 400,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:55.018Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-624000346bb67d6c5518",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1731,
+                  "line": 1737,
                   "column": 9
                 },
                 {
@@ -2241,13 +3630,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 162,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:55.422Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-077fe65f0b64e53e47e3",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1747,
+                  "line": 1753,
                   "column": 9
                 }
               ]
@@ -2255,7 +3658,7 @@
             {
               "title": "US-4.3: Total Updates After Editing an Expense",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1754,
+              "line": 1760,
               "column": 8,
               "specs": [
                 {
@@ -2269,13 +3672,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 179,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:55.589Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-37fb89c137b8448ee803",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1755,
+                  "line": 1761,
                   "column": 9
                 },
                 {
@@ -2289,13 +3706,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 179,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:55.773Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-cdbf4e0c750cbcabef00",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1774,
+                  "line": 1780,
                   "column": 9
                 },
                 {
@@ -2309,13 +3740,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 327,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:55.956Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-f8b25a5b614ea7d48ad6",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1788,
+                  "line": 1794,
                   "column": 9
                 }
               ]
@@ -2323,7 +3768,7 @@
             {
               "title": "US-4.4: Total Error State",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1814,
+              "line": 1820,
               "column": 8,
               "specs": [
                 {
@@ -2337,13 +3782,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 77,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:56.288Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-3fb5144c139d61aa51c5",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1815,
+                  "line": 1821,
                   "column": 9
                 },
                 {
@@ -2357,13 +3816,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 136,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:56.369Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-a99bc8b8143b12bfca3b",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1831,
+                  "line": 1837,
                   "column": 9
                 },
                 {
@@ -2377,13 +3850,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 123,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:56.509Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-f0c7f3177e0b8bdf45ea",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1854,
+                  "line": 1860,
                   "column": 9
                 }
               ]
@@ -2391,7 +3878,7 @@
             {
               "title": "US-5.1: Access Application via Browser",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1879,
+              "line": 1885,
               "column": 8,
               "specs": [
                 {
@@ -2405,13 +3892,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 96,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:56.636Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-5fe9778a2a95676ad27c",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1880,
+                  "line": 1886,
                   "column": 9
                 },
                 {
@@ -2425,13 +3926,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 95,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:56.736Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-51667ac567aa2af79c67",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1887,
+                  "line": 1893,
                   "column": 9
                 },
                 {
@@ -2445,13 +3960,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 96,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:56.835Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-6512ca60d2cdc3d08f92",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1894,
+                  "line": 1900,
                   "column": 9
                 },
                 {
@@ -2465,13 +3994,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 146,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:56.936Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-7a4ae6d1f52a1769f7c4",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1908,
+                  "line": 1914,
                   "column": 9
                 }
               ]
@@ -2479,7 +4022,7 @@
             {
               "title": "US-5.2: Single-Page Layout with Clear Hierarchy",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1917,
+              "line": 1923,
               "column": 8,
               "specs": [
                 {
@@ -2493,13 +4036,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 114,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.086Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-8d00c39d7d0b31e96939",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1918,
+                  "line": 1924,
                   "column": 9
                 },
                 {
@@ -2513,13 +4070,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 146,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.204Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d7117716c96207e6d513",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1928,
+                  "line": 1934,
                   "column": 9
                 },
                 {
@@ -2533,13 +4104,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 112,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.355Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-e585c59f8dce9c61804d",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1938,
+                  "line": 1944,
                   "column": 9
                 },
                 {
@@ -2553,13 +4138,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 114,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.470Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-61a3bdc99fd39b02404e",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1950,
+                  "line": 1956,
                   "column": 9
                 },
                 {
@@ -2573,13 +4172,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 95,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.588Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d720ec203264b2070c44",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1963,
+                  "line": 1969,
                   "column": 9
                 }
               ]
@@ -2587,7 +4200,7 @@
             {
               "title": "US-5.3: Single-Command Server Startup",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 1973,
+              "line": 1979,
               "column": 8,
               "specs": [
                 {
@@ -2601,13 +4214,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.687Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-740fa971d2875ad17adc",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1974,
+                  "line": 1980,
                   "column": 9
                 },
                 {
@@ -2621,13 +4248,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 5,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.695Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-4ef31218df4e0c2e798d",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1982,
+                  "line": 1988,
                   "column": 9
                 },
                 {
@@ -2641,13 +4282,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.703Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-73616d51255325225fa0",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 1998,
+                  "line": 2004,
                   "column": 9
                 },
                 {
@@ -2661,13 +4316,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 159,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.709Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-29891250f1ba814cba08",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2008,
+                  "line": 2014,
                   "column": 9
                 },
                 {
@@ -2681,13 +4350,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 0,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.872Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-15c50247132593ee5a04",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2015,
+                  "line": 2021,
                   "column": 9
                 }
               ]
@@ -2695,7 +4378,7 @@
             {
               "title": "US-5.4: Responsive and Keyboard-Accessible Interface",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 2023,
+              "line": 2029,
               "column": 8,
               "specs": [
                 {
@@ -2709,13 +4392,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 94,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.875Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-bdd6243dcbb81addd8fc",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2024,
+                  "line": 2030,
                   "column": 9
                 },
                 {
@@ -2729,13 +4426,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 245,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:57.973Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-a743e57c994f6e1cb8ae",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2039,
+                  "line": 2045,
                   "column": 9
                 },
                 {
@@ -2749,13 +4460,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 113,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:58.222Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-4ba0096208102411f9ee",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2066,
+                  "line": 2072,
                   "column": 9
                 },
                 {
@@ -2769,13 +4494,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 112,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:58.339Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-91be8d44d048536e399e",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2078,
+                  "line": 2084,
                   "column": 9
                 },
                 {
@@ -2789,13 +4528,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 129,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:58.455Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-058a81cce828781c0a3a",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2098,
+                  "line": 2104,
                   "column": 9
                 },
                 {
@@ -2809,13 +4562,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 114,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:58.588Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-04a9c2c751be9b1ce304",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2115,
+                  "line": 2121,
                   "column": 9
                 }
               ]
@@ -2823,7 +4590,7 @@
             {
               "title": "US-5.5: Graceful Error Handling in the UI",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 2136,
+              "line": 2142,
               "column": 8,
               "specs": [
                 {
@@ -2837,13 +4604,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 146,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:58.705Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-1c69b31b654f82791956",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2137,
+                  "line": 2143,
                   "column": 9
                 },
                 {
@@ -2857,13 +4638,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 178,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:58.855Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-9eb5303e3c2d18279049",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2157,
+                  "line": 2163,
                   "column": 9
                 },
                 {
@@ -2877,13 +4672,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 179,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.038Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-8bd3eabfe89c86dbcf58",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2179,
+                  "line": 2185,
                   "column": 9
                 },
                 {
@@ -2897,13 +4706,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 113,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.221Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-48c02ff3b73b0e2a09b1",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2201,
+                  "line": 2207,
                   "column": 9
                 },
                 {
@@ -2917,13 +4740,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 213,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.338Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-ece35470ce5c76fb1517",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2216,
+                  "line": 2222,
                   "column": 9
                 }
               ]
@@ -2933,14 +4770,14 @@
         {
           "title": "3. Technical checks",
           "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-          "line": 2260,
+          "line": 2266,
           "column": 6,
           "specs": [],
           "suites": [
             {
               "title": "API response schemas",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 2262,
+              "line": 2268,
               "column": 8,
               "specs": [
                 {
@@ -2954,13 +4791,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.555Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-c9f402d67ebb646d78b7",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2263,
+                  "line": 2269,
                   "column": 9
                 },
                 {
@@ -2974,13 +4825,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.563Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-5dd2fae2e7571aa31b00",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2273,
+                  "line": 2279,
                   "column": 9
                 },
                 {
@@ -2994,13 +4859,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.570Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-bc0bcf120a1b4bdb07f4",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2294,
+                  "line": 2300,
                   "column": 9
                 },
                 {
@@ -3014,13 +4893,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.577Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-59d5285f1cabac766217",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2319,
+                  "line": 2325,
                   "column": 9
                 }
               ]
@@ -3028,7 +4921,7 @@
             {
               "title": "Error codes",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 2336,
+              "line": 2342,
               "column": 8,
               "specs": [
                 {
@@ -3042,13 +4935,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 11,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.584Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-427cc0e022b1963ebf51",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2337,
+                  "line": 2343,
                   "column": 9
                 },
                 {
@@ -3062,13 +4969,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 2,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.598Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-e6b4e8b2d4706a3d70b7",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2358,
+                  "line": 2364,
                   "column": 9
                 },
                 {
@@ -3082,13 +5003,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 2,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.603Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-6621b0e49b75f02fd887",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2366,
+                  "line": 2372,
                   "column": 9
                 },
                 {
@@ -3102,13 +5037,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 2,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.608Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-38cb1a03786904de9f3c",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2375,
+                  "line": 2381,
                   "column": 9
                 }
               ]
@@ -3116,7 +5065,7 @@
             {
               "title": "Integer cents storage",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 2389,
+              "line": 2395,
               "column": 8,
               "specs": [
                 {
@@ -3130,13 +5079,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 7,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.614Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-a988e99a870990a00a6f",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2390,
+                  "line": 2396,
                   "column": 9
                 },
                 {
@@ -3150,13 +5113,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 2,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.624Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-65040852ed205341e987",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2417,
+                  "line": 2423,
                   "column": 9
                 },
                 {
@@ -3170,13 +5147,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.629Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-16448ba205cd01ae3bbf",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2425,
+                  "line": 2431,
                   "column": 9
                 }
               ]
@@ -3184,7 +5175,7 @@
             {
               "title": "Input normalisation",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 2445,
+              "line": 2451,
               "column": 8,
               "specs": [
                 {
@@ -3198,13 +5189,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.636Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-5ae99d1302941ffe2f2b",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2446,
+                  "line": 2452,
                   "column": 9
                 },
                 {
@@ -3218,13 +5223,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 2,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.643Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-5ac037901272dd7831bc",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2458,
+                  "line": 2464,
                   "column": 9
                 }
               ]
@@ -3232,7 +5251,7 @@
             {
               "title": "XSS sanitization",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 2470,
+              "line": 2476,
               "column": 8,
               "specs": [
                 {
@@ -3246,13 +5265,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 119,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.648Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-9d30eb78d541e90263e4",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2471,
+                  "line": 2477,
                   "column": 9
                 },
                 {
@@ -3266,13 +5299,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 160,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.771Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-af62a79d811cc9df427f",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2511,
+                  "line": 2517,
                   "column": 9
                 },
                 {
@@ -3286,13 +5333,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 79,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:03:59.935Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-d1c95561fafa77f20aa1",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2522,
+                  "line": 2528,
                   "column": 9
                 }
               ]
@@ -3300,7 +5361,7 @@
             {
               "title": "Edge cases and scale",
               "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-              "line": 2528,
+              "line": 2534,
               "column": 8,
               "specs": [
                 {
@@ -3314,13 +5375,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:04:00.018Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-f6412777b8639de70019",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2529,
+                  "line": 2535,
                   "column": 9
                 },
                 {
@@ -3334,13 +5409,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:04:00.026Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-b7bf5df2b20276bd063e",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2538,
+                  "line": 2544,
                   "column": 9
                 },
                 {
@@ -3354,13 +5443,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 94,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:04:00.034Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-57d6f73554f24e809817",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2567,
+                  "line": 2573,
                   "column": 9
                 },
                 {
@@ -3374,13 +5477,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:04:00.136Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-39b0160a1921a9906a49",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2580,
+                  "line": 2586,
                   "column": 9
                 },
                 {
@@ -3394,13 +5511,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 11,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:04:00.144Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-14a90dcb71faad2c11d8",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2592,
+                  "line": 2598,
                   "column": 9
                 },
                 {
@@ -3414,13 +5545,27 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 174,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-14T08:04:00.159Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "ad27cec2d1576e77b369-fd7a02e66e4aae967a6e",
                   "file": "uat/build-a-simple-expense-tracker-that-allo.spec.ts",
-                  "line": 2615,
+                  "line": 2621,
                   "column": 9
                 }
               ]
@@ -3432,10 +5577,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-14T07:58:20.243Z",
-    "duration": 275.953,
-    "expected": 0,
-    "skipped": 153,
+    "startTime": "2026-09-14T08:03:40.324Z",
+    "duration": 20049.604,
+    "expected": 153,
+    "skipped": 0,
     "unexpected": 0,
     "flaky": 0
   }
