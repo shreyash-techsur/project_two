@@ -125,6 +125,6 @@ htmlcov/
 # <<< pivota:gitignore-managed
 
 # ── Project-specific ──
-data/expenses.db
+# Database files are tracked so data persists across workspace rebuilds
 data/expenses.db-wal
 data/expenses.db-shm
