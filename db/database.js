@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execFile } = require('child_process');
+const { execFile, execSync } = require('child_process');
 const Database = require('better-sqlite3');
 
 let db;
@@ -46,6 +46,19 @@ function initialize() {
 
   // 6. Log success
   console.log(`Storage initialized: ${dbPath}`);
+
+  // 7. Verify git persistence capability on startup
+  try {
+    execSync('git rev-parse --git-dir', { cwd: path.resolve(__dirname, '..'), stdio: 'pipe' });
+    const remoteOut = execSync('git remote -v', { cwd: path.resolve(__dirname, '..'), stdio: 'pipe' }).toString();
+    if (remoteOut.includes('push')) {
+      console.log('[persist] git remote available — data will auto-save to git on writes');
+    } else {
+      console.log('[persist] WARNING: no git push remote — data will NOT survive rebuilds');
+    }
+  } catch {
+    console.log('[persist] WARNING: not a git repo or git unavailable — data will NOT survive rebuilds');
+  }
 }
 
 /**
@@ -149,12 +162,23 @@ function updateExpense(id, { amount, description, category }) {
  * Persist the database file to git so data survives workspace rebuilds.
  * Runs asynchronously in the background — does not block the API response.
  * Checkpoints WAL first so the main .db file has all data.
+ * Debounced: rapid writes within 2s are batched into a single commit+push.
  */
+let persistTimer = null;
+
 function persistToGit() {
   // Skip in test environments
   if (process.env.NODE_ENV === 'test' || process.env.DB_PATH?.includes('test')) {
     return;
   }
+
+  // Debounce: wait 2s after last write before committing
+  if (persistTimer) clearTimeout(persistTimer);
+  persistTimer = setTimeout(_doPersist, 2000);
+}
+
+function _doPersist() {
+  persistTimer = null;
 
   try {
     // Checkpoint WAL into the main DB file so git tracks a single complete file
@@ -167,28 +191,40 @@ function persistToGit() {
   const repoRoot = path.resolve(__dirname, '..');
   const relDbPath = path.relative(repoRoot, path.resolve(dbPath));
 
-  // Run git add + commit in the background (fire-and-forget)
-  execFile('git', ['add', relDbPath], { cwd: repoRoot }, (addErr) => {
+  // Ensure git user config is set (preview sandbox may not have it)
+  try {
+    execSync('git config user.email >/dev/null 2>&1', { cwd: repoRoot });
+  } catch {
+    try {
+      execSync('git config user.email "expense-tracker@localhost"', { cwd: repoRoot });
+      execSync('git config user.name "Expense Tracker"', { cwd: repoRoot });
+    } catch (cfgErr) {
+      console.error('[persist] git config failed:', cfgErr.message);
+    }
+  }
+
+  // Run git add + commit + push in the background (fire-and-forget)
+  execFile('git', ['add', '--force', relDbPath], { cwd: repoRoot }, (addErr, addOut, addStderr) => {
     if (addErr) {
-      console.error('[persist] git add failed:', addErr.message);
+      console.error('[persist] git add failed:', addErr.message, addStderr);
       return;
     }
     execFile(
       'git',
-      ['commit', '-m', `data: auto-save expenses database`, '--', relDbPath],
+      ['commit', '-m', 'data: auto-save expenses database', '--', relDbPath],
       { cwd: repoRoot },
-      (commitErr, stdout) => {
+      (commitErr, commitOut, commitStderr) => {
         if (commitErr) {
           // Exit code 1 with "nothing to commit" is fine — means no actual change
           if (commitErr.code === 1) return;
-          console.error('[persist] git commit failed:', commitErr.message);
+          console.error('[persist] git commit failed:', commitErr.message, commitStderr);
           return;
         }
         console.log('[persist] database saved to git');
         // Push to remote so data survives full workspace rebuilds
-        execFile('git', ['push'], { cwd: repoRoot }, (pushErr) => {
+        execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
           if (pushErr) {
-            console.error('[persist] git push failed:', pushErr.message);
+            console.error('[persist] git push failed:', pushErr.message, pushStderr);
             return;
           }
           console.log('[persist] database pushed to remote');
