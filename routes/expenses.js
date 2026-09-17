@@ -39,6 +39,8 @@ router.post('/', validateExpenseInput, (req, res, next) => {
     });
 
     res.status(201).json({ expense });
+    // Persist DB to git in the background (non-blocking)
+    database.persistToGit();
   } catch (err) {
     next(err);
   }
@@ -89,6 +91,8 @@ router.put('/:id', validateExpenseId, validateExpenseInput, (req, res, next) => 
     }
 
     res.status(200).json({ expense });
+    // Persist DB to git in the background (non-blocking)
+    database.persistToGit();
   } catch (err) {
     next(err);
   }

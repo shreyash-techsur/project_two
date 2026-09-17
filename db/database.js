@@ -2,9 +2,11 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFile } = require('child_process');
 const Database = require('better-sqlite3');
 
 let db;
+let dbPath;
 
 /**
  * Initialize the SQLite database.
@@ -13,7 +15,7 @@ let db;
  * Must be called once on server startup before any queries.
  */
 function initialize() {
-  const dbPath = process.env.DB_PATH || './data/expenses.db';
+  dbPath = process.env.DB_PATH || './data/expenses.db';
   const dbDir = path.dirname(dbPath);
 
   // 1. Ensure data directory exists
@@ -42,35 +44,7 @@ function initialize() {
     CREATE INDEX IF NOT EXISTS idx_expenses_created_at ON expenses (created_at DESC);
   `);
 
-  // 6. Seed sample data if the table is empty (ensures the app always
-  //    has useful demo data after a workspace rebuild / fresh clone).
-  //    Skipped when SKIP_SEED=1 (used by tests that expect an empty DB).
-  const count = db.prepare('SELECT COUNT(*) AS cnt FROM expenses').get().cnt;
-  if (count === 0 && process.env.SKIP_SEED !== '1') {
-    console.log('Empty database detected — seeding sample expenses');
-    const now = new Date().toISOString();
-    const seedData = [
-      { amount: 1250, description: 'Coffee and snacks', category: 'Food' },
-      { amount: 4500, description: 'Monthly gym membership', category: 'Health' },
-      { amount: 3200, description: 'Uber ride to office', category: 'Transport' },
-      { amount: 15000, description: 'Grocery shopping', category: 'Food' },
-      { amount: 2000, description: 'Netflix subscription', category: 'Entertainment' },
-      { amount: 800, description: 'Notebook and pens', category: 'Office Supplies' },
-    ];
-    const insertSeed = db.prepare(`
-      INSERT INTO expenses (amount, description, category, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-    const seedMany = db.transaction((rows) => {
-      for (const row of rows) {
-        insertSeed.run(row.amount, row.description, row.category, now, now);
-      }
-    });
-    seedMany(seedData);
-    console.log(`Seeded ${seedData.length} sample expenses`);
-  }
-
-  // 7. Log success
+  // 6. Log success
   console.log(`Storage initialized: ${dbPath}`);
 }
 
@@ -171,4 +145,57 @@ function updateExpense(id, { amount, description, category }) {
   }
 }
 
-module.exports = { initialize, getAllExpenses, createExpense, updateExpense };
+/**
+ * Persist the database file to git so data survives workspace rebuilds.
+ * Runs asynchronously in the background — does not block the API response.
+ * Checkpoints WAL first so the main .db file has all data.
+ */
+function persistToGit() {
+  // Skip in test environments
+  if (process.env.NODE_ENV === 'test' || process.env.DB_PATH?.includes('test')) {
+    return;
+  }
+
+  try {
+    // Checkpoint WAL into the main DB file so git tracks a single complete file
+    db.pragma('wal_checkpoint(TRUNCATE)');
+  } catch (e) {
+    console.error('[persist] WAL checkpoint failed:', e.message);
+    return;
+  }
+
+  const repoRoot = path.resolve(__dirname, '..');
+  const relDbPath = path.relative(repoRoot, path.resolve(dbPath));
+
+  // Run git add + commit in the background (fire-and-forget)
+  execFile('git', ['add', relDbPath], { cwd: repoRoot }, (addErr) => {
+    if (addErr) {
+      console.error('[persist] git add failed:', addErr.message);
+      return;
+    }
+    execFile(
+      'git',
+      ['commit', '-m', `data: auto-save expenses database`, '--', relDbPath],
+      { cwd: repoRoot },
+      (commitErr, stdout) => {
+        if (commitErr) {
+          // Exit code 1 with "nothing to commit" is fine — means no actual change
+          if (commitErr.code === 1) return;
+          console.error('[persist] git commit failed:', commitErr.message);
+          return;
+        }
+        console.log('[persist] database saved to git');
+        // Push to remote so data survives full workspace rebuilds
+        execFile('git', ['push'], { cwd: repoRoot }, (pushErr) => {
+          if (pushErr) {
+            console.error('[persist] git push failed:', pushErr.message);
+            return;
+          }
+          console.log('[persist] database pushed to remote');
+        });
+      }
+    );
+  });
+}
+
+module.exports = { initialize, getAllExpenses, createExpense, updateExpense, persistToGit };
