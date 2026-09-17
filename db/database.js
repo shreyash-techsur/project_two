@@ -42,7 +42,35 @@ function initialize() {
     CREATE INDEX IF NOT EXISTS idx_expenses_created_at ON expenses (created_at DESC);
   `);
 
-  // 6. Log success
+  // 6. Seed sample data if the table is empty (ensures the app always
+  //    has useful demo data after a workspace rebuild / fresh clone).
+  //    Skipped when SKIP_SEED=1 (used by tests that expect an empty DB).
+  const count = db.prepare('SELECT COUNT(*) AS cnt FROM expenses').get().cnt;
+  if (count === 0 && process.env.SKIP_SEED !== '1') {
+    console.log('Empty database detected — seeding sample expenses');
+    const now = new Date().toISOString();
+    const seedData = [
+      { amount: 1250, description: 'Coffee and snacks', category: 'Food' },
+      { amount: 4500, description: 'Monthly gym membership', category: 'Health' },
+      { amount: 3200, description: 'Uber ride to office', category: 'Transport' },
+      { amount: 15000, description: 'Grocery shopping', category: 'Food' },
+      { amount: 2000, description: 'Netflix subscription', category: 'Entertainment' },
+      { amount: 800, description: 'Notebook and pens', category: 'Office Supplies' },
+    ];
+    const insertSeed = db.prepare(`
+      INSERT INTO expenses (amount, description, category, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+    const seedMany = db.transaction((rows) => {
+      for (const row of rows) {
+        insertSeed.run(row.amount, row.description, row.category, now, now);
+      }
+    });
+    seedMany(seedData);
+    console.log(`Seeded ${seedData.length} sample expenses`);
+  }
+
+  // 7. Log success
   console.log(`Storage initialized: ${dbPath}`);
 }
 
