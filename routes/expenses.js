@@ -98,4 +98,36 @@ router.put('/:id', validateExpenseId, validateExpenseInput, (req, res, next) => 
   }
 });
 
+// POST /api/expenses/import — Bulk import expenses from client backup
+// Used to restore data after workspace rebuilds
+router.post('/import', (req, res, next) => {
+  try {
+    const { expenses } = req.body;
+    if (!Array.isArray(expenses) || expenses.length === 0) {
+      return res.status(400).json({
+        error: { code: 'ERR_IMPORT_INVALID', message: 'Request body must contain a non-empty expenses array' }
+      });
+    }
+
+    // Cap at 1000 to prevent abuse
+    if (expenses.length > 1000) {
+      return res.status(400).json({
+        error: { code: 'ERR_IMPORT_TOO_LARGE', message: 'Cannot import more than 1000 expenses at once' }
+      });
+    }
+
+    const inserted = database.bulkImport(expenses);
+    const allExpenses = database.getAllExpenses();
+
+    res.status(200).json({ imported: inserted, expenses: allExpenses });
+
+    // Persist after import
+    if (inserted > 0) {
+      database.persistToGit();
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

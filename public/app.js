@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // ID of the expense currently being edited, or null in add mode (US-1.1)
   var editingId = null;
 
+  // localStorage key for backup
+  var BACKUP_KEY = 'expense_tracker_backup';
+
   // Auto-focus amount field on load (UX-Mockup Flow 2, US-5.2)
   amountInput.focus();
 
@@ -50,6 +53,18 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(function (data) {
         expenses = data.expenses;
+
+        // If server returned empty but we have a local backup, auto-restore
+        if (expenses.length === 0) {
+          var backup = getBackup();
+          if (backup && backup.length > 0) {
+            restoreFromBackup(backup);
+            return; // restoreFromBackup will call renderExpenses/updateTotal
+          }
+        }
+
+        // Save current state as backup
+        saveBackup(expenses);
         renderExpenses();
         updateTotal();
       })
@@ -74,6 +89,60 @@ document.addEventListener('DOMContentLoaded', function () {
 
         expenseListEl.appendChild(errorDiv);
         totalAmountEl.textContent = '\u2014'; // em dash "—" (US-4.4)
+      });
+  }
+
+  // --- Local Backup (survives sandbox rebuilds via browser localStorage) ---
+
+  function saveBackup(expenseList) {
+    try {
+      localStorage.setItem(BACKUP_KEY, JSON.stringify({
+        timestamp: new Date().toISOString(),
+        expenses: expenseList
+      }));
+    } catch (e) {
+      // localStorage might be full or unavailable — fail silently
+    }
+  }
+
+  function getBackup() {
+    try {
+      var raw = localStorage.getItem(BACKUP_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      return data.expenses || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function restoreFromBackup(backupExpenses) {
+    showToast('Restoring your data from local backup...', 'success');
+
+    fetch('/api/expenses/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ expenses: backupExpenses })
+    })
+      .then(function (response) { return response.json(); })
+      .then(function (data) {
+        if (data.expenses) {
+          expenses = data.expenses;
+          saveBackup(expenses);
+          renderExpenses();
+          updateTotal();
+          var count = data.imported || 0;
+          if (count > 0) {
+            showToast(count + ' expense(s) restored successfully!', 'success');
+          }
+        }
+      })
+      .catch(function () {
+        // If restore fails, just show backup data locally (read-only fallback)
+        expenses = backupExpenses;
+        renderExpenses();
+        updateTotal();
+        showToast('Showing cached data. Server may be unavailable.', 'error');
       });
   }
 
@@ -120,6 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
           expenses.unshift(result.data.expense); // Prepend (most recent first)
           renderExpenses();
           updateTotal();
+          saveBackup(expenses); // Persist to localStorage
           form.reset(); // Clear all fields
           showToast('Expense added!', 'success');
           amountInput.focus(); // Return focus for batch entry (US-0.2)
@@ -130,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
           if (idx !== -1) expenses[idx] = updated;
           exitEditMode(); // clears form and re-renders
           updateTotal();
+          saveBackup(expenses); // Persist to localStorage
           showToast('Expense updated!', 'success');
           amountInput.focus();
         } else if (result.status === 400 && result.data.errors) {

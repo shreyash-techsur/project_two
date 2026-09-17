@@ -234,4 +234,44 @@ function _doPersist() {
   });
 }
 
-module.exports = { initialize, getAllExpenses, createExpense, updateExpense, persistToGit };
+/**
+ * Bulk import expenses (used to restore from client-side backup).
+ * Inserts expenses that don't already exist (matched by created_at + description).
+ * Runs inside a transaction for atomicity.
+ * @param {Array<Object>} items - Array of expense objects with amount, description, category, created_at, updated_at
+ * @returns {number} Number of expenses actually inserted (skips duplicates)
+ */
+function bulkImport(items) {
+  const insertStmt = db.prepare(`
+    INSERT INTO expenses (amount, description, category, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+  const checkStmt = db.prepare(`
+    SELECT COUNT(*) as cnt FROM expenses
+    WHERE created_at = ? AND description = ? AND amount = ?
+  `);
+
+  let inserted = 0;
+
+  const runImport = db.transaction((rows) => {
+    for (const row of rows) {
+      // Skip duplicates (same timestamp + description + amount)
+      const existing = checkStmt.get(row.created_at, row.description, row.amount);
+      if (existing.cnt > 0) continue;
+
+      insertStmt.run(
+        row.amount,
+        row.description,
+        row.category,
+        row.created_at,
+        row.updated_at || row.created_at
+      );
+      inserted++;
+    }
+  });
+
+  runImport(items);
+  return inserted;
+}
+
+module.exports = { initialize, getAllExpenses, createExpense, updateExpense, persistToGit, bulkImport };
