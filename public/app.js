@@ -263,6 +263,42 @@ document.addEventListener('DOMContentLoaded', function () {
     renderExpenses(); // clears the row highlight
   }
 
+  // --- Delete ---
+
+  function handleDelete(expense) {
+    // If currently editing this expense, exit edit mode first
+    if (editingId === expense.id) {
+      exitEditMode();
+    }
+
+    // Confirm before deleting
+    if (!confirm('Delete "' + expense.description + '" (' + formatCurrency(expense.amount) + ')?')) {
+      return;
+    }
+
+    fetch('/api/expenses/' + expense.id, {
+      method: 'DELETE'
+    })
+      .then(function (response) {
+        if (response.status === 200) {
+          // Remove from local array
+          expenses = expenses.filter(function (e) { return e.id !== expense.id; });
+          renderExpenses();
+          updateTotal();
+          saveBackup(expenses);
+          showToast('Expense deleted!', 'success');
+        } else if (response.status === 404) {
+          showToast('Expense not found. It may have already been removed.', 'error');
+          loadExpenses();
+        } else {
+          showToast('Failed to delete expense. Please try again.', 'error');
+        }
+      })
+      .catch(function () {
+        showToast('Unable to connect to the server. Check your connection and try again.', 'error');
+      });
+  }
+
   // --- Client-Side Validation ---
 
   function validateForm() {
@@ -386,6 +422,10 @@ document.addEventListener('DOMContentLoaded', function () {
       row.appendChild(descEl);
       row.appendChild(catEl);
 
+      // Action buttons container
+      var actionsEl = document.createElement('span');
+      actionsEl.className = 'expense-actions';
+
       // Edit button (US-1.1, FRD F01 step 2)
       var editBtn = document.createElement('button');
       editBtn.type = 'button';
@@ -394,7 +434,19 @@ document.addEventListener('DOMContentLoaded', function () {
       editBtn.setAttribute('data-id', String(expense.id));
       editBtn.setAttribute('aria-label', 'Edit ' + expense.description);
       editBtn.addEventListener('click', function () { enterEditMode(expense); });
-      row.appendChild(editBtn);
+      actionsEl.appendChild(editBtn);
+
+      // Delete button
+      var deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'expense-delete-btn';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.setAttribute('data-id', String(expense.id));
+      deleteBtn.setAttribute('aria-label', 'Delete ' + expense.description);
+      deleteBtn.addEventListener('click', function () { handleDelete(expense); });
+      actionsEl.appendChild(deleteBtn);
+
+      row.appendChild(actionsEl);
 
       // Highlight the row currently in edit mode
       if (editingId === expense.id) {

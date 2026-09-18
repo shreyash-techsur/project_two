@@ -274,4 +274,21 @@ function bulkImport(items) {
   return inserted;
 }
 
-module.exports = { initialize, getAllExpenses, createExpense, updateExpense, persistToGit, bulkImport };
+/**
+ * Delete an expense record by ID.
+ * @param {number} id - The ID of the expense to delete
+ * @returns {boolean} true if a row was deleted, false if no expense has that ID
+ */
+function deleteExpense(id) {
+  try {
+    const deleteStmt = db.prepare(`DELETE FROM expenses WHERE id = ?`);
+    const info = deleteStmt.run(id);
+    return info.changes > 0;
+  } catch (err) {
+    const error = new Error(`ERR_STORAGE_WRITE: Failed to delete expense: ${err.message}`);
+    error.code = 'ERR_STORAGE_WRITE';
+    throw error;
+  }
+}
+
+module.exports = { initialize, getAllExpenses, createExpense, updateExpense, deleteExpense, persistToGit, bulkImport };

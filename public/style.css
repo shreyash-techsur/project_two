@@ -74,11 +74,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .expense-amount { font-weight: 700; font-size: 1.1rem; color: #2c3e50; min-width: 100px; }
 .expense-description { flex: 1; margin: 0 16px; color: #555; }
 .expense-category { color: #7f8c8d; font-size: 0.9rem; font-style: italic; min-width: 80px; text-align: right; }
+.expense-actions { display: flex; gap: 6px; margin-left: 12px; flex-shrink: 0; }
 .expense-edit-btn {
   background: none; border: 1px solid #3498db; color: #3498db; padding: 4px 12px;
-  border-radius: 4px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; margin-left: 12px;
+  border-radius: 4px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
 }
 .expense-edit-btn:hover { background: #3498db; color: white; }
+.expense-delete-btn {
+  background: none; border: 1px solid #e74c3c; color: #e74c3c; padding: 4px 12px;
+  border-radius: 4px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+}
+.expense-delete-btn:hover { background: #e74c3c; color: white; }
 .expense-row.editing-row { background: #ebf5fb; }
 
 /* Empty state */

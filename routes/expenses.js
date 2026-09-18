@@ -98,6 +98,26 @@ router.put('/:id', validateExpenseId, validateExpenseInput, (req, res, next) => 
   }
 });
 
+// DELETE /api/expenses/:id — Delete an expense
+// Response 200 OK with { deleted: true }, 404 if not found, 400 if ID invalid
+router.delete('/:id', validateExpenseId, (req, res, next) => {
+  try {
+    const deleted = database.deleteExpense(req.expenseId);
+
+    if (!deleted) {
+      return res.status(404).json({
+        error: { code: 'ERR_EXPENSE_NOT_FOUND', message: 'Expense not found' }
+      });
+    }
+
+    res.status(200).json({ deleted: true });
+    // Persist DB to git in the background (non-blocking)
+    database.persistToGit();
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /api/expenses/import — Bulk import expenses from client backup
 // Used to restore data after workspace rebuilds
 router.post('/import', (req, res, next) => {
