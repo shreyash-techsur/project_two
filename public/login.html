@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker - Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>Expense Tracker</h1>
+    </header>
+
+    <section class="auth-section">
+      <div class="auth-card">
+        <h2 class="auth-title" id="auth-title">Login</h2>
+
+        <form id="auth-form" novalidate>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" maxlength="50" placeholder="Enter your username" required autocomplete="username">
+            <span class="error-message" id="username-error" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+            <span class="error-message" id="password-error" role="alert"></span>
+          </div>
+
+          <div class="auth-error" id="auth-error" role="alert" style="display: none;"></div>
+
+          <button type="submit" id="auth-submit-btn" class="auth-btn">Login</button>
+        </form>
+
+        <p class="auth-switch" id="auth-switch">
+          Don't have an account? <a href="#" id="toggle-auth">Register</a>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Toast notifications -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <script src="auth.js" defer></script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { execFile, execSync } = require('child_process');
 const Database = require('better-sqlite3');
 
@@ -27,21 +28,58 @@ function initialize() {
   // 3. Enable WAL mode
   db.pragma('journal_mode = WAL');
 
-  // 4. Create expenses table with CHECK constraints
+  // 4. Create users table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        username    TEXT    NOT NULL UNIQUE COLLATE NOCASE,
+        password    TEXT    NOT NULL,
+        salt        TEXT    NOT NULL,
+        created_at  TEXT    NOT NULL
+    );
+  `);
+
+  // 5. Create sessions table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS sessions (
+        token       TEXT    PRIMARY KEY,
+        user_id     INTEGER NOT NULL,
+        created_at  TEXT    NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 6. Create expenses table with CHECK constraints and user_id foreign key
+  //    user_id is nullable to support migration of existing data
   db.exec(`
     CREATE TABLE IF NOT EXISTS expenses (
         id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id     INTEGER,
         amount      INTEGER NOT NULL CHECK (amount > 0 AND amount <= 99999999),
         description TEXT    NOT NULL CHECK (length(trim(description)) >= 1 AND length(description) <= 500),
         category    TEXT    NOT NULL CHECK (length(trim(category)) >= 1 AND length(category) <= 100),
         created_at  TEXT    NOT NULL,
-        updated_at  TEXT    NOT NULL
+        updated_at  TEXT    NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `);
 
-  // 5. Create index for default ordering
+  // 6a. Add user_id column to expenses if it doesn't exist (migration for existing DBs)
+  try {
+    db.exec(`ALTER TABLE expenses ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE CASCADE`);
+    console.log('[migrate] Added user_id column to expenses table');
+  } catch (e) {
+    // Column already exists — expected after first migration
+  }
+
+  // 7. Create index for default ordering
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_expenses_created_at ON expenses (created_at DESC);
+  `);
+
+  // 7a. Create index for user-scoped queries
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_expenses_user_id ON expenses (user_id);
   `);
 
   // 6. Log success
@@ -61,18 +99,115 @@ function initialize() {
   }
 }
 
+// --- Authentication helpers ---
+
 /**
- * Retrieve all expenses ordered by created_at descending (most recent first).
+ * Hash a password with a salt using PBKDF2.
+ * @param {string} password - The plaintext password
+ * @param {string} salt - The hex-encoded salt
+ * @returns {string} The hex-encoded hash
+ */
+function hashPassword(password, salt) {
+  return crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+}
+
+/**
+ * Register a new user.
+ * @param {string} username
+ * @param {string} password
+ * @returns {Object} The created user (id, username, created_at)
+ * @throws if username already taken
+ */
+function createUser(username, password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = hashPassword(password, salt);
+  const now = new Date().toISOString();
+
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO users (username, password, salt, created_at)
+      VALUES (?, ?, ?, ?)
+    `);
+    const info = stmt.run(username.trim(), hash, salt, now);
+    return { id: info.lastInsertRowid, username: username.trim(), created_at: now };
+  } catch (err) {
+    if (err.message.includes('UNIQUE constraint failed')) {
+      const error = new Error('Username already taken');
+      error.code = 'ERR_USERNAME_TAKEN';
+      throw error;
+    }
+    throw err;
+  }
+}
+
+/**
+ * Verify a user's credentials.
+ * @param {string} username
+ * @param {string} password
+ * @returns {Object|null} The user object if valid, null otherwise
+ */
+function verifyUser(username, password) {
+  const stmt = db.prepare(`SELECT id, username, password, salt, created_at FROM users WHERE username = ?`);
+  const user = stmt.get(username.trim());
+  if (!user) return null;
+
+  const hash = hashPassword(password, user.salt);
+  if (hash !== user.password) return null;
+
+  return { id: user.id, username: user.username, created_at: user.created_at };
+}
+
+/**
+ * Create a session token for a user.
+ * @param {number} userId
+ * @returns {string} The session token
+ */
+function createSession(userId) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const now = new Date().toISOString();
+  const stmt = db.prepare(`INSERT INTO sessions (token, user_id, created_at) VALUES (?, ?, ?)`);
+  stmt.run(token, userId, now);
+  return token;
+}
+
+/**
+ * Validate a session token and return the associated user.
+ * @param {string} token
+ * @returns {Object|null} The user object, or null if invalid/expired
+ */
+function getSessionUser(token) {
+  if (!token) return null;
+  const stmt = db.prepare(`
+    SELECT u.id, u.username, u.created_at
+    FROM sessions s JOIN users u ON s.user_id = u.id
+    WHERE s.token = ?
+  `);
+  return stmt.get(token) || null;
+}
+
+/**
+ * Delete a session token (logout).
+ * @param {string} token
+ */
+function deleteSession(token) {
+  const stmt = db.prepare(`DELETE FROM sessions WHERE token = ?`);
+  stmt.run(token);
+}
+
+/**
+ * Retrieve all expenses for a specific user, ordered by created_at descending.
+ * @param {number} userId - The user's ID
  * @returns {Array<Object>} Array of expense row objects
  */
-function getAllExpenses() {
+function getAllExpenses(userId) {
   try {
     const stmt = db.prepare(`
       SELECT id, amount, description, category, created_at, updated_at
       FROM expenses
+      WHERE user_id = ?
       ORDER BY created_at DESC
     `);
-    return stmt.all();
+    return stmt.all(userId);
   } catch (err) {
     const error = new Error(`ERR_STORAGE_READ: Failed to retrieve expenses: ${err.message}`);
     error.code = 'ERR_STORAGE_READ';
@@ -81,25 +216,26 @@ function getAllExpenses() {
 }
 
 /**
- * Create a new expense record.
+ * Create a new expense record for a specific user.
+ * @param {number} userId - The user's ID
  * @param {Object} data - The expense data
  * @param {number} data.amount - Amount in cents (positive integer)
  * @param {string} data.description - Expense description
  * @param {string} data.category - Expense category
  * @returns {Object} The complete expense record including server-generated fields
  */
-function createExpense({ amount, description, category }) {
+function createExpense(userId, { amount, description, category }) {
   try {
     const now = new Date().toISOString();
     const created_at = now;
     const updated_at = now;
 
     const insertStmt = db.prepare(`
-      INSERT INTO expenses (amount, description, category, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO expenses (user_id, amount, description, category, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?)
     `);
 
-    const info = insertStmt.run(amount, description, category, created_at, updated_at);
+    const info = insertStmt.run(userId, amount, description, category, created_at, updated_at);
     const id = info.lastInsertRowid;
 
     // Fetch and return the full row
@@ -118,8 +254,9 @@ function createExpense({ amount, description, category }) {
 }
 
 /**
- * Update an existing expense record.
+ * Update an existing expense record, scoped to a specific user.
  * `created_at` is immutable; `updated_at` is set to the current UTC time.
+ * @param {number} userId - The user's ID (ensures user can only update their own expenses)
  * @param {number} id - The ID of the expense to update
  * @param {Object} data - The updated expense data
  * @param {number} data.amount - Amount in cents (positive integer)
@@ -127,19 +264,19 @@ function createExpense({ amount, description, category }) {
  * @param {string} data.category - Expense category
  * @returns {Object|null} The complete updated record, or null if no expense has that ID
  */
-function updateExpense(id, { amount, description, category }) {
+function updateExpense(userId, id, { amount, description, category }) {
   try {
     const updated_at = new Date().toISOString();
 
     const updateStmt = db.prepare(`
       UPDATE expenses
       SET amount = ?, description = ?, category = ?, updated_at = ?
-      WHERE id = ?
+      WHERE id = ? AND user_id = ?
     `);
 
-    const info = updateStmt.run(amount, description, category, updated_at, id);
+    const info = updateStmt.run(amount, description, category, updated_at, id, userId);
 
-    // No row matched the given ID — caller maps this to a 404
+    // No row matched the given ID + user — caller maps this to a 404
     if (info.changes === 0) {
       return null;
     }
@@ -235,31 +372,33 @@ function _doPersist() {
 }
 
 /**
- * Bulk import expenses (used to restore from client-side backup).
- * Inserts expenses that don't already exist (matched by created_at + description).
+ * Bulk import expenses for a specific user (used to restore from client-side backup).
+ * Inserts expenses that don't already exist (matched by created_at + description + user_id).
  * Runs inside a transaction for atomicity.
+ * @param {number} userId - The user's ID
  * @param {Array<Object>} items - Array of expense objects with amount, description, category, created_at, updated_at
  * @returns {number} Number of expenses actually inserted (skips duplicates)
  */
-function bulkImport(items) {
+function bulkImport(userId, items) {
   const insertStmt = db.prepare(`
-    INSERT INTO expenses (amount, description, category, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO expenses (user_id, amount, description, category, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
   const checkStmt = db.prepare(`
     SELECT COUNT(*) as cnt FROM expenses
-    WHERE created_at = ? AND description = ? AND amount = ?
+    WHERE user_id = ? AND created_at = ? AND description = ? AND amount = ?
   `);
 
   let inserted = 0;
 
   const runImport = db.transaction((rows) => {
     for (const row of rows) {
-      // Skip duplicates (same timestamp + description + amount)
-      const existing = checkStmt.get(row.created_at, row.description, row.amount);
+      // Skip duplicates (same user + timestamp + description + amount)
+      const existing = checkStmt.get(userId, row.created_at, row.description, row.amount);
       if (existing.cnt > 0) continue;
 
       insertStmt.run(
+        userId,
         row.amount,
         row.description,
         row.category,
@@ -275,14 +414,15 @@ function bulkImport(items) {
 }
 
 /**
- * Delete an expense record by ID.
+ * Delete an expense record by ID, scoped to a specific user.
+ * @param {number} userId - The user's ID (ensures user can only delete their own expenses)
  * @param {number} id - The ID of the expense to delete
  * @returns {boolean} true if a row was deleted, false if no expense has that ID
  */
-function deleteExpense(id) {
+function deleteExpense(userId, id) {
   try {
-    const deleteStmt = db.prepare(`DELETE FROM expenses WHERE id = ?`);
-    const info = deleteStmt.run(id);
+    const deleteStmt = db.prepare(`DELETE FROM expenses WHERE id = ? AND user_id = ?`);
+    const info = deleteStmt.run(id, userId);
     return info.changes > 0;
   } catch (err) {
     const error = new Error(`ERR_STORAGE_WRITE: Failed to delete expense: ${err.message}`);
@@ -291,4 +431,10 @@ function deleteExpense(id) {
   }
 }
 
-module.exports = { initialize, getAllExpenses, createExpense, updateExpense, deleteExpense, persistToGit, bulkImport };
+module.exports = {
+  initialize,
+  // Auth
+  createUser, verifyUser, createSession, getSessionUser, deleteSession,
+  // Expenses
+  getAllExpenses, createExpense, updateExpense, deleteExpense, persistToGit, bulkImport
+};

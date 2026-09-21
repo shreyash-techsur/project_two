@@ -5,11 +5,11 @@ const router = express.Router();
 const database = require('../db/database');
 const { validateExpenseInput } = require('../middleware/validate');
 
-// GET /api/expenses — List all expenses (most recent first)
+// GET /api/expenses — List all expenses for the logged-in user (most recent first)
 // FRD Y1: Response 200 OK with { expenses: [...] }
 router.get('/', (req, res, next) => {
   try {
-    const expenses = database.getAllExpenses();
+    const expenses = database.getAllExpenses(req.user.id);
     res.status(200).json({ expenses });
   } catch (err) {
     err.message = 'read: ' + err.message; // Tag for error handler
@@ -32,7 +32,7 @@ router.post('/', validateExpenseInput, (req, res, next) => {
     const trimmedDescription = description.trim();
     const trimmedCategory = category.trim();
 
-    const expense = database.createExpense({
+    const expense = database.createExpense(req.user.id, {
       amount: amountCents,
       description: trimmedDescription,
       category: trimmedCategory
@@ -77,7 +77,7 @@ router.put('/:id', validateExpenseId, validateExpenseInput, (req, res, next) => 
     const trimmedDescription = description.trim();
     const trimmedCategory = category.trim();
 
-    const expense = database.updateExpense(req.expenseId, {
+    const expense = database.updateExpense(req.user.id, req.expenseId, {
       amount: amountCents,
       description: trimmedDescription,
       category: trimmedCategory
@@ -102,7 +102,7 @@ router.put('/:id', validateExpenseId, validateExpenseInput, (req, res, next) => 
 // Response 200 OK with { deleted: true }, 404 if not found, 400 if ID invalid
 router.delete('/:id', validateExpenseId, (req, res, next) => {
   try {
-    const deleted = database.deleteExpense(req.expenseId);
+    const deleted = database.deleteExpense(req.user.id, req.expenseId);
 
     if (!deleted) {
       return res.status(404).json({
@@ -136,8 +136,8 @@ router.post('/import', (req, res, next) => {
       });
     }
 
-    const inserted = database.bulkImport(expenses);
-    const allExpenses = database.getAllExpenses();
+    const inserted = database.bulkImport(req.user.id, expenses);
+    const allExpenses = database.getAllExpenses(req.user.id);
 
     res.status(200).json({ imported: inserted, expenses: allExpenses });
 

@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // --- Auth check: redirect to login if not authenticated ---
+  var authToken = localStorage.getItem('auth_token');
+  var authUser = null;
+  try { authUser = JSON.parse(localStorage.getItem('auth_user')); } catch (e) {}
+
+  if (!authToken) {
+    window.location.href = '/login.html';
+    return;
+  }
+
+  // Helper to get auth headers for all API calls
+  function authHeaders() {
+    return { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' };
+  }
+
+  // Verify token is still valid
+  fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + authToken } })
+    .then(function (res) {
+      if (!res.ok) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        window.location.href = '/login.html';
+      }
+    })
+    .catch(function () {
+      // Network error — allow offline usage with cached data
+    });
+
   // Cache DOM references
   var form = document.getElementById('expense-form');
   var amountInput = document.getElementById('amount');
@@ -11,14 +39,38 @@ document.addEventListener('DOMContentLoaded', function () {
   var expenseListEl = document.getElementById('expense-list');
   var toastContainer = document.getElementById('toast-container');
 
+  // Show logged-in user info and logout button
+  var headerEl = document.querySelector('.app-header');
+  var userBar = document.createElement('div');
+  userBar.className = 'user-bar';
+  var userLabel = document.createElement('span');
+  userLabel.className = 'user-label';
+  userLabel.textContent = 'Logged in as ' + (authUser ? authUser.username : 'User');
+  var logoutBtn = document.createElement('button');
+  logoutBtn.className = 'logout-btn';
+  logoutBtn.textContent = 'Logout';
+  logoutBtn.addEventListener('click', function () {
+    fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + authToken }
+    }).finally(function () {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      window.location.href = '/login.html';
+    });
+  });
+  userBar.appendChild(userLabel);
+  userBar.appendChild(logoutBtn);
+  headerEl.appendChild(userBar);
+
   // State — in-memory array of expenses (populated from API)
   var expenses = [];
 
   // ID of the expense currently being edited, or null in add mode (US-1.1)
   var editingId = null;
 
-  // localStorage key for backup
-  var BACKUP_KEY = 'expense_tracker_backup';
+  // localStorage key for backup (scoped per user)
+  var BACKUP_KEY = 'expense_tracker_backup_' + (authUser ? authUser.id : 'default');
 
   // Auto-focus amount field on load (UX-Mockup Flow 2, US-5.2)
   amountInput.focus();
@@ -44,8 +96,14 @@ document.addEventListener('DOMContentLoaded', function () {
     expenseListEl.appendChild(loadingEl);
     totalAmountEl.textContent = '...';
 
-    fetch('/api/expenses')
+    fetch('/api/expenses', { headers: { 'Authorization': 'Bearer ' + authToken } })
       .then(function (response) {
+        if (response.status === 401) {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('auth_user');
+          window.location.href = '/login.html';
+          throw new Error('Not authenticated');
+        }
         if (!response.ok) {
           throw new Error('Server error');
         }
@@ -121,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     fetch('/api/expenses/import', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({ expenses: backupExpenses })
     })
       .then(function (response) { return response.json(); })
@@ -171,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     fetch(isEdit ? '/api/expenses/' + targetId : '/api/expenses', {
       method: isEdit ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({
         amount: parseFloat(amountInput.value),
         description: descriptionInput.value.trim(),
@@ -277,7 +335,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     fetch('/api/expenses/' + expense.id, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + authToken }
     })
       .then(function (response) {
         if (response.status === 200) {

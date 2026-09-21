@@ -4,7 +4,9 @@ const express = require('express');
 const path = require('path');
 const helmet = require('helmet');
 const database = require('./db/database');
+const authRouter = require('./routes/auth');
 const expensesRouter = require('./routes/expenses');
+const { requireAuth } = require('./middleware/auth');
 const { errorHandler } = require('./middleware/errorHandler');
 
 // Initialize storage — MUST succeed or server exits
@@ -28,8 +30,16 @@ app.use(express.json());
 // Static file serving (public/ directory)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API routes
-app.use('/api/expenses', expensesRouter);
+// Redirect root to login if no auth (handled client-side, but also serve login.html for /login)
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Auth routes (public — no auth required)
+app.use('/api/auth', authRouter);
+
+// API routes (protected — auth required)
+app.use('/api/expenses', requireAuth, expensesRouter);
 
 // Global error handler — MUST be after routes
 app.use(errorHandler);
