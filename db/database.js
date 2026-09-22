@@ -605,25 +605,25 @@ function _doPersist() {
         }
         console.log('[persist] database saved to git');
         lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
-        // Push to remote so data survives full workspace rebuilds (best-effort)
-        execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
-          if (pushErr) {
-            // Push failure is non-fatal — local git commit already succeeded
-            console.warn('[persist] git push skipped (auth may have expired):', pushErr.message.split('\n')[0]);
-            // Single retry after 30s
-            setTimeout(() => {
-              execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (retryErr) => {
-                if (retryErr) {
-                  console.warn('[persist] git push retry also skipped — data is safe in local git');
-                } else {
-                  console.log('[persist] database pushed to remote (retry succeeded)');
-                }
-              });
-            }, 30000);
-            return;
-          }
-          console.log('[persist] database pushed to remote');
-        });
+        // Push to remote so data survives full workspace rebuilds (best-effort, never crashes)
+        try {
+          execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr) => {
+            try {
+              if (pushErr) {
+                const msg = (pushErr.message || String(pushErr)).split('\n')[0];
+                console.warn('[persist] git push skipped (auth may have expired):', msg);
+                return;
+              }
+              console.log('[persist] database pushed to remote');
+            } catch (innerErr) {
+              // Absolutely never crash from push logging
+              console.warn('[persist] git push callback error (non-fatal)');
+            }
+          });
+        } catch (spawnErr) {
+          // execFile itself can throw synchronously in rare cases
+          console.warn('[persist] git push could not be started (non-fatal)');
+        }
       }
     );
   });

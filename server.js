@@ -4,6 +4,14 @@ const express = require('express');
 const path = require('path');
 const helmet = require('helmet');
 const database = require('./db/database');
+
+// Prevent unhandled async errors (e.g. from git push callbacks) from crashing the server
+process.on('uncaughtException', (err) => {
+  console.error('[server] uncaught exception (non-fatal):', err.message || err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[server] unhandled rejection (non-fatal):', reason);
+});
 const authRouter = require('./routes/auth');
 const expensesRouter = require('./routes/expenses');
 const { requireAuth } = require('./middleware/auth');
