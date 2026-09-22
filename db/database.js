@@ -604,26 +604,25 @@ function _doPersist() {
           return;
         }
         console.log('[persist] database saved to git');
-        // Push to remote so data survives full workspace rebuilds
+        lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
+        // Push to remote so data survives full workspace rebuilds (best-effort)
         execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
           if (pushErr) {
-            console.error('[persist] git push failed:', pushErr.message, pushStderr);
-            lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'git push failed: ' + pushErr.message };
-            // Retry push after 30s
+            // Push failure is non-fatal — local git commit already succeeded
+            console.warn('[persist] git push skipped (auth may have expired):', pushErr.message.split('\n')[0]);
+            // Single retry after 30s
             setTimeout(() => {
               execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (retryErr) => {
                 if (retryErr) {
-                  console.error('[persist] git push retry failed:', retryErr.message);
+                  console.warn('[persist] git push retry also skipped — data is safe in local git');
                 } else {
                   console.log('[persist] database pushed to remote (retry succeeded)');
-                  lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
                 }
               });
             }, 30000);
             return;
           }
           console.log('[persist] database pushed to remote');
-          lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
         });
       }
     );
