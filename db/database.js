@@ -5,14 +5,49 @@ const path = require('path');
 const crypto = require('crypto');
 const { execFile, execSync } = require('child_process');
 const Database = require('better-sqlite3');
+const jwt = require('jsonwebtoken');
 
 let db;
 let dbPath;
 
+// --- JWT Configuration ---
+// Secret is generated once per server lifetime and stored in the DB.
+// On workspace rebuild, a new secret is generated — old JWTs become invalid,
+// but users can re-login (their password hashes survive in the persisted DB).
+const JWT_ACCESS_EXPIRY = '15m';    // Access tokens expire in 15 minutes
+const JWT_REFRESH_EXPIRY = '7d';    // Refresh tokens expire in 7 days
+let jwtSecret = null;
+
+/**
+ * Get or create the JWT secret.
+ * Stored in a `config` table so it persists as long as the DB file does.
+ * If the DB is lost and recreated, a new secret is generated automatically.
+ */
+function getOrCreateJwtSecret() {
+  // Create config table if needed
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS config (
+        key   TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+    );
+  `);
+
+  const row = db.prepare(`SELECT value FROM config WHERE key = 'jwt_secret'`).get();
+  if (row) {
+    return row.value;
+  }
+
+  // Generate a new 256-bit secret
+  const secret = crypto.randomBytes(32).toString('hex');
+  db.prepare(`INSERT INTO config (key, value) VALUES ('jwt_secret', ?)`).run(secret);
+  console.log('[auth] Generated new JWT secret');
+  return secret;
+}
+
 /**
  * Initialize the SQLite database.
  * Creates the data directory, opens the database file, enables WAL mode,
- * and creates the expenses table and index if they don't exist.
+ * and creates all tables and indexes if they don't exist.
  * Must be called once on server startup before any queries.
  */
 function initialize() {
@@ -25,8 +60,9 @@ function initialize() {
   // 2. Open SQLite database
   db = new Database(dbPath);
 
-  // 3. Enable WAL mode
+  // 3. Enable WAL mode and foreign keys
   db.pragma('journal_mode = WAL');
+  db.pragma('foreign_keys = ON');
 
   // 4. Create users table
   db.exec(`
@@ -39,14 +75,26 @@ function initialize() {
     );
   `);
 
-  // 5. Create sessions table
+  // 5. Create refresh_tokens table (replaces old sessions table)
   db.exec(`
-    CREATE TABLE IF NOT EXISTS sessions (
-        token       TEXT    PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS refresh_tokens (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        token_hash  TEXT    NOT NULL UNIQUE,
         user_id     INTEGER NOT NULL,
+        expires_at  TEXT    NOT NULL,
         created_at  TEXT    NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
+  `);
+
+  // 5a. Create index for cleanup queries
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires ON refresh_tokens (expires_at);
+  `);
+
+  // 5b. Create index for user lookups
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens (user_id);
   `);
 
   // 6. Create expenses table with CHECK constraints and user_id foreign key
@@ -72,6 +120,20 @@ function initialize() {
     // Column already exists — expected after first migration
   }
 
+  // 6b. Migrate from old sessions table to refresh_tokens if needed
+  try {
+    const hasSessionsTable = db.prepare(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='sessions'`
+    ).get();
+    if (hasSessionsTable) {
+      // Old sessions are invalidated — users will need to re-login with JWT
+      db.exec(`DROP TABLE IF EXISTS sessions`);
+      console.log('[migrate] Dropped legacy sessions table — users will re-login with JWT');
+    }
+  } catch (e) {
+    // Ignore migration errors
+  }
+
   // 7. Create index for default ordering
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_expenses_created_at ON expenses (created_at DESC);
@@ -82,10 +144,24 @@ function initialize() {
     CREATE INDEX IF NOT EXISTS idx_expenses_user_id ON expenses (user_id);
   `);
 
-  // 6. Log success
+  // 8. Initialize JWT secret
+  jwtSecret = getOrCreateJwtSecret();
+
+  // 9. Clean up expired refresh tokens on startup
+  cleanupExpiredTokens();
+
+  // 10. Log success
   console.log(`Storage initialized: ${dbPath}`);
 
-  // 7. Verify git persistence capability on startup
+  // 11. Verify git persistence capability on startup
+  verifyGitPersistence();
+}
+
+/**
+ * Verify git remote is available for persistence.
+ * Logs warnings if data won't survive workspace rebuilds.
+ */
+function verifyGitPersistence() {
   try {
     execSync('git rev-parse --git-dir', { cwd: path.resolve(__dirname, '..'), stdio: 'pipe' });
     const remoteOut = execSync('git remote -v', { cwd: path.resolve(__dirname, '..'), stdio: 'pipe' }).toString();
@@ -158,41 +234,140 @@ function verifyUser(username, password) {
 }
 
 /**
- * Create a session token for a user.
+ * Look up a user by ID.
  * @param {number} userId
- * @returns {string} The session token
+ * @returns {Object|null} The user object, or null if not found
  */
-function createSession(userId) {
-  const token = crypto.randomBytes(32).toString('hex');
-  const now = new Date().toISOString();
-  const stmt = db.prepare(`INSERT INTO sessions (token, user_id, created_at) VALUES (?, ?, ?)`);
-  stmt.run(token, userId, now);
+function getUserById(userId) {
+  const stmt = db.prepare(`SELECT id, username, created_at FROM users WHERE id = ?`);
+  return stmt.get(userId) || null;
+}
+
+// --- JWT Token Management ---
+
+/**
+ * Generate a JWT access token for a user.
+ * Short-lived (15 minutes). Contains user id and username.
+ * @param {Object} user - { id, username }
+ * @returns {string} The signed JWT
+ */
+function generateAccessToken(user) {
+  return jwt.sign(
+    { userId: user.id, username: user.username, type: 'access' },
+    jwtSecret,
+    { expiresIn: JWT_ACCESS_EXPIRY }
+  );
+}
+
+/**
+ * Generate a refresh token for a user.
+ * Long-lived (7 days). Stored as a hash in the DB so it can be revoked.
+ * @param {number} userId
+ * @returns {string} The signed JWT refresh token
+ */
+function generateRefreshToken(userId) {
+  const tokenId = crypto.randomBytes(16).toString('hex');
+  const token = jwt.sign(
+    { userId, tokenId, type: 'refresh' },
+    jwtSecret,
+    { expiresIn: JWT_REFRESH_EXPIRY }
+  );
+
+  // Store hash of the token for revocation lookups
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  db.prepare(`
+    INSERT INTO refresh_tokens (token_hash, user_id, expires_at, created_at)
+    VALUES (?, ?, ?, ?)
+  `).run(tokenHash, userId, expiresAt, now.toISOString());
+
   return token;
 }
 
 /**
- * Validate a session token and return the associated user.
- * @param {string} token
- * @returns {Object|null} The user object, or null if invalid/expired
+ * Verify a JWT access token.
+ * @param {string} token - The JWT to verify
+ * @returns {Object|null} The decoded payload { userId, username }, or null if invalid
  */
-function getSessionUser(token) {
-  if (!token) return null;
-  const stmt = db.prepare(`
-    SELECT u.id, u.username, u.created_at
-    FROM sessions s JOIN users u ON s.user_id = u.id
-    WHERE s.token = ?
-  `);
-  return stmt.get(token) || null;
+function verifyAccessToken(token) {
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    if (decoded.type !== 'access') return null;
+    return { userId: decoded.userId, username: decoded.username };
+  } catch (err) {
+    return null;
+  }
 }
 
 /**
- * Delete a session token (logout).
- * @param {string} token
+ * Verify and consume a refresh token. Returns new access + refresh tokens.
+ * The old refresh token is revoked (rotation for security).
+ * @param {string} token - The refresh JWT
+ * @returns {Object|null} { accessToken, refreshToken, user } or null if invalid
  */
-function deleteSession(token) {
-  const stmt = db.prepare(`DELETE FROM sessions WHERE token = ?`);
-  stmt.run(token);
+function rotateRefreshToken(token) {
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    if (decoded.type !== 'refresh') return null;
+
+    // Check the token hash exists in DB (hasn't been revoked)
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const row = db.prepare(`SELECT id, user_id FROM refresh_tokens WHERE token_hash = ?`).get(tokenHash);
+    if (!row) return null; // Already revoked or doesn't exist
+
+    // Revoke the old refresh token
+    db.prepare(`DELETE FROM refresh_tokens WHERE id = ?`).run(row.id);
+
+    // Look up the user
+    const user = getUserById(row.user_id);
+    if (!user) return null; // User was deleted
+
+    // Issue new token pair
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user.id);
+
+    return { accessToken, refreshToken, user: { id: user.id, username: user.username } };
+  } catch (err) {
+    return null;
+  }
 }
+
+/**
+ * Revoke all refresh tokens for a user (logout from all devices).
+ * @param {number} userId
+ */
+function revokeAllUserTokens(userId) {
+  db.prepare(`DELETE FROM refresh_tokens WHERE user_id = ?`).run(userId);
+}
+
+/**
+ * Revoke a specific refresh token (single-device logout).
+ * @param {string} token - The raw refresh token
+ */
+function revokeRefreshToken(token) {
+  try {
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    db.prepare(`DELETE FROM refresh_tokens WHERE token_hash = ?`).run(tokenHash);
+  } catch (e) {
+    // Token might be malformed — ignore
+  }
+}
+
+/**
+ * Clean up expired refresh tokens from the database.
+ * Called on startup and periodically.
+ */
+function cleanupExpiredTokens() {
+  const now = new Date().toISOString();
+  const result = db.prepare(`DELETE FROM refresh_tokens WHERE expires_at < ?`).run(now);
+  if (result.changes > 0) {
+    console.log(`[auth] Cleaned up ${result.changes} expired refresh token(s)`);
+  }
+}
+
+// --- Expense CRUD ---
 
 /**
  * Retrieve all expenses for a specific user, ordered by created_at descending.
@@ -296,79 +471,21 @@ function updateExpense(userId, id, { amount, description, category }) {
 }
 
 /**
- * Persist the database file to git so data survives workspace rebuilds.
- * Runs asynchronously in the background — does not block the API response.
- * Checkpoints WAL first so the main .db file has all data.
- * Debounced: rapid writes within 2s are batched into a single commit+push.
+ * Delete an expense record by ID, scoped to a specific user.
+ * @param {number} userId - The user's ID (ensures user can only delete their own expenses)
+ * @param {number} id - The ID of the expense to delete
+ * @returns {boolean} true if a row was deleted, false if no expense has that ID
  */
-let persistTimer = null;
-
-function persistToGit() {
-  // Skip in test environments
-  if (process.env.NODE_ENV === 'test' || process.env.DB_PATH?.includes('test')) {
-    return;
-  }
-
-  // Debounce: wait 2s after last write before committing
-  if (persistTimer) clearTimeout(persistTimer);
-  persistTimer = setTimeout(_doPersist, 2000);
-}
-
-function _doPersist() {
-  persistTimer = null;
-
+function deleteExpense(userId, id) {
   try {
-    // Checkpoint WAL into the main DB file so git tracks a single complete file
-    db.pragma('wal_checkpoint(TRUNCATE)');
-  } catch (e) {
-    console.error('[persist] WAL checkpoint failed:', e.message);
-    return;
+    const deleteStmt = db.prepare(`DELETE FROM expenses WHERE id = ? AND user_id = ?`);
+    const info = deleteStmt.run(id, userId);
+    return info.changes > 0;
+  } catch (err) {
+    const error = new Error(`ERR_STORAGE_WRITE: Failed to delete expense: ${err.message}`);
+    error.code = 'ERR_STORAGE_WRITE';
+    throw error;
   }
-
-  const repoRoot = path.resolve(__dirname, '..');
-  const relDbPath = path.relative(repoRoot, path.resolve(dbPath));
-
-  // Ensure git user config is set (preview sandbox may not have it)
-  try {
-    execSync('git config user.email >/dev/null 2>&1', { cwd: repoRoot });
-  } catch {
-    try {
-      execSync('git config user.email "expense-tracker@localhost"', { cwd: repoRoot });
-      execSync('git config user.name "Expense Tracker"', { cwd: repoRoot });
-    } catch (cfgErr) {
-      console.error('[persist] git config failed:', cfgErr.message);
-    }
-  }
-
-  // Run git add + commit + push in the background (fire-and-forget)
-  execFile('git', ['add', '--force', relDbPath], { cwd: repoRoot }, (addErr, addOut, addStderr) => {
-    if (addErr) {
-      console.error('[persist] git add failed:', addErr.message, addStderr);
-      return;
-    }
-    execFile(
-      'git',
-      ['commit', '-m', 'data: auto-save expenses database', '--', relDbPath],
-      { cwd: repoRoot },
-      (commitErr, commitOut, commitStderr) => {
-        if (commitErr) {
-          // Exit code 1 with "nothing to commit" is fine — means no actual change
-          if (commitErr.code === 1) return;
-          console.error('[persist] git commit failed:', commitErr.message, commitStderr);
-          return;
-        }
-        console.log('[persist] database saved to git');
-        // Push to remote so data survives full workspace rebuilds
-        execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
-          if (pushErr) {
-            console.error('[persist] git push failed:', pushErr.message, pushStderr);
-            return;
-          }
-          console.log('[persist] database pushed to remote');
-        });
-      }
-    );
-  });
 }
 
 /**
@@ -413,28 +530,125 @@ function bulkImport(userId, items) {
   return inserted;
 }
 
+// --- Git Persistence ---
+
 /**
- * Delete an expense record by ID, scoped to a specific user.
- * @param {number} userId - The user's ID (ensures user can only delete their own expenses)
- * @param {number} id - The ID of the expense to delete
- * @returns {boolean} true if a row was deleted, false if no expense has that ID
+ * Persist the database file to git so data survives workspace rebuilds.
+ * Runs asynchronously in the background — does not block the API response.
+ * Checkpoints WAL first so the main .db file has all data.
+ * Debounced: rapid writes within 2s are batched into a single commit+push.
  */
-function deleteExpense(userId, id) {
-  try {
-    const deleteStmt = db.prepare(`DELETE FROM expenses WHERE id = ? AND user_id = ?`);
-    const info = deleteStmt.run(id, userId);
-    return info.changes > 0;
-  } catch (err) {
-    const error = new Error(`ERR_STORAGE_WRITE: Failed to delete expense: ${err.message}`);
-    error.code = 'ERR_STORAGE_WRITE';
-    throw error;
+let persistTimer = null;
+let lastPersistStatus = { success: true, timestamp: null, error: null };
+
+function persistToGit() {
+  // Skip in test environments
+  if (process.env.NODE_ENV === 'test' || process.env.DB_PATH?.includes('test')) {
+    return;
   }
+
+  // Debounce: wait 2s after last write before committing
+  if (persistTimer) clearTimeout(persistTimer);
+  persistTimer = setTimeout(_doPersist, 2000);
+}
+
+function _doPersist() {
+  persistTimer = null;
+
+  try {
+    // Checkpoint WAL into the main DB file so git tracks a single complete file
+    db.pragma('wal_checkpoint(TRUNCATE)');
+  } catch (e) {
+    console.error('[persist] WAL checkpoint failed:', e.message);
+    lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'WAL checkpoint failed: ' + e.message };
+    return;
+  }
+
+  const repoRoot = path.resolve(__dirname, '..');
+  const relDbPath = path.relative(repoRoot, path.resolve(dbPath));
+
+  // Ensure git user config is set (preview sandbox may not have it)
+  try {
+    execSync('git config user.email >/dev/null 2>&1', { cwd: repoRoot });
+  } catch {
+    try {
+      execSync('git config user.email "expense-tracker@localhost"', { cwd: repoRoot });
+      execSync('git config user.name "Expense Tracker"', { cwd: repoRoot });
+    } catch (cfgErr) {
+      console.error('[persist] git config failed:', cfgErr.message);
+    }
+  }
+
+  // Run git add + commit + push in the background (fire-and-forget)
+  execFile('git', ['add', '--force', relDbPath], { cwd: repoRoot }, (addErr, addOut, addStderr) => {
+    if (addErr) {
+      console.error('[persist] git add failed:', addErr.message, addStderr);
+      lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'git add failed' };
+      // Retry after 10s
+      setTimeout(_doPersist, 10000);
+      return;
+    }
+    execFile(
+      'git',
+      ['commit', '-m', 'data: auto-save expenses database', '--', relDbPath],
+      { cwd: repoRoot },
+      (commitErr, commitOut, commitStderr) => {
+        if (commitErr) {
+          // Exit code 1 with "nothing to commit" is fine — means no actual change
+          if (commitErr.code === 1) {
+            lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
+            return;
+          }
+          console.error('[persist] git commit failed:', commitErr.message, commitStderr);
+          lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'git commit failed' };
+          return;
+        }
+        console.log('[persist] database saved to git');
+        // Push to remote so data survives full workspace rebuilds
+        execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
+          if (pushErr) {
+            console.error('[persist] git push failed:', pushErr.message, pushStderr);
+            lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'git push failed: ' + pushErr.message };
+            // Retry push after 30s
+            setTimeout(() => {
+              execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (retryErr) => {
+                if (retryErr) {
+                  console.error('[persist] git push retry failed:', retryErr.message);
+                } else {
+                  console.log('[persist] database pushed to remote (retry succeeded)');
+                  lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
+                }
+              });
+            }, 30000);
+            return;
+          }
+          console.log('[persist] database pushed to remote');
+          lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
+        });
+      }
+    );
+  });
+}
+
+/**
+ * Get the current persistence status for health checks.
+ * @returns {Object} { success, timestamp, error }
+ */
+function getPersistenceStatus() {
+  return { ...lastPersistStatus };
 }
 
 module.exports = {
   initialize,
-  // Auth
-  createUser, verifyUser, createSession, getSessionUser, deleteSession,
+  // Auth - password
+  createUser, verifyUser, getUserById,
+  // Auth - JWT
+  generateAccessToken, generateRefreshToken,
+  verifyAccessToken, rotateRefreshToken,
+  revokeRefreshToken, revokeAllUserTokens,
+  cleanupExpiredTokens,
   // Expenses
-  getAllExpenses, createExpense, updateExpense, deleteExpense, persistToGit, bulkImport
+  getAllExpenses, createExpense, updateExpense, deleteExpense, persistToGit, bulkImport,
+  // Health
+  getPersistenceStatus
 };

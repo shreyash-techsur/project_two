@@ -1,16 +1,46 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // If already logged in, redirect to main app
-  var token = localStorage.getItem('auth_token');
-  if (token) {
-    // Verify the token is still valid
+  // If already logged in, try to verify / refresh and redirect
+  var accessToken = localStorage.getItem('access_token');
+  var refreshToken = localStorage.getItem('refresh_token');
+
+  if (accessToken) {
+    // Try to verify the access token
     fetch('/api/auth/me', {
-      headers: { 'Authorization': 'Bearer ' + token }
+      headers: { 'Authorization': 'Bearer ' + accessToken }
     })
       .then(function (res) {
         if (res.ok) {
           window.location.href = '/';
+          return;
         }
-        // If not ok, token is invalid — stay on login page
+        // Access token expired — try to refresh
+        if (refreshToken) {
+          return tryRefresh(refreshToken);
+        }
+      })
+      .catch(function () {
+        // Network error — stay on login page
+      });
+  } else if (refreshToken) {
+    // No access token but have refresh token — try to refresh
+    tryRefresh(refreshToken);
+  }
+
+  function tryRefresh(rt) {
+    return fetch('/api/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: rt })
+    })
+      .then(function (res) { return res.json().then(function (data) { return { status: res.status, data: data }; }); })
+      .then(function (result) {
+        if (result.status === 200) {
+          storeTokens(result.data);
+          window.location.href = '/';
+        } else {
+          // Refresh token is also invalid — clear and stay on login
+          clearTokens();
+        }
       })
       .catch(function () {
         // Network error — stay on login page
@@ -104,9 +134,8 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(function (result) {
         if (result.status === 200 || result.status === 201) {
-          // Success — save token and redirect
-          localStorage.setItem('auth_token', result.data.token);
-          localStorage.setItem('auth_user', JSON.stringify(result.data.user));
+          // Success — store JWT tokens and redirect
+          storeTokens(result.data);
           window.location.href = '/';
         } else if (result.data.errors) {
           // Server validation errors
@@ -142,6 +171,20 @@ document.addEventListener('DOMContentLoaded', function () {
         submitBtn.textContent = mode === 'login' ? 'Login' : 'Create Account';
       });
   });
+
+  // --- Token helpers ---
+
+  function storeTokens(data) {
+    localStorage.setItem('access_token', data.accessToken);
+    localStorage.setItem('refresh_token', data.refreshToken);
+    localStorage.setItem('auth_user', JSON.stringify(data.user));
+  }
+
+  function clearTokens() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('auth_user');
+  }
 
   // --- Error Display ---
   function clearErrors() {

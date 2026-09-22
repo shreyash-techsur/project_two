@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const database = require('../db/database');
 
-// POST /api/auth/register — Create a new user account
+// POST /api/auth/register — Create a new user account, issue JWT tokens
 router.post('/register', (req, res, next) => {
   try {
     const { username, password } = req.body || {};
@@ -34,12 +34,17 @@ router.post('/register', (req, res, next) => {
     // Create user
     const user = database.createUser(username.trim(), password);
 
-    // Auto-login: create session
-    const token = database.createSession(user.id);
+    // Issue JWT tokens
+    const accessToken = database.generateAccessToken(user);
+    const refreshToken = database.generateRefreshToken(user.id);
+
+    // Persist DB after registration (new user data)
+    database.persistToGit();
 
     res.status(201).json({
       user: { id: user.id, username: user.username },
-      token
+      accessToken,
+      refreshToken
     });
   } catch (err) {
     if (err.code === 'ERR_USERNAME_TAKEN') {
@@ -51,7 +56,7 @@ router.post('/register', (req, res, next) => {
   }
 });
 
-// POST /api/auth/login — Authenticate and get a session token
+// POST /api/auth/login — Authenticate and get JWT tokens
 router.post('/login', (req, res, next) => {
   try {
     const { username, password } = req.body || {};
@@ -69,34 +74,87 @@ router.post('/login', (req, res, next) => {
       });
     }
 
-    // Create session
-    const token = database.createSession(user.id);
+    // Issue JWT tokens
+    const accessToken = database.generateAccessToken(user);
+    const refreshToken = database.generateRefreshToken(user.id);
 
     res.status(200).json({
       user: { id: user.id, username: user.username },
-      token
+      accessToken,
+      refreshToken
     });
   } catch (err) {
     next(err);
   }
 });
 
-// POST /api/auth/logout — Destroy the current session
-router.post('/logout', (req, res) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (token) {
-    database.deleteSession(token);
+// POST /api/auth/refresh — Exchange a refresh token for new access + refresh tokens
+router.post('/refresh', (req, res) => {
+  const { refreshToken } = req.body || {};
+
+  if (!refreshToken) {
+    return res.status(400).json({
+      error: { code: 'ERR_REFRESH_TOKEN_REQUIRED', message: 'Refresh token is required' }
+    });
   }
+
+  const result = database.rotateRefreshToken(refreshToken);
+
+  if (!result) {
+    return res.status(401).json({
+      error: { code: 'ERR_REFRESH_TOKEN_INVALID', message: 'Refresh token is invalid or expired. Please login again.' }
+    });
+  }
+
+  res.status(200).json({
+    user: result.user,
+    accessToken: result.accessToken,
+    refreshToken: result.refreshToken
+  });
+});
+
+// POST /api/auth/logout — Revoke the refresh token
+router.post('/logout', (req, res) => {
+  const { refreshToken } = req.body || {};
+
+  // Revoke the specific refresh token if provided
+  if (refreshToken) {
+    database.revokeRefreshToken(refreshToken);
+  }
+
+  // Also try to revoke by user ID if access token is valid
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.replace('Bearer ', '');
+    const payload = database.verifyAccessToken(token);
+    if (payload && !refreshToken) {
+      // If no specific refresh token given but access token is valid,
+      // revoke all refresh tokens for this user (full logout)
+      database.revokeAllUserTokens(payload.userId);
+    }
+  }
+
   res.status(200).json({ success: true });
 });
 
-// GET /api/auth/me — Check current session / get user info
+// GET /api/auth/me — Check current access token / get user info
 router.get('/me', (req, res) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  const user = database.getSessionUser(token);
-
-  if (!user) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: { code: 'ERR_NOT_AUTHENTICATED', message: 'Not authenticated' } });
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  const payload = database.verifyAccessToken(token);
+
+  if (!payload) {
+    return res.status(401).json({ error: { code: 'ERR_TOKEN_EXPIRED', message: 'Access token expired or invalid' } });
+  }
+
+  // Verify user still exists in DB
+  const user = database.getUserById(payload.userId);
+  if (!user) {
+    return res.status(401).json({ error: { code: 'ERR_USER_NOT_FOUND', message: 'User no longer exists' } });
   }
 
   res.status(200).json({ user: { id: user.id, username: user.username } });

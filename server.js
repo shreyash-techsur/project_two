@@ -41,15 +41,36 @@ app.use('/api/auth', authRouter);
 // API routes (protected — auth required)
 app.use('/api/expenses', requireAuth, expensesRouter);
 
+// Persistence health check endpoint (public — for client-side monitoring)
+app.get('/api/health/persistence', (req, res) => {
+  const status = database.getPersistenceStatus();
+  res.status(200).json(status);
+});
+
 // Global error handler — MUST be after routes
 app.use(errorHandler);
 
-// Start server — bind to 0.0.0.0 for container/sandbox access
-// Only auto-listen when run directly (not when required by tests)
+// Periodic cleanup of expired refresh tokens (every hour)
+const CLEANUP_INTERVAL = 60 * 60 * 1000; // 1 hour
+let cleanupTimer = null;
+
 if (require.main === module) {
+  // Start server — bind to 0.0.0.0 for container/sandbox access
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Expense Tracker running on http://localhost:${PORT}`);
   });
+
+  // Start periodic token cleanup
+  cleanupTimer = setInterval(() => {
+    try {
+      database.cleanupExpiredTokens();
+    } catch (err) {
+      console.error('[cleanup] Failed to clean expired tokens:', err.message);
+    }
+  }, CLEANUP_INTERVAL);
+
+  // Don't let the cleanup timer keep the process alive
+  if (cleanupTimer.unref) cleanupTimer.unref();
 }
 
 module.exports = app;

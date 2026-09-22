@@ -1,26 +1,141 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // --- Auth check: redirect to login if not authenticated ---
-  var authToken = localStorage.getItem('auth_token');
+  // --- Token Management ---
+  var accessToken = localStorage.getItem('access_token');
+  var refreshTokenValue = localStorage.getItem('refresh_token');
   var authUser = null;
   try { authUser = JSON.parse(localStorage.getItem('auth_user')); } catch (e) {}
 
-  if (!authToken) {
+  // Redirect to login if no tokens at all
+  if (!accessToken && !refreshTokenValue) {
     window.location.href = '/login.html';
     return;
   }
 
-  // Helper to get auth headers for all API calls
-  function authHeaders() {
-    return { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' };
+  // Flag to prevent concurrent refresh attempts
+  var isRefreshing = false;
+  // Queue of callbacks waiting for a token refresh to complete
+  var refreshQueue = [];
+
+  /**
+   * Refresh the access token using the refresh token.
+   * Returns a Promise that resolves to the new access token or null if refresh failed.
+   * Multiple callers are coalesced — only one refresh request at a time.
+   */
+  function refreshAccessToken() {
+    if (isRefreshing) {
+      // Already refreshing — queue this caller
+      return new Promise(function (resolve) {
+        refreshQueue.push(resolve);
+      });
+    }
+
+    isRefreshing = true;
+
+    return fetch('/api/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: refreshTokenValue })
+    })
+      .then(function (res) {
+        return res.json().then(function (data) {
+          return { status: res.status, data: data };
+        });
+      })
+      .then(function (result) {
+        isRefreshing = false;
+
+        if (result.status === 200) {
+          // Store new tokens
+          accessToken = result.data.accessToken;
+          refreshTokenValue = result.data.refreshToken;
+          authUser = result.data.user;
+          localStorage.setItem('access_token', accessToken);
+          localStorage.setItem('refresh_token', refreshTokenValue);
+          localStorage.setItem('auth_user', JSON.stringify(authUser));
+
+          // Resolve all queued callers with the new token
+          refreshQueue.forEach(function (cb) { cb(accessToken); });
+          refreshQueue = [];
+
+          return accessToken;
+        } else {
+          // Refresh failed — force re-login
+          refreshQueue.forEach(function (cb) { cb(null); });
+          refreshQueue = [];
+          forceLogout();
+          return null;
+        }
+      })
+      .catch(function () {
+        isRefreshing = false;
+        refreshQueue.forEach(function (cb) { cb(null); });
+        refreshQueue = [];
+        // Network error during refresh — don't force logout, let retry happen
+        return null;
+      });
   }
 
-  // Verify token is still valid
-  fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + authToken } })
-    .then(function (res) {
-      if (!res.ok) {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
-        window.location.href = '/login.html';
+  /**
+   * Make an authenticated API request.
+   * Automatically retries once with a refreshed token if the server returns 401.
+   *
+   * @param {string} url - The API URL
+   * @param {Object} options - fetch options (method, body, etc.)
+   * @returns {Promise<{status: number, data: Object}>}
+   */
+  function apiFetch(url, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+    options.headers['Authorization'] = 'Bearer ' + accessToken;
+    if (options.body && !options.headers['Content-Type']) {
+      options.headers['Content-Type'] = 'application/json';
+    }
+
+    return fetch(url, options)
+      .then(function (response) {
+        if (response.status === 401) {
+          // Token expired — try to refresh and retry
+          return refreshAccessToken().then(function (newToken) {
+            if (!newToken) {
+              // Refresh failed — return the 401 as-is
+              return response.json().then(function (data) {
+                return { status: 401, data: data };
+              });
+            }
+            // Retry with new token
+            options.headers['Authorization'] = 'Bearer ' + newToken;
+            return fetch(url, options).then(function (retryResponse) {
+              return retryResponse.json().then(function (data) {
+                return { status: retryResponse.status, data: data };
+              });
+            });
+          });
+        }
+        return response.json().then(function (data) {
+          return { status: response.status, data: data };
+        });
+      });
+  }
+
+  function forceLogout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('auth_user');
+    window.location.href = '/login.html';
+  }
+
+  // Verify current token is still valid (or refresh it)
+  apiFetch('/api/auth/me', { method: 'GET' })
+    .then(function (result) {
+      if (result.status === 401) {
+        forceLogout();
+      } else if (result.data && result.data.user) {
+        authUser = result.data.user;
+        localStorage.setItem('auth_user', JSON.stringify(authUser));
+        // Update username display
+        if (userLabel) {
+          userLabel.textContent = 'Logged in as ' + authUser.username;
+        }
       }
     })
     .catch(function () {
@@ -52,11 +167,13 @@ document.addEventListener('DOMContentLoaded', function () {
   logoutBtn.addEventListener('click', function () {
     fetch('/api/auth/logout', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + authToken }
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ refreshToken: refreshTokenValue })
     }).finally(function () {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-      window.location.href = '/login.html';
+      forceLogout();
     });
   });
   userBar.appendChild(userLabel);
@@ -82,8 +199,23 @@ document.addEventListener('DOMContentLoaded', function () {
   form.addEventListener('submit', handleSubmit);
 
   // Cancel discards pending edits with no server call (FRD F01 step 7).
-  // Wrapped so the click Event is not passed through as `preserveInput`.
   cancelBtn.addEventListener('click', function () { exitEditMode(); });
+
+  // --- Persistence Monitor ---
+  // Periodically check if the DB was successfully pushed to git
+  setInterval(function () {
+    fetch('/api/health/persistence')
+      .then(function (res) { return res.json(); })
+      .then(function (status) {
+        if (!status.success && status.error) {
+          console.warn('[persistence] DB push issue:', status.error);
+          showToast('Warning: Data may not be saved permanently. ' + status.error, 'error');
+        }
+      })
+      .catch(function () {
+        // Health endpoint unavailable — ignore
+      });
+  }, 5 * 60 * 1000); // Check every 5 minutes
 
   // --- API Communication ---
 
@@ -96,21 +228,17 @@ document.addEventListener('DOMContentLoaded', function () {
     expenseListEl.appendChild(loadingEl);
     totalAmountEl.textContent = '...';
 
-    fetch('/api/expenses', { headers: { 'Authorization': 'Bearer ' + authToken } })
-      .then(function (response) {
-        if (response.status === 401) {
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('auth_user');
-          window.location.href = '/login.html';
+    apiFetch('/api/expenses', { method: 'GET' })
+      .then(function (result) {
+        if (result.status === 401) {
+          forceLogout();
           throw new Error('Not authenticated');
         }
-        if (!response.ok) {
+        if (result.status !== 200) {
           throw new Error('Server error');
         }
-        return response.json();
-      })
-      .then(function (data) {
-        expenses = data.expenses;
+
+        expenses = result.data.expenses;
 
         // If server returned empty but we have a local backup, auto-restore
         if (expenses.length === 0) {
@@ -146,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function () {
         errorDiv.appendChild(retryBtn);
 
         expenseListEl.appendChild(errorDiv);
-        totalAmountEl.textContent = '\u2014'; // em dash "—" (US-4.4)
+        totalAmountEl.textContent = '\u2014'; // em dash
       });
   }
 
@@ -177,19 +305,17 @@ document.addEventListener('DOMContentLoaded', function () {
   function restoreFromBackup(backupExpenses) {
     showToast('Restoring your data from local backup...', 'success');
 
-    fetch('/api/expenses/import', {
+    apiFetch('/api/expenses/import', {
       method: 'POST',
-      headers: authHeaders(),
       body: JSON.stringify({ expenses: backupExpenses })
     })
-      .then(function (response) { return response.json(); })
-      .then(function (data) {
-        if (data.expenses) {
-          expenses = data.expenses;
+      .then(function (result) {
+        if (result.data && result.data.expenses) {
+          expenses = result.data.expenses;
           saveBackup(expenses);
           renderExpenses();
           updateTotal();
-          var count = data.imported || 0;
+          var count = result.data.imported || 0;
           if (count > 0) {
             showToast(count + ' expense(s) restored successfully!', 'success');
           }
@@ -223,66 +349,57 @@ document.addEventListener('DOMContentLoaded', function () {
     var isEdit = editingId !== null;
     var targetId = editingId;
 
-    // Disable button during request (UX-Mockup: "Saving..." label)
+    // Disable button during request
     submitBtn.disabled = true;
     submitBtn.textContent = 'Saving...';
 
-    fetch(isEdit ? '/api/expenses/' + targetId : '/api/expenses', {
+    apiFetch(isEdit ? '/api/expenses/' + targetId : '/api/expenses', {
       method: isEdit ? 'PUT' : 'POST',
-      headers: authHeaders(),
       body: JSON.stringify({
         amount: parseFloat(amountInput.value),
         description: descriptionInput.value.trim(),
         category: categoryInput.value.trim()
       })
     })
-      .then(function (response) {
-        return response.json().then(function (data) {
-          return { status: response.status, data: data };
-        });
-      })
       .then(function (result) {
         if (result.status === 201) {
-          // Created — FRD F0 step 12
-          expenses.unshift(result.data.expense); // Prepend (most recent first)
+          // Created
+          expenses.unshift(result.data.expense);
           renderExpenses();
           updateTotal();
-          saveBackup(expenses); // Persist to localStorage
-          form.reset(); // Clear all fields
+          saveBackup(expenses);
+          form.reset();
           showToast('Expense added!', 'success');
-          amountInput.focus(); // Return focus for batch entry (US-0.2)
+          amountInput.focus();
         } else if (result.status === 200) {
-          // Updated — FRD F01 step 6j–6m: replace row in place, recalc total, exit edit mode
+          // Updated
           var updated = result.data.expense;
           var idx = expenses.findIndex(function (e) { return e.id === updated.id; });
           if (idx !== -1) expenses[idx] = updated;
-          exitEditMode(); // clears form and re-renders
+          exitEditMode();
           updateTotal();
-          saveBackup(expenses); // Persist to localStorage
+          saveBackup(expenses);
           showToast('Expense updated!', 'success');
           amountInput.focus();
         } else if (result.status === 400 && result.data.errors) {
           // Server validation errors — display inline
           displayServerErrors(result.data.errors);
         } else if (result.status === 404) {
-          // Expense vanished between load and save (FRD F01 outputs: not-found).
-          // Return to add-new state but keep the typed values so the user can
-          // re-submit them as a new expense (US-1.4 AC).
           showToast('Expense not found. It may have been removed.', 'error');
-          exitEditMode(true); // preserve input
+          exitEditMode(true);
           loadExpenses();
+        } else if (result.status === 401) {
+          // Auth failed even after refresh — force logout
+          forceLogout();
         } else {
-          // Unexpected error
           showToast('Failed to save expense. Please try again.', 'error');
         }
       })
       .catch(function () {
-        // Network error — US-5.5
         showToast('Unable to connect to the server. Check your connection and try again.', 'error');
       })
       .finally(function () {
         submitBtn.disabled = false;
-        // Restore the label for whichever mode we are in now
         submitBtn.textContent = editingId !== null ? 'Save Changes' : 'Add Expense';
       });
   }
@@ -292,23 +409,21 @@ document.addEventListener('DOMContentLoaded', function () {
   function enterEditMode(expense) {
     editingId = expense.id;
 
-    // Populate form with current values (FRD F01 step 3); amount is cents -> dollars
+    // Populate form with current values; amount is cents -> dollars
     amountInput.value = (expense.amount / 100).toFixed(2);
     descriptionInput.value = expense.description;
     categoryInput.value = expense.category;
 
-    // Visual edit-mode indicators (FRD F01 step 4)
+    // Visual edit-mode indicators
     submitBtn.textContent = 'Save Changes';
     cancelBtn.style.display = '';
     editIndicator.style.display = '';
 
     clearErrors();
-    renderExpenses(); // re-render to highlight the row being edited
+    renderExpenses();
     amountInput.focus();
   }
 
-  // preserveInput=true leaves the typed field values in place while still
-  // returning the form to add-new state (US-1.4: 404 must not clear the form).
   function exitEditMode(preserveInput) {
     editingId = null;
     if (!preserveInput) form.reset();
@@ -318,35 +433,29 @@ document.addEventListener('DOMContentLoaded', function () {
     cancelBtn.style.display = 'none';
     editIndicator.style.display = 'none';
 
-    renderExpenses(); // clears the row highlight
+    renderExpenses();
   }
 
   // --- Delete ---
 
   function handleDelete(expense) {
-    // If currently editing this expense, exit edit mode first
     if (editingId === expense.id) {
       exitEditMode();
     }
 
-    // Confirm before deleting
     if (!confirm('Delete "' + expense.description + '" (' + formatCurrency(expense.amount) + ')?')) {
       return;
     }
 
-    fetch('/api/expenses/' + expense.id, {
-      method: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + authToken }
-    })
-      .then(function (response) {
-        if (response.status === 200) {
-          // Remove from local array
+    apiFetch('/api/expenses/' + expense.id, { method: 'DELETE' })
+      .then(function (result) {
+        if (result.status === 200) {
           expenses = expenses.filter(function (e) { return e.id !== expense.id; });
           renderExpenses();
           updateTotal();
           saveBackup(expenses);
           showToast('Expense deleted!', 'success');
-        } else if (response.status === 404) {
+        } else if (result.status === 404) {
           showToast('Expense not found. It may have already been removed.', 'error');
           loadExpenses();
         } else {
@@ -379,7 +488,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (numAmount > 999999.99) {
         errors.push({ field: 'amount', message: 'Amount must not exceed 999,999.99' });
       }
-      // Precision check — more than 2 decimal places
       var parts = amount.split('.');
       if (parts.length === 2 && parts[1].length > 2) {
         errors.push({ field: 'amount', message: 'Amount must have at most two decimal places' });
@@ -417,7 +525,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (errorEl) errorEl.textContent = err.message;
       if (inputEl) inputEl.classList.add('input-error');
     });
-    // Focus first invalid field (UX-Mockup Interaction Pattern: Form Submission step 3)
     if (errors.length > 0) {
       var firstField = document.getElementById(errors[0].field);
       if (firstField) firstField.focus();
@@ -425,7 +532,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function displayServerErrors(serverErrors) {
-    // Map server error codes to field names
     var fieldMap = {
       'ERR_EXPENSE_AMOUNT_REQUIRED': 'amount',
       'ERR_EXPENSE_INVALID_AMOUNT': 'amount',
@@ -449,10 +555,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // --- List Rendering ---
 
   function renderExpenses() {
-    expenseListEl.innerHTML = ''; // Clear current content
+    expenseListEl.innerHTML = '';
 
     if (expenses.length === 0) {
-      // Empty state (US-3.2, UX-Mockup Empty State)
       var emptyEl = document.createElement('p');
       emptyEl.className = 'empty-state';
       emptyEl.textContent = 'No expenses yet. Add your first expense above!';
@@ -460,32 +565,29 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // Render each expense as a row (US-3.1)
     expenses.forEach(function (expense) {
       var row = document.createElement('div');
       row.className = 'expense-row';
 
       var amountEl = document.createElement('span');
       amountEl.className = 'expense-amount';
-      amountEl.textContent = formatCurrency(expense.amount); // cents -> $X.XX
+      amountEl.textContent = formatCurrency(expense.amount);
 
       var descEl = document.createElement('span');
       descEl.className = 'expense-description';
-      descEl.textContent = expense.description; // textContent for XSS prevention (TechArch S5)
+      descEl.textContent = expense.description;
 
       var catEl = document.createElement('span');
       catEl.className = 'expense-category';
-      catEl.textContent = expense.category; // textContent for XSS prevention
+      catEl.textContent = expense.category;
 
       row.appendChild(amountEl);
       row.appendChild(descEl);
       row.appendChild(catEl);
 
-      // Action buttons container
       var actionsEl = document.createElement('span');
       actionsEl.className = 'expense-actions';
 
-      // Edit button (US-1.1, FRD F01 step 2)
       var editBtn = document.createElement('button');
       editBtn.type = 'button';
       editBtn.className = 'expense-edit-btn';
@@ -495,7 +597,6 @@ document.addEventListener('DOMContentLoaded', function () {
       editBtn.addEventListener('click', function () { enterEditMode(expense); });
       actionsEl.appendChild(editBtn);
 
-      // Delete button
       var deleteBtn = document.createElement('button');
       deleteBtn.type = 'button';
       deleteBtn.className = 'expense-delete-btn';
@@ -507,7 +608,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
       row.appendChild(actionsEl);
 
-      // Highlight the row currently in edit mode
       if (editingId === expense.id) {
         row.classList.add('editing-row');
       }
@@ -519,13 +619,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // --- Total Calculation ---
 
   function updateTotal() {
-    // Sum all amounts using integer cents arithmetic (US-4.1, FRD F4 process step 1)
     var totalCents = expenses.reduce(function (sum, exp) { return sum + exp.amount; }, 0);
     totalAmountEl.textContent = formatCurrency(totalCents);
   }
 
   function formatCurrency(cents) {
-    // Convert cents to dollars and format (US-4.1: $X,XXX.XX)
     var dollars = cents / 100;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -543,7 +641,6 @@ document.addEventListener('DOMContentLoaded', function () {
     toast.textContent = message;
     toastContainer.appendChild(toast);
 
-    // Auto-dismiss after 2 seconds (UX-Mockup Success Toast pattern)
     setTimeout(function () {
       toast.style.animation = 'slideOut 0.3s forwards';
       setTimeout(function () { toast.remove(); }, 300);
@@ -553,7 +650,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // --- Global Error Handler ---
 
   window.addEventListener('error', function () {
-    // Fallback for unhandled JS errors (US-5.5)
     var existing = document.querySelector('.global-error');
     if (!existing) {
       var errorBanner = document.createElement('div');

@@ -14,18 +14,31 @@ const app = require('../server');
 let server;
 let baseUrl;
 
+// JWT tokens for the test user — populated in the before() hook
+let accessToken;
+let refreshToken;
+
 /**
  * Helper: make an HTTP request and return { status, headers, body }.
+ * Optionally adds Authorization header with the test user's JWT.
  */
-function request(method, urlPath, body) {
+function request(method, urlPath, body, opts) {
+  opts = opts || {};
   return new Promise((resolve, reject) => {
     const url = new URL(urlPath, baseUrl);
+    const headers = { 'Content-Type': 'application/json' };
+
+    // Add auth header by default (unless explicitly skipped)
+    if (opts.noAuth !== true && accessToken) {
+      headers['Authorization'] = 'Bearer ' + accessToken;
+    }
+
     const options = {
       method,
       hostname: url.hostname,
       port: url.port,
       path: url.pathname,
-      headers: { 'Content-Type': 'application/json' }
+      headers
     };
 
     const req = http.request(options, (res) => {
@@ -43,7 +56,7 @@ function request(method, urlPath, body) {
   });
 }
 
-// Start the test server on a random port
+// Start the test server on a random port and register a test user
 before(async () => {
   await new Promise((resolve) => {
     server = app.listen(0, '127.0.0.1', () => {
@@ -52,6 +65,16 @@ before(async () => {
       resolve();
     });
   });
+
+  // Register a test user and capture JWT tokens
+  const res = await request('POST', '/api/auth/register', {
+    username: 'testuser',
+    password: 'testpass'
+  }, { noAuth: true });
+
+  assert.equal(res.status, 201, 'Test user registration should succeed');
+  accessToken = res.body.accessToken;
+  refreshToken = res.body.refreshToken;
 });
 
 // Shut down server and clean up test DB
@@ -71,6 +94,107 @@ after(async () => {
 });
 
 // ============================================================
+// Auth — JWT Tests
+// ============================================================
+
+describe('JWT Authentication', () => {
+  it('register returns accessToken and refreshToken', async () => {
+    const res = await request('POST', '/api/auth/register', {
+      username: 'jwttest',
+      password: 'testpass'
+    }, { noAuth: true });
+    assert.equal(res.status, 201);
+    assert.ok(res.body.accessToken);
+    assert.ok(res.body.refreshToken);
+    assert.ok(res.body.user);
+    assert.equal(res.body.user.username, 'jwttest');
+  });
+
+  it('login returns accessToken and refreshToken', async () => {
+    const res = await request('POST', '/api/auth/login', {
+      username: 'testuser',
+      password: 'testpass'
+    }, { noAuth: true });
+    assert.equal(res.status, 200);
+    assert.ok(res.body.accessToken);
+    assert.ok(res.body.refreshToken);
+    // Update our tokens for subsequent tests
+    accessToken = res.body.accessToken;
+    refreshToken = res.body.refreshToken;
+  });
+
+  it('GET /api/auth/me returns user info with valid access token', async () => {
+    const res = await request('GET', '/api/auth/me');
+    assert.equal(res.status, 200);
+    assert.ok(res.body.user);
+    assert.equal(res.body.user.username, 'testuser');
+  });
+
+  it('GET /api/auth/me returns 401 without token', async () => {
+    const res = await request('GET', '/api/auth/me', null, { noAuth: true });
+    assert.equal(res.status, 401);
+  });
+
+  it('refresh token rotation returns new token pair', async () => {
+    const res = await request('POST', '/api/auth/refresh', {
+      refreshToken: refreshToken
+    }, { noAuth: true });
+    assert.equal(res.status, 200);
+    assert.ok(res.body.accessToken);
+    assert.ok(res.body.refreshToken);
+    assert.ok(res.body.user);
+    // Update tokens for subsequent tests
+    accessToken = res.body.accessToken;
+    refreshToken = res.body.refreshToken;
+  });
+
+  it('old refresh token is revoked after rotation', async () => {
+    // Login to get a fresh token pair
+    const loginRes = await request('POST', '/api/auth/login', {
+      username: 'testuser',
+      password: 'testpass'
+    }, { noAuth: true });
+    const rt = loginRes.body.refreshToken;
+
+    // Use the refresh token
+    const refreshRes = await request('POST', '/api/auth/refresh', {
+      refreshToken: rt
+    }, { noAuth: true });
+    assert.equal(refreshRes.status, 200);
+
+    // Try to use the old refresh token again — should fail
+    const reuse = await request('POST', '/api/auth/refresh', {
+      refreshToken: rt
+    }, { noAuth: true });
+    assert.equal(reuse.status, 401);
+
+    // Update to latest tokens
+    accessToken = refreshRes.body.accessToken;
+    refreshToken = refreshRes.body.refreshToken;
+  });
+
+  it('logout revokes refresh token', async () => {
+    // Login to get tokens to logout
+    const loginRes = await request('POST', '/api/auth/login', {
+      username: 'testuser',
+      password: 'testpass'
+    }, { noAuth: true });
+
+    const logoutRes = await request('POST', '/api/auth/logout', {
+      refreshToken: loginRes.body.refreshToken
+    });
+    assert.equal(logoutRes.status, 200);
+    assert.ok(logoutRes.body.success);
+
+    // Try to use the revoked refresh token — should fail
+    const refreshRes = await request('POST', '/api/auth/refresh', {
+      refreshToken: loginRes.body.refreshToken
+    }, { noAuth: true });
+    assert.equal(refreshRes.status, 401);
+  });
+});
+
+// ============================================================
 // GET /api/expenses
 // ============================================================
 
@@ -85,6 +209,11 @@ describe('GET /api/expenses', () => {
   it('returns Content-Type application/json', async () => {
     const res = await request('GET', '/api/expenses');
     assert.ok(res.headers['content-type'].includes('application/json'));
+  });
+
+  it('returns 401 without authentication', async () => {
+    const res = await request('GET', '/api/expenses', null, { noAuth: true });
+    assert.equal(res.status, 401);
   });
 });
 
@@ -104,7 +233,7 @@ describe('POST /api/expenses — happy path', () => {
     assert.ok(res.body.expense.id > 0);
   });
 
-  it('converts dollars to cents (10.50 → 1050)', async () => {
+  it('converts dollars to cents (10.50 -> 1050)', async () => {
     const res = await request('POST', '/api/expenses', {
       amount: 10.50,
       description: 'Dollar to cents test',
@@ -294,7 +423,6 @@ describe('Security', () => {
     const res = await request('GET', '/api/expenses');
     assert.equal(res.headers['x-content-type-options'], 'nosniff');
   });
-
 });
 
 // ============================================================
@@ -459,5 +587,17 @@ describe('PUT /api/expenses/:id', () => {
 
     assert.equal(found.description, 'Original lunch');
     assert.equal(found.amount, 1000);
+  });
+});
+
+// ============================================================
+// Persistence Health Check
+// ============================================================
+
+describe('GET /api/health/persistence', () => {
+  it('returns persistence status', async () => {
+    const res = await request('GET', '/api/health/persistence', null, { noAuth: true });
+    assert.equal(res.status, 200);
+    assert.ok(typeof res.body.success === 'boolean');
   });
 });
