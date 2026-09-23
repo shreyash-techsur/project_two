@@ -539,6 +539,7 @@ function bulkImport(userId, items) {
  * Debounced: rapid writes within 2s are batched into a single commit+push.
  */
 let persistTimer = null;
+let persistInProgress = false;
 let lastPersistStatus = { success: true, timestamp: null, error: null };
 
 function persistToGit() {
@@ -555,10 +556,19 @@ function persistToGit() {
 function _doPersist() {
   persistTimer = null;
 
+  // Prevent overlapping persist operations
+  if (persistInProgress) {
+    // Re-queue after current operation finishes
+    setTimeout(_doPersist, 5000);
+    return;
+  }
+  persistInProgress = true;
+
   try {
     // Checkpoint WAL into the main DB file so git tracks a single complete file
     db.pragma('wal_checkpoint(TRUNCATE)');
   } catch (e) {
+    persistInProgress = false;
     console.error('[persist] WAL checkpoint failed:', e.message);
     lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'WAL checkpoint failed: ' + e.message };
     return;
@@ -580,53 +590,56 @@ function _doPersist() {
   }
 
   // Run git add + commit + push in the background (fire-and-forget)
-  execFile('git', ['add', '--force', relDbPath], { cwd: repoRoot }, (addErr, addOut, addStderr) => {
-    if (addErr) {
-      console.error('[persist] git add failed:', addErr.message, addStderr);
-      lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'git add failed' };
-      // Retry after 10s
-      setTimeout(_doPersist, 10000);
-      return;
-    }
-    execFile(
-      'git',
-      ['commit', '-m', 'data: auto-save expenses database', '--', relDbPath],
-      { cwd: repoRoot },
-      (commitErr, commitOut, commitStderr) => {
-        if (commitErr) {
-          // Exit code 1 with "nothing to commit" is fine — means no actual change
-          if (commitErr.code === 1) {
-            lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
-            return;
-          }
-          console.error('[persist] git commit failed:', commitErr.message, commitStderr);
-          lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'git commit failed' };
+  try {
+    execFile('git', ['add', '--force', relDbPath], { cwd: repoRoot, timeout: 15000 }, (addErr, addOut, addStderr) => {
+      try {
+        if (addErr) {
+          console.error('[persist] git add failed:', addErr.message);
+          lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'git add failed' };
+          persistInProgress = false;
           return;
         }
-        console.log('[persist] database saved to git');
-        lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
-        // Push to remote so data survives full workspace rebuilds (best-effort, never crashes)
-        try {
-          execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr) => {
+        execFile(
+          'git',
+          ['commit', '-m', 'data: auto-save expenses database', '--', relDbPath],
+          { cwd: repoRoot, timeout: 15000 },
+          (commitErr, commitOut, commitStderr) => {
             try {
-              if (pushErr) {
-                const msg = (pushErr.message || String(pushErr)).split('\n')[0];
-                console.warn('[persist] git push skipped (auth may have expired):', msg);
+              if (commitErr) {
+                // Exit code 1 with "nothing to commit" is fine — means no actual change
+                lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
+                persistInProgress = false;
                 return;
               }
-              console.log('[persist] database pushed to remote');
-            } catch (innerErr) {
-              // Absolutely never crash from push logging
-              console.warn('[persist] git push callback error (non-fatal)');
+              console.log('[persist] database saved to git');
+              lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
+              // Push to remote so data survives full workspace rebuilds (best-effort, never crashes)
+              execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr) => {
+                try {
+                  if (pushErr) {
+                    const msg = (pushErr.message || String(pushErr)).split('\n')[0];
+                    console.warn('[persist] git push skipped (auth may have expired):', msg);
+                  } else {
+                    console.log('[persist] database pushed to remote');
+                  }
+                } catch (innerErr) {
+                  // Absolutely never crash from push logging
+                }
+                persistInProgress = false;
+              });
+            } catch (e) {
+              persistInProgress = false;
             }
-          });
-        } catch (spawnErr) {
-          // execFile itself can throw synchronously in rare cases
-          console.warn('[persist] git push could not be started (non-fatal)');
-        }
+          }
+        );
+      } catch (e) {
+        persistInProgress = false;
       }
-    );
-  });
+    });
+  } catch (spawnErr) {
+    persistInProgress = false;
+    console.warn('[persist] git operations could not be started (non-fatal)');
+  }
 }
 
 /**
