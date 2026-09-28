@@ -5,14 +5,11 @@ const path = require('path');
 const helmet = require('helmet');
 const database = require('./db/database');
 
-// Prevent unhandled async errors (e.g. from git push callbacks) from crashing the server.
-// EADDRINUSE is NOT caught here — it's handled on the server 'error' event below.
+// Prevent unhandled async errors (e.g. from git push callbacks) from crashing
+// the server.  Git persistence runs fire-and-forget child processes whose
+// errors surface as uncaughtException / unhandledRejection — these must NEVER
+// take the Express server down.
 process.on('uncaughtException', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    // Let this propagate — the server error handler will deal with it
-    console.error(`[server] FATAL: port already in use — exiting so process manager can retry`);
-    process.exit(1);
-  }
   console.error('[server] uncaught exception (non-fatal):', err.message || err);
 });
 process.on('unhandledRejection', (reason) => {
@@ -70,55 +67,74 @@ let cleanupTimer = null;
 
 if (require.main === module) {
   /**
-   * Kill any stale process listening on the target port.
-   * Prevents EADDRINUSE when nodemon/Pivota restarts the server before
-   * the previous process has fully released the socket.
+   * Kill any stale process bound to the target port.
+   * Uses `ss` (always available on Linux) to find the PID, then kills it.
+   * Falls back to fuser / lsof if available.
    */
   function killStaleProcess(port) {
+    const { execSync } = require('child_process');
     try {
-      const { execSync } = require('child_process');
-      const out = execSync(`lsof -ti tcp:${port}`, { stdio: 'pipe' }).toString().trim();
-      if (out) {
-        const pids = out.split('\n').filter(p => p && parseInt(p, 10) !== process.pid);
-        for (const pid of pids) {
-          try {
-            process.kill(parseInt(pid, 10), 'SIGTERM');
-            console.log(`[server] killed stale process ${pid} on port ${port}`);
-          } catch { /* already gone */ }
-        }
-        // Brief pause to let the OS release the socket
-        if (pids.length > 0) {
-          execSync('sleep 0.5', { stdio: 'pipe' });
-        }
+      // ss -tlnp shows listening sockets with PIDs.  Extract PIDs for our port.
+      // Output format: "LISTEN  0  511  0.0.0.0:3000  ... users:(("node",pid=1234,fd=22))"
+      const ssOut = execSync(`ss -tlnp 'sport = :${port}' 2>/dev/null || true`, { stdio: 'pipe' }).toString();
+      const pidMatches = ssOut.matchAll(/pid=(\d+)/g);
+      const pids = [];
+      for (const m of pidMatches) {
+        const pid = parseInt(m[1], 10);
+        if (pid && pid !== process.pid) pids.push(pid);
       }
+
+      if (pids.length === 0) return; // No stale process
+
+      for (const pid of pids) {
+        try { process.kill(pid, 'SIGKILL'); } catch { /* already gone */ }
+      }
+      // Wait for the OS to release the socket after SIGKILL
+      execSync('sleep 1', { stdio: 'pipe' });
+      console.log(`[server] killed stale process(es) on port ${port}: ${pids.join(', ')}`);
     } catch {
-      // lsof not available or no process found — both OK
+      // ss unavailable or parsing failed — try fuser/lsof as fallback
+      try {
+        execSync(`fuser -k ${port}/tcp 2>/dev/null || lsof -ti tcp:${port} | xargs -r kill -9 2>/dev/null`, {
+          stdio: 'pipe', timeout: 3000
+        });
+        execSync('sleep 1', { stdio: 'pipe' });
+      } catch { /* nothing to kill */ }
     }
   }
 
-  function startServer(retryCount) {
-    const server = app.listen(PORT, '0.0.0.0');
+  // Kill any leftover server from a previous nodemon/Pivota restart BEFORE
+  // we try to bind.  This prevents EADDRINUSE entirely rather than reacting
+  // to it after the fact.
+  killStaleProcess(PORT);
 
-    server.on('listening', () => {
-      console.log(`Expense Tracker running on http://localhost:${PORT}`);
-    });
+  const server = app.listen(PORT, '0.0.0.0');
 
-    server.on('error', (err) => {
-      if (err.code === 'EADDRINUSE' && retryCount < 1) {
-        console.warn(`[server] port ${PORT} in use — killing stale process and retrying`);
-        killStaleProcess(PORT);
-        setTimeout(() => startServer(retryCount + 1), 1000);
-      } else if (err.code === 'EADDRINUSE') {
-        console.error(`[server] FATAL: port ${PORT} still in use after retry — exiting`);
-        process.exit(1);
-      } else {
-        console.error('[server] listen error:', err.message);
-        process.exit(1);
-      }
-    });
+  server.on('listening', () => {
+    console.log(`Expense Tracker running on http://localhost:${PORT}`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      // The pre-emptive kill didn't work (race condition or different process).
+      // Exit cleanly so nodemon / Pivota can retry after a delay.
+      console.error(`[server] port ${PORT} is still in use — exiting so process manager can retry`);
+      process.exit(1);
+    }
+    console.error('[server] listen error:', err.message);
+    process.exit(1);
+  });
+
+  // Graceful shutdown: close the HTTP server so the port is released
+  // before nodemon spawns the replacement process.
+  function shutdown(signal) {
+    console.log(`[server] ${signal} received — shutting down`);
+    server.close(() => process.exit(0));
+    // Force-exit after 3 s if connections are stuck
+    setTimeout(() => process.exit(0), 3000).unref();
   }
-
-  startServer(0);
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT',  () => shutdown('SIGINT'));
 
   // Start periodic token cleanup
   cleanupTimer = setInterval(() => {
