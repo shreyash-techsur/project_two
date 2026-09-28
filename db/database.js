@@ -45,6 +45,94 @@ function getOrCreateJwtSecret() {
 }
 
 /**
+ * Environment variables passed to ALL git child processes.
+ * GIT_TERMINAL_PROMPT=0 prevents git from ever trying to open /dev/tty to prompt
+ * for credentials, which would fail with "No such device or address" in a
+ * background process. Instead git will fail fast with a clear auth error.
+ */
+const GIT_ENV = { ...process.env, GIT_TERMINAL_PROMPT: '0' };
+
+/**
+ * Ensure git has working authentication for the remote.
+ *
+ * Daytona/Pivota injects a GitHub OAuth token via `http.<url>.extraheader` in
+ * the local git config at clone time.  These `gho_*` tokens can expire between
+ * sandbox sessions. When they do, git falls back to prompting for credentials
+ * (which fails in non-interactive processes with "No such device or address").
+ *
+ * This function:
+ *  1. Reads the token from the `http.extraheader` config.
+ *  2. Embeds it directly in the remote push URL
+ *     (`https://x-access-token:TOKEN@github.com/…`), which is the most
+ *     reliable transport for HTTPS auth — it never falls through to a prompt.
+ *  3. Configures `credential.helper store` as an additional fallback so any
+ *     other git operation (fetch, pull) also has access.
+ *
+ * Called once on startup, synchronously.
+ */
+function _ensureGitAuth(repoRoot) {
+  try {
+    // 1. Extract token from the Daytona-injected extraheader
+    let token = null;
+    try {
+      const header = execSync(
+        'git config --local --get http.https://github.com/.extraheader',
+        { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV }
+      ).toString().trim();
+      // Format: "AUTHORIZATION: Basic <base64(x-access-token:TOKEN)>"
+      const b64 = header.replace(/^AUTHORIZATION:\s*Basic\s*/i, '');
+      const decoded = Buffer.from(b64, 'base64').toString('utf8');
+      const parts = decoded.split(':');
+      if (parts.length >= 2) {
+        token = parts.slice(1).join(':'); // handle tokens containing ':'
+      }
+    } catch {
+      // No extraheader configured
+    }
+
+    if (!token) {
+      console.warn('[persist] no git auth token found in config — push will likely fail');
+      return;
+    }
+
+    // 2. Embed token in the remote URL for reliable push auth
+    const currentUrl = execSync('git remote get-url origin', {
+      cwd: repoRoot, stdio: 'pipe', env: GIT_ENV
+    }).toString().trim();
+
+    // Only modify if not already authenticated
+    if (!currentUrl.includes('@github.com')) {
+      const authUrl = currentUrl.replace(
+        'https://github.com/',
+        `https://x-access-token:${token}@github.com/`
+      );
+      execSync(`git remote set-url origin "${authUrl}"`, {
+        cwd: repoRoot, stdio: 'pipe', env: GIT_ENV
+      });
+      console.log('[persist] embedded auth token in remote URL');
+    }
+
+    // 3. Set up credential store as a belt-and-suspenders fallback
+    const credFile = path.join(repoRoot, '.git', 'pivota-credentials');
+    // Extract owner/repo from the URL
+    const match = currentUrl.match(/github\.com[/:]([^/]+\/[^/.]+)/);
+    if (match) {
+      const credEntry = `https://x-access-token:${token}@github.com`;
+      fs.writeFileSync(credFile, credEntry + '\n', { mode: 0o600 });
+      try {
+        execSync(`git config --local credential.helper "store --file=${credFile}"`, {
+          cwd: repoRoot, stdio: 'pipe', env: GIT_ENV
+        });
+      } catch {
+        // credential.helper may already be set — not critical
+      }
+    }
+  } catch (err) {
+    console.warn('[persist] git auth setup failed (non-fatal):', (err.message || '').split('\n')[0]);
+  }
+}
+
+/**
  * Pull the latest database file from the git remote.
  * Called BEFORE opening the database so that a new sandbox gets the most
  * recent data that was pushed by a previous sandbox.
@@ -57,16 +145,19 @@ function restoreFromGit() {
   const repoRoot = path.resolve(__dirname, '..');
   try {
     // Verify this is a git repo with a remote
-    execSync('git rev-parse --git-dir', { cwd: repoRoot, stdio: 'pipe' });
-    const remoteOut = execSync('git remote -v', { cwd: repoRoot, stdio: 'pipe' }).toString();
+    execSync('git rev-parse --git-dir', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV });
+    const remoteOut = execSync('git remote -v', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV }).toString();
     if (!remoteOut.includes('fetch')) {
       console.log('[persist] no git fetch remote — skipping restore');
       return;
     }
 
+    // Ensure git auth is configured before any remote operations
+    _ensureGitAuth(repoRoot);
+
     // Fetch the latest state from remote
     try {
-      execSync('git fetch origin', { cwd: repoRoot, stdio: 'pipe', timeout: 30000 });
+      execSync('git fetch origin', { cwd: repoRoot, stdio: 'pipe', timeout: 30000, env: GIT_ENV });
     } catch (fetchErr) {
       console.warn('[persist] git fetch failed (will use local data):', (fetchErr.message || '').split('\n')[0]);
       return;
@@ -74,7 +165,7 @@ function restoreFromGit() {
 
     // Check if the remote branch has commits ahead of local
     try {
-      const behind = execSync('git rev-list HEAD..origin/main --count', { cwd: repoRoot, stdio: 'pipe' })
+      const behind = execSync('git rev-list HEAD..origin/main --count', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV })
         .toString().trim();
       if (behind === '0') {
         console.log('[persist] local branch is up-to-date with remote');
@@ -88,13 +179,13 @@ function restoreFromGit() {
     // Pull with rebase to integrate remote data commits
     // Use --autostash in case there are local uncommitted changes to the db
     try {
-      execSync('git pull --rebase --autostash origin main', { cwd: repoRoot, stdio: 'pipe', timeout: 30000 });
+      execSync('git pull --rebase --autostash origin main', { cwd: repoRoot, stdio: 'pipe', timeout: 30000, env: GIT_ENV });
       console.log('[persist] restored latest database from git remote');
     } catch (pullErr) {
       // If pull fails due to conflict, abort the rebase and continue with local data
       console.warn('[persist] git pull failed (will use local data):', (pullErr.message || '').split('\n')[0]);
       try {
-        execSync('git rebase --abort', { cwd: repoRoot, stdio: 'pipe' });
+        execSync('git rebase --abort', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV });
       } catch {
         // No rebase in progress — that's fine
       }
@@ -226,10 +317,16 @@ function initialize() {
  */
 function verifyGitPersistence() {
   try {
-    execSync('git rev-parse --git-dir', { cwd: path.resolve(__dirname, '..'), stdio: 'pipe' });
-    const remoteOut = execSync('git remote -v', { cwd: path.resolve(__dirname, '..'), stdio: 'pipe' }).toString();
+    execSync('git rev-parse --git-dir', { cwd: path.resolve(__dirname, '..'), stdio: 'pipe', env: GIT_ENV });
+    const remoteOut = execSync('git remote -v', { cwd: path.resolve(__dirname, '..'), stdio: 'pipe', env: GIT_ENV }).toString();
     if (remoteOut.includes('push')) {
-      console.log('[persist] git remote available — data will auto-save to git on writes');
+      // Verify push auth by checking the remote URL has embedded credentials
+      const pushUrl = execSync('git remote get-url --push origin', {
+        cwd: path.resolve(__dirname, '..'), stdio: 'pipe', env: GIT_ENV
+      }).toString().trim();
+      const hasAuth = pushUrl.includes('@github.com');
+      console.log('[persist] git remote available — data will auto-save to git on writes' +
+        (hasAuth ? '' : ' (WARNING: no embedded auth — push may fail)'));
     } else {
       console.log('[persist] WARNING: no git push remote — data will NOT survive rebuilds');
     }
@@ -642,19 +739,22 @@ function _doPersist() {
 
   // Ensure git user config is set (preview sandbox may not have it)
   try {
-    execSync('git config user.email >/dev/null 2>&1', { cwd: repoRoot });
+    execSync('git config user.email', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV });
   } catch {
     try {
-      execSync('git config user.email "expense-tracker@localhost"', { cwd: repoRoot });
-      execSync('git config user.name "Expense Tracker"', { cwd: repoRoot });
+      execSync('git config user.email "expense-tracker@localhost"', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV });
+      execSync('git config user.name "Expense Tracker"', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV });
     } catch (cfgErr) {
       console.error('[persist] git config failed:', cfgErr.message);
     }
   }
 
+  // Ensure auth is set up (may be first persist after startup)
+  _ensureGitAuth(repoRoot);
+
   // Run git add + commit + push in the background
   try {
-    execFile('git', ['add', '--force', relDbPath], { cwd: repoRoot, timeout: 15000 }, (addErr, addOut, addStderr) => {
+    execFile('git', ['add', '--force', relDbPath], { cwd: repoRoot, timeout: 15000, env: GIT_ENV }, (addErr, addOut, addStderr) => {
       try {
         if (addErr) {
           console.error('[persist] git add failed:', addErr.message);
@@ -665,7 +765,7 @@ function _doPersist() {
         execFile(
           'git',
           ['commit', '-m', 'data: auto-save expenses database', '--', relDbPath],
-          { cwd: repoRoot, timeout: 15000 },
+          { cwd: repoRoot, timeout: 15000, env: GIT_ENV },
           (commitErr, commitOut, commitStderr) => {
             try {
               if (commitErr) {
@@ -713,7 +813,7 @@ function _doPersist() {
 const MAX_PUSH_RETRIES = 2;
 
 function _pushToRemote(repoRoot, attempt, cb) {
-  execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
+  execFile('git', ['push'], { cwd: repoRoot, timeout: 30000, env: GIT_ENV }, (pushErr, pushOut, pushStderr) => {
     try {
       if (!pushErr) {
         cb(true);
@@ -726,11 +826,11 @@ function _pushToRemote(repoRoot, attempt, cb) {
       // If rejected because remote has diverged, try pull --rebase then retry
       if (attempt < MAX_PUSH_RETRIES && (stderr.includes('rejected') || stderr.includes('non-fast-forward') || stderr.includes('fetch first'))) {
         console.warn(`[persist] push rejected (attempt ${attempt + 1}/${MAX_PUSH_RETRIES + 1}) — pulling remote changes`);
-        execFile('git', ['pull', '--rebase', '--autostash', 'origin', 'main'], { cwd: repoRoot, timeout: 30000 }, (pullErr) => {
+        execFile('git', ['pull', '--rebase', '--autostash', 'origin', 'main'], { cwd: repoRoot, timeout: 30000, env: GIT_ENV }, (pullErr) => {
           try {
             if (pullErr) {
               // Pull/rebase failed — abort rebase and report failure
-              try { execSync('git rebase --abort', { cwd: repoRoot, stdio: 'pipe' }); } catch { /* no rebase in progress */ }
+              try { execSync('git rebase --abort', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV }); } catch { /* no rebase in progress */ }
               cb(false, 'pull --rebase failed before retry: ' + (pullErr.message || '').split('\n')[0]);
               return;
             }
@@ -743,10 +843,9 @@ function _pushToRemote(repoRoot, attempt, cb) {
         return;
       }
 
-      // If it's an auth error or final attempt, report failure with details
-      if (attempt < MAX_PUSH_RETRIES && (stderr.includes('Authentication') || stderr.includes('403') || stderr.includes('401') || stderr.includes('could not read Username'))) {
-        console.warn(`[persist] push auth failed (attempt ${attempt + 1}/${MAX_PUSH_RETRIES + 1}) — retrying`);
-        setTimeout(() => _pushToRemote(repoRoot, attempt + 1, cb), 2000);
+      // If it's an auth error, report clearly — do not retry endlessly
+      if (stderr.includes('Authentication') || stderr.includes('403') || stderr.includes('401') || stderr.includes('could not read Username')) {
+        cb(false, 'authentication failed — GitHub token may have expired');
         return;
       }
 
