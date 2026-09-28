@@ -45,6 +45,66 @@ function getOrCreateJwtSecret() {
 }
 
 /**
+ * Pull the latest database file from the git remote.
+ * Called BEFORE opening the database so that a new sandbox gets the most
+ * recent data that was pushed by a previous sandbox.
+ * Runs synchronously at startup — acceptable because it only happens once.
+ */
+function restoreFromGit() {
+  if (process.env.NODE_ENV === 'test' || process.env.DB_PATH?.includes('test')) {
+    return;
+  }
+  const repoRoot = path.resolve(__dirname, '..');
+  try {
+    // Verify this is a git repo with a remote
+    execSync('git rev-parse --git-dir', { cwd: repoRoot, stdio: 'pipe' });
+    const remoteOut = execSync('git remote -v', { cwd: repoRoot, stdio: 'pipe' }).toString();
+    if (!remoteOut.includes('fetch')) {
+      console.log('[persist] no git fetch remote — skipping restore');
+      return;
+    }
+
+    // Fetch the latest state from remote
+    try {
+      execSync('git fetch origin', { cwd: repoRoot, stdio: 'pipe', timeout: 30000 });
+    } catch (fetchErr) {
+      console.warn('[persist] git fetch failed (will use local data):', (fetchErr.message || '').split('\n')[0]);
+      return;
+    }
+
+    // Check if the remote branch has commits ahead of local
+    try {
+      const behind = execSync('git rev-list HEAD..origin/main --count', { cwd: repoRoot, stdio: 'pipe' })
+        .toString().trim();
+      if (behind === '0') {
+        console.log('[persist] local branch is up-to-date with remote');
+        return;
+      }
+      console.log(`[persist] remote is ${behind} commit(s) ahead — pulling latest data`);
+    } catch {
+      // If rev-list fails, try the pull anyway
+    }
+
+    // Pull with rebase to integrate remote data commits
+    // Use --autostash in case there are local uncommitted changes to the db
+    try {
+      execSync('git pull --rebase --autostash origin main', { cwd: repoRoot, stdio: 'pipe', timeout: 30000 });
+      console.log('[persist] restored latest database from git remote');
+    } catch (pullErr) {
+      // If pull fails due to conflict, abort the rebase and continue with local data
+      console.warn('[persist] git pull failed (will use local data):', (pullErr.message || '').split('\n')[0]);
+      try {
+        execSync('git rebase --abort', { cwd: repoRoot, stdio: 'pipe' });
+      } catch {
+        // No rebase in progress — that's fine
+      }
+    }
+  } catch {
+    // Not a git repo or git unavailable — skip restore
+  }
+}
+
+/**
  * Initialize the SQLite database.
  * Creates the data directory, opens the database file, enables WAL mode,
  * and creates all tables and indexes if they don't exist.
@@ -56,6 +116,9 @@ function initialize() {
 
   // 1. Ensure data directory exists
   fs.mkdirSync(dbDir, { recursive: true });
+
+  // 1a. Restore latest database from git remote (before opening the DB)
+  restoreFromGit();
 
   // 2. Open SQLite database
   db = new Database(dbPath);
@@ -589,7 +652,7 @@ function _doPersist() {
     }
   }
 
-  // Run git add + commit + push in the background (fire-and-forget)
+  // Run git add + commit + push in the background
   try {
     execFile('git', ['add', '--force', relDbPath], { cwd: repoRoot, timeout: 15000 }, (addErr, addOut, addStderr) => {
       try {
@@ -611,19 +674,16 @@ function _doPersist() {
                 persistInProgress = false;
                 return;
               }
-              console.log('[persist] database saved to git');
-              lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
-              // Push to remote so data survives full workspace rebuilds (best-effort, never crashes)
-              execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr) => {
-                try {
-                  if (pushErr) {
-                    const msg = (pushErr.message || String(pushErr)).split('\n')[0];
-                    console.warn('[persist] git push skipped (auth may have expired):', msg);
-                  } else {
-                    console.log('[persist] database pushed to remote');
-                  }
-                } catch (innerErr) {
-                  // Absolutely never crash from push logging
+              console.log('[persist] database committed to git');
+              // Push to remote — this is the critical step for cross-sandbox persistence.
+              // A push failure means data will NOT survive a sandbox rebuild.
+              _pushToRemote(repoRoot, 0, (pushOk, pushErrMsg) => {
+                if (pushOk) {
+                  console.log('[persist] database pushed to remote');
+                  lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
+                } else {
+                  console.error('[persist] git push FAILED — data will NOT survive sandbox rebuild:', pushErrMsg);
+                  lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'git push failed: ' + pushErrMsg };
                 }
                 persistInProgress = false;
               });
@@ -640,6 +700,61 @@ function _doPersist() {
     persistInProgress = false;
     console.warn('[persist] git operations could not be started (non-fatal)');
   }
+}
+
+/**
+ * Push to remote with retry and pull-rebase on rejection.
+ * Retries up to MAX_PUSH_RETRIES times. On the first rejection (e.g. remote
+ * has commits from another sandbox), performs a pull --rebase before retrying.
+ * @param {string} repoRoot - Path to the git repository root
+ * @param {number} attempt - Current attempt number (0-based)
+ * @param {Function} cb - Callback: cb(success: boolean, errorMsg?: string)
+ */
+const MAX_PUSH_RETRIES = 2;
+
+function _pushToRemote(repoRoot, attempt, cb) {
+  execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
+    try {
+      if (!pushErr) {
+        cb(true);
+        return;
+      }
+
+      const stderr = (pushStderr || pushErr.message || String(pushErr));
+      const firstLine = stderr.split('\n')[0];
+
+      // If rejected because remote has diverged, try pull --rebase then retry
+      if (attempt < MAX_PUSH_RETRIES && (stderr.includes('rejected') || stderr.includes('non-fast-forward') || stderr.includes('fetch first'))) {
+        console.warn(`[persist] push rejected (attempt ${attempt + 1}/${MAX_PUSH_RETRIES + 1}) — pulling remote changes`);
+        execFile('git', ['pull', '--rebase', '--autostash', 'origin', 'main'], { cwd: repoRoot, timeout: 30000 }, (pullErr) => {
+          try {
+            if (pullErr) {
+              // Pull/rebase failed — abort rebase and report failure
+              try { execSync('git rebase --abort', { cwd: repoRoot, stdio: 'pipe' }); } catch { /* no rebase in progress */ }
+              cb(false, 'pull --rebase failed before retry: ' + (pullErr.message || '').split('\n')[0]);
+              return;
+            }
+            // Retry push after successful pull
+            _pushToRemote(repoRoot, attempt + 1, cb);
+          } catch (e) {
+            cb(false, 'unexpected error during pull: ' + (e.message || ''));
+          }
+        });
+        return;
+      }
+
+      // If it's an auth error or final attempt, report failure with details
+      if (attempt < MAX_PUSH_RETRIES && (stderr.includes('Authentication') || stderr.includes('403') || stderr.includes('401') || stderr.includes('could not read Username'))) {
+        console.warn(`[persist] push auth failed (attempt ${attempt + 1}/${MAX_PUSH_RETRIES + 1}) — retrying`);
+        setTimeout(() => _pushToRemote(repoRoot, attempt + 1, cb), 2000);
+        return;
+      }
+
+      cb(false, firstLine);
+    } catch (e) {
+      cb(false, 'unexpected error: ' + (e.message || ''));
+    }
+  });
 }
 
 /**
