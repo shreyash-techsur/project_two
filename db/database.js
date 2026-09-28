@@ -84,9 +84,10 @@ function _ensureGitAuth(repoRoot) {
     let token = null;
 
     // --- Source 1: Daytona-injected http.extraheader ---
+    // Check ALL scopes (local, global, system) — the platform may inject at any level.
     try {
       const header = execSync(
-        'git config --local --get http.https://github.com/.extraheader',
+        'git config --get http.https://github.com/.extraheader',
         { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV }
       ).toString().trim();
       // Format: "AUTHORIZATION: Basic <base64(x-access-token:TOKEN)>"
@@ -126,9 +127,25 @@ function _ensureGitAuth(repoRoot) {
       }
     }
 
+    // --- Source 4: git credential fill (queries system/global credential helpers) ---
+    if (!token) {
+      try {
+        const credOut = execSync(
+          'printf "protocol=https\\nhost=github.com\\n\\n" | git credential fill',
+          { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV, timeout: 5000 }
+        ).toString();
+        const pwMatch = credOut.match(/password=(.+)/);
+        if (pwMatch && pwMatch[1].trim().length > 0) {
+          token = pwMatch[1].trim();
+        }
+      } catch {
+        // No credential helper configured or fill failed
+      }
+    }
+
     // --- No token found from any source ---
     if (!token) {
-      console.warn('[persist] no git auth token found (extraheader / remote URL / credential store) — push will require platform-injected credentials');
+      console.warn('[persist] no git auth token found (extraheader / remote URL / credential store / credential helper) — push will require platform-injected credentials');
       return;
     }
 
