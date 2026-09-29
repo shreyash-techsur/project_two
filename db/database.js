@@ -53,24 +53,17 @@ function getOrCreateJwtSecret() {
 const GIT_ENV = { ...process.env, GIT_TERMINAL_PROMPT: '0' };
 
 /**
- * Ensure git has working authentication for the remote.
+ * Verify that git has working authentication for the remote.
  *
- * Token discovery order (first non-empty wins):
- *  1. `http.<url>.extraheader` in local git config — injected by Daytona/Pivota
- *     at clone time via `git clone -c …`.
- *  2. Token already embedded in the remote URL from a previous session's
- *     `_ensureGitAuth` call (survives sandbox restarts but not full rebuilds).
- *  3. `.git/pivota-credentials` store file (belt-and-suspenders, same lifetime
- *     as the URL approach).
+ * Instead of extracting / decoding / re-embedding tokens (which is fragile and
+ * can accidentally expose credentials), we rely on the sandbox platform
+ * (Daytona/Pivota) to inject credentials via whichever mechanism it uses
+ * (http.extraheader, credential helper, etc.).
  *
- * Once a token is found, this function:
- *  a. Embeds it directly in the remote push URL so git never falls through to
- *     an interactive credential prompt (which fails with "No such device or
- *     address" in a background process).
- *  b. Writes it to `.git/pivota-credentials` and configures
- *     `credential.helper store` so fetch/pull also authenticate.
- *  c. Sets `GIT_TERMINAL_PROMPT=0` (via GIT_ENV) so that if auth still fails,
- *     git exits immediately instead of hanging on /dev/tty.
+ * This function simply verifies that `git ls-remote` can reach the remote.
+ * If it can, git already has working auth — no further action needed.
+ * GIT_TERMINAL_PROMPT=0 (via GIT_ENV) ensures git exits immediately instead
+ * of hanging on /dev/tty if auth is missing.
  *
  * Called once on startup and again before each persist operation.
  */
@@ -81,101 +74,25 @@ function _ensureGitAuth(repoRoot) {
   if (_gitAuthConfigured) return;
 
   try {
-    let token = null;
-
-    // --- Source 1: Daytona-injected http.extraheader ---
-    // Check ALL scopes (local, global, system) — the platform may inject at any level.
-    try {
-      const header = execSync(
-        'git config --get http.https://github.com/.extraheader',
-        { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV }
-      ).toString().trim();
-      // Format: "AUTHORIZATION: Basic <base64(x-access-token:TOKEN)>"
-      const b64 = header.replace(/^AUTHORIZATION:\s*Basic\s*/i, '');
-      const decoded = Buffer.from(b64, 'base64').toString('utf8');
-      const parts = decoded.split(':');
-      if (parts.length >= 2 && parts.slice(1).join(':').length > 0) {
-        token = parts.slice(1).join(':');
-      }
-    } catch {
-      // No extraheader — try next source
-    }
-
-    // --- Source 2: token already embedded in the remote URL ---
-    const currentUrl = execSync('git remote get-url origin', {
-      cwd: repoRoot, stdio: 'pipe', env: GIT_ENV
-    }).toString().trim();
-
-    if (!token) {
-      const urlMatch = currentUrl.match(/:\/\/x-access-token:([^@]+)@/);
-      if (urlMatch && urlMatch[1].length > 0) {
-        token = urlMatch[1];
-      }
-    }
-
-    // --- Source 3: .git/pivota-credentials store file ---
-    if (!token) {
-      const credFile = path.join(repoRoot, '.git', 'pivota-credentials');
-      try {
-        const credContent = fs.readFileSync(credFile, 'utf8').trim();
-        const credMatch = credContent.match(/:\/\/x-access-token:([^@\s]+)@/);
-        if (credMatch && credMatch[1].length > 0) {
-          token = credMatch[1];
-        }
-      } catch {
-        // File doesn't exist — try next source
-      }
-    }
-
-    // --- Source 4: git credential fill (queries system/global credential helpers) ---
-    if (!token) {
-      try {
-        const credOut = execSync(
-          'printf "protocol=https\\nhost=github.com\\n\\n" | git credential fill',
-          { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV, timeout: 5000 }
-        ).toString();
-        const pwMatch = credOut.match(/password=(.+)/);
-        if (pwMatch && pwMatch[1].trim().length > 0) {
-          token = pwMatch[1].trim();
-        }
-      } catch {
-        // No credential helper configured or fill failed
-      }
-    }
-
-    // --- No token found from any source ---
-    if (!token) {
-      console.warn('[persist] no git auth token found (extraheader / remote URL / credential store / credential helper) — push will require platform-injected credentials');
-      return;
-    }
-
-    // --- Apply token: embed in remote URL ---
-    if (!currentUrl.includes('@github.com')) {
-      const authUrl = currentUrl.replace(
-        'https://github.com/',
-        `https://x-access-token:${token}@github.com/`
-      );
-      execSync(`git remote set-url origin "${authUrl}"`, {
-        cwd: repoRoot, stdio: 'pipe', env: GIT_ENV
-      });
-      console.log('[persist] embedded auth token in remote URL');
-    }
-
-    // --- Apply token: credential store (for fetch/pull) ---
-    const credFile = path.join(repoRoot, '.git', 'pivota-credentials');
-    const credEntry = `https://x-access-token:${token}@github.com`;
-    try {
-      fs.writeFileSync(credFile, credEntry + '\n', { mode: 0o600 });
-      execSync(`git config --local credential.helper "store --file=${credFile}"`, {
-        cwd: repoRoot, stdio: 'pipe', env: GIT_ENV
-      });
-    } catch {
-      // Non-fatal — URL-embedded auth is the primary mechanism
-    }
-
+    // Verify that git can actually reach the remote with whatever credentials
+    // the platform has injected (extraheader, credential helper, URL token, etc.)
+    execSync('git ls-remote --quiet --exit-code origin HEAD', {
+      cwd: repoRoot,
+      stdio: 'pipe',
+      env: GIT_ENV,
+      timeout: 15000,
+    });
+    console.log('[persist] git remote authentication verified (platform-injected credentials working)');
     _gitAuthConfigured = true;
   } catch (err) {
-    console.warn('[persist] git auth setup failed (non-fatal):', (err.message || '').split('\n')[0]);
+    const msg = (err.message || '').split('\n')[0];
+    // Exit code 2 from ls-remote means "remote found but ref not found" — auth is still working
+    if (err.status === 2) {
+      console.log('[persist] git remote authentication verified (remote reachable)');
+      _gitAuthConfigured = true;
+    } else {
+      console.warn('[persist] git remote authentication check failed — push may not work:', msg);
+    }
   }
 }
 
@@ -360,6 +277,8 @@ function initialize() {
 
 /**
  * Verify git remote is available for persistence.
+ * Uses _ensureGitAuth to actually test remote connectivity rather than
+ * inspecting URLs for embedded tokens.
  * Logs warnings if data won't survive workspace rebuilds.
  */
 function verifyGitPersistence() {
@@ -368,23 +287,12 @@ function verifyGitPersistence() {
     execSync('git rev-parse --git-dir', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV });
     const remoteOut = execSync('git remote -v', { cwd: repoRoot, stdio: 'pipe', env: GIT_ENV }).toString();
     if (remoteOut.includes('push')) {
-      const pushUrl = execSync('git remote get-url --push origin', {
-        cwd: repoRoot, stdio: 'pipe', env: GIT_ENV
-      }).toString().trim();
-      if (pushUrl.includes('@github.com')) {
+      // _ensureGitAuth will test actual remote connectivity via ls-remote
+      _ensureGitAuth(repoRoot);
+      if (_gitAuthConfigured) {
         console.log('[persist] git remote available — data will auto-save to git on writes');
       } else {
-        // Auth wasn't set up (no token found anywhere). Try one more time in case
-        // restoreFromGit ran before the platform finished injecting credentials.
-        _ensureGitAuth(repoRoot);
-        const retryUrl = execSync('git remote get-url --push origin', {
-          cwd: repoRoot, stdio: 'pipe', env: GIT_ENV
-        }).toString().trim();
-        if (retryUrl.includes('@github.com')) {
-          console.log('[persist] git remote available — data will auto-save to git on writes');
-        } else {
-          console.log('[persist] git remote available — data will auto-save to git on writes (WARNING: no push credentials found — push may fail)');
-        }
+        console.log('[persist] git remote available — data will auto-save to git on writes (WARNING: remote auth check failed — push may fail)');
       }
     } else {
       console.log('[persist] WARNING: no git push remote — data will NOT survive rebuilds');
