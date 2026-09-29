@@ -843,10 +843,7 @@ function _doPersist() {
  * Logs results so we can compare ls-remote vs push if push fails.
  */
 function _runPrePushDiagnostics(repoRoot, done) {
-  const redact = (s) => (s || '')
-    .replace(/AUTHORIZATION[^\n]*/gi, 'AUTHORIZATION: <REDACTED>')
-    .replace(/x-access-token:[^@\s]+/gi, 'x-access-token:***')
-    .replace(/Basic [A-Za-z0-9+/=]+/gi, 'Basic ***');
+  const redact = _redactForLog;
 
   const results = {};
 
@@ -973,7 +970,83 @@ function _scheduleRetryPush(repoRoot) {
  */
 const MAX_PUSH_RETRIES = 2;
 
+/**
+ * Redact sensitive values from git config output (tokens, Authorization headers).
+ */
+function _redactForLog(s) {
+  return (s || '')
+    .replace(/AUTHORIZATION[^\n]*/gi, 'AUTHORIZATION: <REDACTED>')
+    .replace(/x-access-token:[^@\s]+/gi, 'x-access-token:***')
+    .replace(/Basic [A-Za-z0-9+/=]+/gi, 'Basic ***');
+}
+
+/**
+ * Log non-sensitive diagnostic context immediately before executing git push.
+ * This runs synchronously inside _pushToRemote so the diagnostics reflect the
+ * exact same process state (cwd, env, git config) that the push will use.
+ */
+function _logPushContext(repoRoot, attempt) {
+  const tag = `[persist][push-ctx attempt=${attempt + 1}]`;
+  try {
+    console.log(`${tag} process.cwd()=${process.cwd()}`);
+    console.log(`${tag} repoRoot=${repoRoot}`);
+  } catch { /* non-fatal */ }
+
+  // git rev-parse --show-toplevel
+  try {
+    const toplevel = execSync('git rev-parse --show-toplevel', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
+    console.log(`${tag} git rev-parse --show-toplevel=${toplevel}`);
+  } catch (e) {
+    console.warn(`${tag} git rev-parse --show-toplevel FAILED: ${(e.message || '').split('\n')[0]}`);
+  }
+
+  // git rev-parse --git-dir
+  try {
+    const gitDir = execSync('git rev-parse --git-dir', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
+    console.log(`${tag} git rev-parse --git-dir=${gitDir}`);
+  } catch (e) {
+    console.warn(`${tag} git rev-parse --git-dir FAILED: ${(e.message || '').split('\n')[0]}`);
+  }
+
+  // git config --get-regexp '^http\.' (redacted)
+  try {
+    const httpConfig = execSync('git config --get-regexp "^http\\."', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
+    console.log(`${tag} git http config: ${_redactForLog(httpConfig)}`);
+  } catch (e) {
+    // exit code 1 means no matching keys
+    if (e.status === 1) {
+      console.warn(`${tag} git http config: (none — no http.* keys found)`);
+    } else {
+      console.warn(`${tag} git http config FAILED: ${(e.message || '').split('\n')[0]}`);
+    }
+  }
+
+  // git remote get-url origin
+  try {
+    const remoteUrl = execSync('git remote get-url origin', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
+    console.log(`${tag} git remote get-url origin=${remoteUrl}`);
+  } catch (e) {
+    console.warn(`${tag} git remote get-url origin FAILED: ${(e.message || '').split('\n')[0]}`);
+  }
+
+  // Resolved git executable path
+  try {
+    const gitPath = execSync('which git', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
+    console.log(`${tag} git executable: ${gitPath}`);
+  } catch (e) {
+    console.warn(`${tag} git executable lookup FAILED: ${(e.message || '').split('\n')[0]}`);
+  }
+}
+
 function _pushToRemote(repoRoot, attempt, cb) {
+  // Log diagnostic context on every attempt so we can compare successful vs
+  // failed pushes and detect cwd / config drift.
+  try {
+    _logPushContext(repoRoot, attempt);
+  } catch (diagErr) {
+    console.warn('[persist] push context diagnostics failed (non-fatal):', (diagErr.message || '').split('\n')[0]);
+  }
+
   execFile('git', ['push', 'origin', 'main'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
     try {
       if (!pushErr) {
@@ -985,9 +1058,7 @@ function _pushToRemote(repoRoot, attempt, cb) {
 
       // Always log the raw stderr so operators can diagnose — redact any
       // embedded tokens that might appear in URL-based error messages.
-      const safeStderr = stderr
-        .replace(/x-access-token:[^@\s]+/gi, 'x-access-token:***')
-        .replace(/Basic [A-Za-z0-9+/=]+/gi, 'Basic ***');
+      const safeStderr = _redactForLog(stderr);
       console.warn(`[persist] push attempt ${attempt + 1}/${MAX_PUSH_RETRIES + 1} failed:`, safeStderr.split('\n')[0]);
 
       // --- Rejected (remote diverged) → pull --rebase then retry ---
@@ -1008,17 +1079,20 @@ function _pushToRemote(repoRoot, attempt, cb) {
         return;
       }
 
-      // --- Authentication / permission error → invalidate cache, retry with delay ---
-      const isAuthErr = stderr.includes('Authentication') || stderr.includes('403')
-        || stderr.includes('401') || stderr.includes('could not read Username')
+      // --- Authentication / credential error → classify precisely ---
+      const isCredentialMissing = stderr.includes('could not read Username')
         || stderr.includes('terminal prompts disabled');
+      const isAuthRejected = stderr.includes('Authentication') || stderr.includes('403')
+        || stderr.includes('401');
+      const isAuthErr = isCredentialMissing || isAuthRejected;
+
       if (isAuthErr) {
         _invalidateAuthCache();
 
         if (attempt < MAX_PUSH_RETRIES) {
           // Wait 2s then re-verify and retry — gives the platform time to
           // refresh the token if it was in the middle of rotating credentials.
-          console.warn('[persist] auth error on push — waiting 2 s then retrying');
+          console.warn('[persist] auth/credential error on push — waiting 2 s then retrying');
           setTimeout(() => {
             const canRead = _verifyGitAuth(repoRoot, true);
             if (canRead) {
@@ -1031,12 +1105,25 @@ function _pushToRemote(repoRoot, attempt, cb) {
           return;
         }
 
-        // All retries exhausted — provide specific diagnostic
+        // All retries exhausted — provide specific diagnostic based on the
+        // actual failure mode (not a generic "token scope" guess).
         const canRead = _verifyGitAuth(repoRoot, true);
-        if (canRead) {
-          cb(false, 'authentication failed on push but read access works — token may lack write/push scope (needs "contents: write")');
+        const rawError = safeStderr.split('\n')[0];
+        if (isCredentialMissing) {
+          // The git process could not find credentials at all — this is NOT
+          // a token-scope problem, it's a credential-delivery problem.
+          if (canRead) {
+            cb(false, `git push could not locate credentials ("${rawError}") but ls-remote works — the push child process may not be reading .git/config correctly (check cwd and GIT_DIR)`);
+          } else {
+            cb(false, `git could not locate credentials for push or ls-remote ("${rawError}") — platform-injected credential may have expired or the .git/config extraheader is missing`);
+          }
         } else {
-          cb(false, 'authentication failed — platform-injected GitHub token has expired or been revoked; the sandbox platform needs to refresh it');
+          // 401/403/Authentication — the credential was found but rejected.
+          if (canRead) {
+            cb(false, `git push authentication rejected ("${rawError}") but read access works — the token may have been rotated mid-operation or lacks push permission`);
+          } else {
+            cb(false, `git authentication failed for both push and ls-remote ("${rawError}") — platform-injected GitHub token has expired or been revoked; the sandbox platform needs to refresh it`);
+          }
         }
         return;
       }
