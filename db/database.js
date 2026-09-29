@@ -58,6 +58,41 @@ function getOrCreateJwtSecret() {
 process.env.GIT_TERMINAL_PROMPT = '0';
 
 /**
+ * Build child-process options for git commands that explicitly anchor Git to
+ * the repository's .git directory via the GIT_DIR environment variable.
+ *
+ * Root cause context:  The sandbox platform (Daytona) injects the GitHub
+ * OAuth credential as a URL-scoped `http.https://github.com/.extraheader`
+ * in `.git/config` (local scope).  When a child process's working directory
+ * doesn't match the repo root — or when git fails to discover `.git` for any
+ * other reason — the local config (and the credential in it) is invisible,
+ * producing `could not read Username for 'https://github.com'`.
+ *
+ * Setting GIT_DIR to the absolute path of the .git directory guarantees git
+ * always reads the correct local config regardless of the cwd the Node
+ * process happens to be in.
+ *
+ * The returned object merges with process.env at call time (not at module
+ * load) so that late-injected env vars (e.g. GIT_TERMINAL_PROMPT) are
+ * inherited.  No GIT_WORK_TREE is set — git infers it from GIT_DIR.
+ *
+ * @param {string} repoRoot - Absolute path to the repository root.
+ * @param {object} [extra]  - Additional options (timeout, stdio, etc.)
+ * @returns {object} Options suitable for execFile / execSync.
+ */
+function _gitOpts(repoRoot, extra) {
+  return Object.assign(
+    {
+      cwd: repoRoot,
+      env: Object.assign({}, process.env, {
+        GIT_DIR: path.join(repoRoot, '.git'),
+      }),
+    },
+    extra
+  );
+}
+
+/**
  * Verify that git has working authentication for the remote.
  *
  * Instead of extracting / decoding / re-embedding tokens (which is fragile and
@@ -67,6 +102,7 @@ process.env.GIT_TERMINAL_PROMPT = '0';
  *
  * This function verifies that `git ls-remote` can reach the remote.
  * If it can, git already has working auth — no further action needed.
+ *
  * GIT_TERMINAL_PROMPT=0 (set on process.env) ensures git exits immediately instead
  * of hanging on /dev/tty if auth is missing.
  *
@@ -95,11 +131,9 @@ function _invalidateAuthCache() {
  */
 function _verifyGitAuth(repoRoot, quiet) {
   try {
-    execSync('git ls-remote --quiet --exit-code origin HEAD', {
-      cwd: repoRoot,
-      stdio: 'pipe',
-      timeout: 15000,
-    });
+    execSync('git ls-remote --quiet --exit-code origin HEAD',
+      _gitOpts(repoRoot, { stdio: 'pipe', timeout: 15000 })
+    );
     _gitAuthVerifiedAt = Date.now();
     if (!quiet) console.log('[persist] git remote authentication verified (platform-injected credentials working)');
     return true;
@@ -135,8 +169,8 @@ function restoreFromGit() {
   const repoRoot = path.resolve(__dirname, '..');
   try {
     // Verify this is a git repo with a remote
-    execSync('git rev-parse --git-dir', { cwd: repoRoot, stdio: 'pipe' });
-    const remoteOut = execSync('git remote -v', { cwd: repoRoot, stdio: 'pipe' }).toString();
+    execSync('git rev-parse --git-dir', _gitOpts(repoRoot, { stdio: 'pipe' }));
+    const remoteOut = execSync('git remote -v', _gitOpts(repoRoot, { stdio: 'pipe' })).toString();
     if (!remoteOut.includes('fetch')) {
       console.log('[persist] no git fetch remote — skipping restore');
       return;
@@ -147,7 +181,7 @@ function restoreFromGit() {
 
     // Fetch the latest state from remote
     try {
-      execSync('git fetch origin', { cwd: repoRoot, stdio: 'pipe', timeout: 30000 });
+      execSync('git fetch origin', _gitOpts(repoRoot, { stdio: 'pipe', timeout: 30000 }));
     } catch (fetchErr) {
       console.warn('[persist] git fetch failed (will use local data):', (fetchErr.message || '').split('\n')[0]);
       return;
@@ -156,7 +190,7 @@ function restoreFromGit() {
     // Check if the remote branch has commits ahead of local
     let needsPull = false;
     try {
-      const behind = execSync('git rev-list HEAD..origin/main --count', { cwd: repoRoot, stdio: 'pipe' })
+      const behind = execSync('git rev-list HEAD..origin/main --count', _gitOpts(repoRoot, { stdio: 'pipe' }))
         .toString().trim();
       if (behind !== '0') {
         console.log(`[persist] remote is ${behind} commit(s) ahead — pulling latest data`);
@@ -177,13 +211,13 @@ function restoreFromGit() {
       const relDbPath = path.relative(repoRoot, path.resolve(dbFilePath));
       try {
         // Check if git tracks this file
-        execSync(`git cat-file -e HEAD:"${relDbPath}"`, { cwd: repoRoot, stdio: 'pipe' });
+        execSync(`git cat-file -e HEAD:"${relDbPath}"`, _gitOpts(repoRoot, { stdio: 'pipe' }));
         // Git has the file — check if it exists on disk with real content
         let diskSize = 0;
         try { diskSize = fs.statSync(path.resolve(repoRoot, relDbPath)).size; } catch { /* missing */ }
         if (diskSize === 0 || !fs.existsSync(path.resolve(repoRoot, relDbPath))) {
           console.log('[persist] database file missing or empty on disk — restoring from git HEAD');
-          execSync(`git checkout HEAD -- "${relDbPath}"`, { cwd: repoRoot, stdio: 'pipe' });
+          execSync(`git checkout HEAD -- "${relDbPath}"`, _gitOpts(repoRoot, { stdio: 'pipe' }));
           console.log('[persist] restored database from git HEAD');
         } else {
           console.log('[persist] local branch is up-to-date with remote');
@@ -198,13 +232,13 @@ function restoreFromGit() {
     // Pull with rebase to integrate remote data commits
     // Use --autostash in case there are local uncommitted changes to the db
     try {
-      execSync('git pull --rebase --autostash origin main', { cwd: repoRoot, stdio: 'pipe', timeout: 30000 });
+      execSync('git pull --rebase --autostash origin main', _gitOpts(repoRoot, { stdio: 'pipe', timeout: 30000 }));
       console.log('[persist] restored latest database from git remote');
     } catch (pullErr) {
       // If pull fails due to conflict, abort the rebase and continue with local data
       console.warn('[persist] git pull failed (will use local data):', (pullErr.message || '').split('\n')[0]);
       try {
-        execSync('git rebase --abort', { cwd: repoRoot, stdio: 'pipe' });
+        execSync('git rebase --abort', _gitOpts(repoRoot, { stdio: 'pipe' }));
       } catch {
         // No rebase in progress — that's fine
       }
@@ -339,8 +373,8 @@ function initialize() {
 function verifyGitPersistence() {
   const repoRoot = path.resolve(__dirname, '..');
   try {
-    execSync('git rev-parse --git-dir', { cwd: repoRoot, stdio: 'pipe' });
-    const remoteOut = execSync('git remote -v', { cwd: repoRoot, stdio: 'pipe' }).toString();
+    execSync('git rev-parse --git-dir', _gitOpts(repoRoot, { stdio: 'pipe' }));
+    const remoteOut = execSync('git remote -v', _gitOpts(repoRoot, { stdio: 'pipe' })).toString();
     if (remoteOut.includes('push')) {
       // _ensureGitAuth will test actual remote connectivity via ls-remote
       _ensureGitAuth(repoRoot);
@@ -761,11 +795,11 @@ function _doPersist() {
 
   // Ensure git user config is set (preview sandbox may not have it)
   try {
-    execSync('git config user.email', { cwd: repoRoot, stdio: 'pipe' });
+    execSync('git config user.email', _gitOpts(repoRoot, { stdio: 'pipe' }));
   } catch {
     try {
-      execSync('git config user.email "expense-tracker@localhost"', { cwd: repoRoot, stdio: 'pipe' });
-      execSync('git config user.name "Expense Tracker"', { cwd: repoRoot, stdio: 'pipe' });
+      execSync('git config user.email "expense-tracker@localhost"', _gitOpts(repoRoot, { stdio: 'pipe' }));
+      execSync('git config user.name "Expense Tracker"', _gitOpts(repoRoot, { stdio: 'pipe' }));
     } catch (cfgErr) {
       console.error('[persist] git config failed:', cfgErr.message);
     }
@@ -776,7 +810,7 @@ function _doPersist() {
 
   // Run git add + commit + push in the background
   try {
-    execFile('git', ['add', '--force', relDbPath], { cwd: repoRoot, timeout: 15000 }, (addErr, addOut, addStderr) => {
+    execFile('git', ['add', '--force', relDbPath], _gitOpts(repoRoot, { timeout: 15000 }), (addErr, addOut, addStderr) => {
       try {
         if (addErr) {
           console.error('[persist] git add failed:', addErr.message);
@@ -787,7 +821,7 @@ function _doPersist() {
         execFile(
           'git',
           ['commit', '-m', 'data: auto-save expenses database', '--', relDbPath],
-          { cwd: repoRoot, timeout: 15000 },
+          _gitOpts(repoRoot, { timeout: 15000 }),
           (commitErr, commitOut, commitStderr) => {
             try {
               if (commitErr) {
@@ -847,18 +881,20 @@ function _runPrePushDiagnostics(repoRoot, done) {
 
   const results = {};
 
+  const opts = (extra) => _gitOpts(repoRoot, extra);
+
   // 1. git rev-parse --show-toplevel
-  execFile('git', ['rev-parse', '--show-toplevel'], { cwd: repoRoot, timeout: 5000 },
+  execFile('git', ['rev-parse', '--show-toplevel'], opts({ timeout: 5000 }),
     (err, out, stderr) => {
       results.toplevel = err ? `ERR(${err.code}): ${(stderr||err.message).split('\n')[0]}` : out.trim();
 
       // 2. git remote -v
-      execFile('git', ['remote', '-v'], { cwd: repoRoot, timeout: 5000 },
+      execFile('git', ['remote', '-v'], opts({ timeout: 5000 }),
         (err2, out2, stderr2) => {
           results.remote = err2 ? `ERR: ${(stderr2||'').split('\n')[0]}` : redact(out2.trim().split('\n')[0]);
 
           // 3. git config --local --get-regexp '^http\.'
-          execFile('git', ['config', '--local', '--get-regexp', '^http\\.'], { cwd: repoRoot, timeout: 5000 },
+          execFile('git', ['config', '--local', '--get-regexp', '^http\\.'], opts({ timeout: 5000 }),
             (err3, out3, stderr3) => {
               if (err3 && err3.code === 1) {
                 results.httpConfig = '(none)';
@@ -870,7 +906,7 @@ function _runPrePushDiagnostics(repoRoot, done) {
 
               // 4. git ls-remote --quiet --exit-code origin HEAD
               execFile('git', ['ls-remote', '--quiet', '--exit-code', 'origin', 'HEAD'],
-                { cwd: repoRoot, timeout: 15000 },
+                opts({ timeout: 15000 }),
                 (err4, out4, stderr4) => {
                   if (!err4) {
                     results.lsRemote = `OK (exit 0)`;
@@ -880,7 +916,7 @@ function _runPrePushDiagnostics(repoRoot, done) {
 
                   // 5. git push --dry-run origin HEAD
                   execFile('git', ['push', '--dry-run', 'origin', 'HEAD'],
-                    { cwd: repoRoot, timeout: 30000 },
+                    opts({ timeout: 30000 }),
                     (err5, out5, stderr5) => {
                       if (!err5) {
                         results.pushDryRun = `OK: ${(stderr5||out5||'').trim().split('\n')[0]}`;
@@ -889,7 +925,8 @@ function _runPrePushDiagnostics(repoRoot, done) {
                       }
 
                       // Log all results
-                      console.log('[persist][diag] pre-push diagnostics (same cwd + execFile):');
+                      console.log('[persist][diag] pre-push diagnostics:');
+                      console.log('[persist][diag]   GIT_DIR:', path.join(repoRoot, '.git'));
                       console.log('[persist][diag]   toplevel:', results.toplevel);
                       console.log('[persist][diag]   remote:', results.remote);
                       console.log('[persist][diag]   http config:', results.httpConfig);
@@ -930,9 +967,9 @@ function _scheduleRetryPush(repoRoot) {
 
     // Check if there are actually unpushed commits
     try {
-      const ahead = execSync('git rev-list origin/main..HEAD --count', {
-        cwd: repoRoot, stdio: 'pipe', timeout: 10000
-      }).toString().trim();
+      const ahead = execSync('git rev-list origin/main..HEAD --count',
+        _gitOpts(repoRoot, { stdio: 'pipe', timeout: 10000 })
+      ).toString().trim();
       if (ahead === '0') {
         console.log('[persist] no unpushed commits — skipping retry');
         _retryPushCount = 0;
@@ -980,74 +1017,10 @@ function _redactForLog(s) {
     .replace(/Basic [A-Za-z0-9+/=]+/gi, 'Basic ***');
 }
 
-/**
- * Log non-sensitive diagnostic context immediately before executing git push.
- * This runs synchronously inside _pushToRemote so the diagnostics reflect the
- * exact same process state (cwd, env, git config) that the push will use.
- */
-function _logPushContext(repoRoot, attempt) {
-  const tag = `[persist][push-ctx attempt=${attempt + 1}]`;
-  try {
-    console.log(`${tag} process.cwd()=${process.cwd()}`);
-    console.log(`${tag} repoRoot=${repoRoot}`);
-  } catch { /* non-fatal */ }
-
-  // git rev-parse --show-toplevel
-  try {
-    const toplevel = execSync('git rev-parse --show-toplevel', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
-    console.log(`${tag} git rev-parse --show-toplevel=${toplevel}`);
-  } catch (e) {
-    console.warn(`${tag} git rev-parse --show-toplevel FAILED: ${(e.message || '').split('\n')[0]}`);
-  }
-
-  // git rev-parse --git-dir
-  try {
-    const gitDir = execSync('git rev-parse --git-dir', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
-    console.log(`${tag} git rev-parse --git-dir=${gitDir}`);
-  } catch (e) {
-    console.warn(`${tag} git rev-parse --git-dir FAILED: ${(e.message || '').split('\n')[0]}`);
-  }
-
-  // git config --get-regexp '^http\.' (redacted)
-  try {
-    const httpConfig = execSync('git config --get-regexp "^http\\."', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
-    console.log(`${tag} git http config: ${_redactForLog(httpConfig)}`);
-  } catch (e) {
-    // exit code 1 means no matching keys
-    if (e.status === 1) {
-      console.warn(`${tag} git http config: (none — no http.* keys found)`);
-    } else {
-      console.warn(`${tag} git http config FAILED: ${(e.message || '').split('\n')[0]}`);
-    }
-  }
-
-  // git remote get-url origin
-  try {
-    const remoteUrl = execSync('git remote get-url origin', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
-    console.log(`${tag} git remote get-url origin=${remoteUrl}`);
-  } catch (e) {
-    console.warn(`${tag} git remote get-url origin FAILED: ${(e.message || '').split('\n')[0]}`);
-  }
-
-  // Resolved git executable path
-  try {
-    const gitPath = execSync('which git', { cwd: repoRoot, stdio: 'pipe', timeout: 5000 }).toString().trim();
-    console.log(`${tag} git executable: ${gitPath}`);
-  } catch (e) {
-    console.warn(`${tag} git executable lookup FAILED: ${(e.message || '').split('\n')[0]}`);
-  }
-}
-
 function _pushToRemote(repoRoot, attempt, cb) {
-  // Log diagnostic context on every attempt so we can compare successful vs
-  // failed pushes and detect cwd / config drift.
-  try {
-    _logPushContext(repoRoot, attempt);
-  } catch (diagErr) {
-    console.warn('[persist] push context diagnostics failed (non-fatal):', (diagErr.message || '').split('\n')[0]);
-  }
+  const opts = (extra) => _gitOpts(repoRoot, extra);
 
-  execFile('git', ['push', 'origin', 'main'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
+  execFile('git', ['push', 'origin', 'main'], opts({ timeout: 30000 }), (pushErr, pushOut, pushStderr) => {
     try {
       if (!pushErr) {
         cb(true);
@@ -1059,15 +1032,15 @@ function _pushToRemote(repoRoot, attempt, cb) {
       // Always log the raw stderr so operators can diagnose — redact any
       // embedded tokens that might appear in URL-based error messages.
       const safeStderr = _redactForLog(stderr);
-      console.warn(`[persist] push attempt ${attempt + 1}/${MAX_PUSH_RETRIES + 1} failed:`, safeStderr.split('\n')[0]);
+      console.warn(`[persist] push attempt ${attempt + 1}/${MAX_PUSH_RETRIES + 1} failed (GIT_DIR=${path.join(repoRoot, '.git')}):`, safeStderr.split('\n')[0]);
 
       // --- Rejected (remote diverged) → pull --rebase then retry ---
       if (attempt < MAX_PUSH_RETRIES && (stderr.includes('rejected') || stderr.includes('non-fast-forward') || stderr.includes('fetch first'))) {
         console.warn('[persist] remote has diverged — pulling before retry');
-        execFile('git', ['pull', '--rebase', '--autostash', 'origin', 'main'], { cwd: repoRoot, timeout: 30000 }, (pullErr) => {
+        execFile('git', ['pull', '--rebase', '--autostash', 'origin', 'main'], opts({ timeout: 30000 }), (pullErr) => {
           try {
             if (pullErr) {
-              try { execSync('git rebase --abort', { cwd: repoRoot, stdio: 'pipe' }); } catch { /* no rebase in progress */ }
+              try { execSync('git rebase --abort', opts({ stdio: 'pipe' })); } catch { /* no rebase in progress */ }
               cb(false, 'pull --rebase failed before retry: ' + (pullErr.message || '').split('\n')[0]);
               return;
             }
