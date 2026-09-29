@@ -806,6 +806,10 @@ function _doPersist() {
                 } else {
                   console.error('[persist] git push FAILED — data will NOT survive sandbox rebuild:', pushErrMsg);
                   lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'git push failed: ' + pushErrMsg };
+                  // Schedule a background retry — the commit is local, so we just
+                  // need to push.  Wait 30 s to give the platform time to rotate
+                  // credentials if the token was mid-refresh.
+                  _scheduleRetryPush(repoRoot);
                 }
                 persistInProgress = false;
               });
@@ -822,6 +826,62 @@ function _doPersist() {
     persistInProgress = false;
     console.warn('[persist] git operations could not be started (non-fatal)');
   }
+}
+
+/**
+ * Schedule a background retry of git push for unpushed local commits.
+ * Uses exponential backoff: 30 s, 60 s, 120 s (3 attempts).
+ * This catches the case where a push failed due to a transient auth issue
+ * (e.g. platform token rotation) and no new writes happen to trigger another
+ * persist cycle.
+ */
+let _retryPushTimer = null;
+let _retryPushCount = 0;
+const MAX_RETRY_PUSH = 3;
+const RETRY_PUSH_BASE_DELAY = 30000; // 30 seconds
+
+function _scheduleRetryPush(repoRoot) {
+  if (_retryPushTimer) return; // already scheduled
+  if (_retryPushCount >= MAX_RETRY_PUSH) {
+    console.warn(`[persist] giving up on push after ${MAX_RETRY_PUSH} background retries — data is committed locally but NOT pushed`);
+    return;
+  }
+  const delay = RETRY_PUSH_BASE_DELAY * Math.pow(2, _retryPushCount);
+  console.log(`[persist] scheduling push retry in ${delay / 1000}s (attempt ${_retryPushCount + 1}/${MAX_RETRY_PUSH})`);
+  _retryPushTimer = setTimeout(() => {
+    _retryPushTimer = null;
+    _retryPushCount++;
+
+    // Check if there are actually unpushed commits
+    try {
+      const ahead = execSync('git rev-list origin/main..HEAD --count', {
+        cwd: repoRoot, stdio: 'pipe', timeout: 10000
+      }).toString().trim();
+      if (ahead === '0') {
+        console.log('[persist] no unpushed commits — skipping retry');
+        _retryPushCount = 0;
+        return;
+      }
+    } catch {
+      // Can't check — try the push anyway
+    }
+
+    _invalidateAuthCache();
+    _ensureGitAuth(repoRoot);
+
+    console.log('[persist] retrying push (background)');
+    _pushToRemote(repoRoot, 0, (ok, errMsg) => {
+      if (ok) {
+        console.log('[persist] background push succeeded — data is now safe on remote');
+        lastPersistStatus = { success: true, timestamp: new Date().toISOString(), error: null };
+        _retryPushCount = 0;
+      } else {
+        console.error('[persist] background push failed:', errMsg);
+        lastPersistStatus = { success: false, timestamp: new Date().toISOString(), error: 'background push failed: ' + errMsg };
+        _scheduleRetryPush(repoRoot);
+      }
+    });
+  }, delay);
 }
 
 /**
@@ -843,20 +903,24 @@ function _pushToRemote(repoRoot, attempt, cb) {
       }
 
       const stderr = (pushStderr || pushErr.message || String(pushErr));
-      const firstLine = stderr.split('\n')[0];
 
-      // If rejected because remote has diverged, try pull --rebase then retry
+      // Always log the raw stderr so operators can diagnose — redact any
+      // embedded tokens that might appear in URL-based error messages.
+      const safeStderr = stderr
+        .replace(/x-access-token:[^@\s]+/gi, 'x-access-token:***')
+        .replace(/Basic [A-Za-z0-9+/=]+/gi, 'Basic ***');
+      console.warn(`[persist] push attempt ${attempt + 1}/${MAX_PUSH_RETRIES + 1} failed:`, safeStderr.split('\n')[0]);
+
+      // --- Rejected (remote diverged) → pull --rebase then retry ---
       if (attempt < MAX_PUSH_RETRIES && (stderr.includes('rejected') || stderr.includes('non-fast-forward') || stderr.includes('fetch first'))) {
-        console.warn(`[persist] push rejected (attempt ${attempt + 1}/${MAX_PUSH_RETRIES + 1}) — pulling remote changes`);
+        console.warn('[persist] remote has diverged — pulling before retry');
         execFile('git', ['pull', '--rebase', '--autostash', 'origin', 'main'], { cwd: repoRoot, timeout: 30000 }, (pullErr) => {
           try {
             if (pullErr) {
-              // Pull/rebase failed — abort rebase and report failure
               try { execSync('git rebase --abort', { cwd: repoRoot, stdio: 'pipe' }); } catch { /* no rebase in progress */ }
               cb(false, 'pull --rebase failed before retry: ' + (pullErr.message || '').split('\n')[0]);
               return;
             }
-            // Retry push after successful pull
             _pushToRemote(repoRoot, attempt + 1, cb);
           } catch (e) {
             cb(false, 'unexpected error during pull: ' + (e.message || ''));
@@ -865,29 +929,41 @@ function _pushToRemote(repoRoot, attempt, cb) {
         return;
       }
 
-      // If it's an auth error, invalidate the cache and re-verify before giving up.
-      // The platform token (gho_) may have been refreshed in .git/config since the
-      // last successful verification.
-      if (stderr.includes('Authentication') || stderr.includes('403') || stderr.includes('401') || stderr.includes('could not read Username')) {
+      // --- Authentication / permission error → invalidate cache, retry with delay ---
+      const isAuthErr = stderr.includes('Authentication') || stderr.includes('403')
+        || stderr.includes('401') || stderr.includes('could not read Username')
+        || stderr.includes('terminal prompts disabled');
+      if (isAuthErr) {
         _invalidateAuthCache();
 
-        // Re-verify: does git ls-remote still work?
-        const canRead = _verifyGitAuth(repoRoot, true);
-        if (canRead && attempt < MAX_PUSH_RETRIES) {
-          // Token was refreshed (or the failure was transient) — retry the push
-          console.warn('[persist] push auth failed but ls-remote succeeded — retrying push');
-          _pushToRemote(repoRoot, attempt + 1, cb);
+        if (attempt < MAX_PUSH_RETRIES) {
+          // Wait 2s then re-verify and retry — gives the platform time to
+          // refresh the token if it was in the middle of rotating credentials.
+          console.warn('[persist] auth error on push — waiting 2 s then retrying');
+          setTimeout(() => {
+            const canRead = _verifyGitAuth(repoRoot, true);
+            if (canRead) {
+              console.warn('[persist] ls-remote succeeded after delay — retrying push');
+              _pushToRemote(repoRoot, attempt + 1, cb);
+            } else {
+              cb(false, 'authentication failed — platform-injected GitHub token has expired or been revoked (ls-remote also fails); the sandbox platform needs to refresh it');
+            }
+          }, 2000);
           return;
         }
+
+        // All retries exhausted — provide specific diagnostic
+        const canRead = _verifyGitAuth(repoRoot, true);
         if (canRead) {
-          cb(false, 'authentication failed on push but read access works — token may lack write/push permissions');
+          cb(false, 'authentication failed on push but read access works — token may lack write/push scope (needs "contents: write")');
         } else {
-          cb(false, 'authentication failed — platform-injected GitHub token has expired or been revoked; the sandbox platform (Daytona/Pivota) needs to refresh it');
+          cb(false, 'authentication failed — platform-injected GitHub token has expired or been revoked; the sandbox platform needs to refresh it');
         }
         return;
       }
 
-      cb(false, firstLine);
+      // --- Any other error ---
+      cb(false, safeStderr.split('\n')[0]);
     } catch (e) {
       cb(false, 'unexpected error: ' + (e.message || ''));
     }
