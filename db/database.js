@@ -65,39 +65,61 @@ process.env.GIT_TERMINAL_PROMPT = '0';
  * (Daytona/Pivota) to inject credentials via whichever mechanism it uses
  * (http.extraheader, credential helper, etc.).
  *
- * This function simply verifies that `git ls-remote` can reach the remote.
+ * This function verifies that `git ls-remote` can reach the remote.
  * If it can, git already has working auth — no further action needed.
  * GIT_TERMINAL_PROMPT=0 (set on process.env) ensures git exits immediately instead
  * of hanging on /dev/tty if auth is missing.
  *
- * Called once on startup and again before each persist operation.
+ * The verification result is cached for AUTH_CACHE_TTL_MS to avoid hitting
+ * GitHub on every write, but expires so that token rotation or expiry
+ * (GitHub App `gho_` tokens are typically valid for ~1 hour) is detected.
+ *
+ * Called before each persist operation and at startup.
  */
-let _gitAuthConfigured = false;
+const AUTH_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+let _gitAuthVerifiedAt = 0;   // timestamp of last successful verification
 
-function _ensureGitAuth(repoRoot) {
-  // Fast path: skip expensive work if we already succeeded in this process
-  if (_gitAuthConfigured) return;
+function _isAuthCacheValid() {
+  return _gitAuthVerifiedAt > 0 && (Date.now() - _gitAuthVerifiedAt) < AUTH_CACHE_TTL_MS;
+}
 
+function _invalidateAuthCache() {
+  _gitAuthVerifiedAt = 0;
+}
+
+/**
+ * Test remote authentication via git ls-remote.
+ * @param {string} repoRoot
+ * @param {boolean} [quiet=false] - suppress success log (used on retries)
+ * @returns {boolean} true if authentication succeeded
+ */
+function _verifyGitAuth(repoRoot, quiet) {
   try {
-    // Verify that git can actually reach the remote with whatever credentials
-    // the platform has injected (extraheader, credential helper, URL token, etc.)
     execSync('git ls-remote --quiet --exit-code origin HEAD', {
       cwd: repoRoot,
       stdio: 'pipe',
       timeout: 15000,
     });
-    console.log('[persist] git remote authentication verified (platform-injected credentials working)');
-    _gitAuthConfigured = true;
+    _gitAuthVerifiedAt = Date.now();
+    if (!quiet) console.log('[persist] git remote authentication verified (platform-injected credentials working)');
+    return true;
   } catch (err) {
-    const msg = (err.message || '').split('\n')[0];
     // Exit code 2 from ls-remote means "remote found but ref not found" — auth is still working
     if (err.status === 2) {
-      console.log('[persist] git remote authentication verified (remote reachable)');
-      _gitAuthConfigured = true;
-    } else {
-      console.warn('[persist] git remote authentication check failed — push may not work:', msg);
+      _gitAuthVerifiedAt = Date.now();
+      if (!quiet) console.log('[persist] git remote authentication verified (remote reachable)');
+      return true;
     }
+    const msg = (err.message || '').split('\n')[0];
+    console.warn('[persist] git remote authentication check failed — push may not work:', msg);
+    _invalidateAuthCache();
+    return false;
   }
+}
+
+function _ensureGitAuth(repoRoot) {
+  if (_isAuthCacheValid()) return;
+  _verifyGitAuth(repoRoot, false);
 }
 
 /**
@@ -132,16 +154,45 @@ function restoreFromGit() {
     }
 
     // Check if the remote branch has commits ahead of local
+    let needsPull = false;
     try {
       const behind = execSync('git rev-list HEAD..origin/main --count', { cwd: repoRoot, stdio: 'pipe' })
         .toString().trim();
-      if (behind === '0') {
-        console.log('[persist] local branch is up-to-date with remote');
-        return;
+      if (behind !== '0') {
+        console.log(`[persist] remote is ${behind} commit(s) ahead — pulling latest data`);
+        needsPull = true;
       }
-      console.log(`[persist] remote is ${behind} commit(s) ahead — pulling latest data`);
     } catch {
       // If rev-list fails, try the pull anyway
+      needsPull = true;
+    }
+
+    // Even if the branch is up-to-date, the database file may be missing from
+    // the working tree (e.g. after a sandbox rebuild that cloned the repo but
+    // the DB was deleted or replaced by an empty one before this runs).
+    // Restore the tracked DB file from HEAD if it exists in git but is missing
+    // or empty on disk.
+    if (!needsPull) {
+      const dbFilePath = process.env.DB_PATH || './data/expenses.db';
+      const relDbPath = path.relative(repoRoot, path.resolve(dbFilePath));
+      try {
+        // Check if git tracks this file
+        execSync(`git cat-file -e HEAD:"${relDbPath}"`, { cwd: repoRoot, stdio: 'pipe' });
+        // Git has the file — check if it exists on disk with real content
+        let diskSize = 0;
+        try { diskSize = fs.statSync(path.resolve(repoRoot, relDbPath)).size; } catch { /* missing */ }
+        if (diskSize === 0 || !fs.existsSync(path.resolve(repoRoot, relDbPath))) {
+          console.log('[persist] database file missing or empty on disk — restoring from git HEAD');
+          execSync(`git checkout HEAD -- "${relDbPath}"`, { cwd: repoRoot, stdio: 'pipe' });
+          console.log('[persist] restored database from git HEAD');
+        } else {
+          console.log('[persist] local branch is up-to-date with remote');
+        }
+      } catch {
+        // File not tracked in git — nothing to restore (fresh project)
+        console.log('[persist] local branch is up-to-date with remote');
+      }
+      return;
     }
 
     // Pull with rebase to integrate remote data commits
@@ -293,7 +344,7 @@ function verifyGitPersistence() {
     if (remoteOut.includes('push')) {
       // _ensureGitAuth will test actual remote connectivity via ls-remote
       _ensureGitAuth(repoRoot);
-      if (_gitAuthConfigured) {
+      if (_isAuthCacheValid()) {
         console.log('[persist] git remote available — data will auto-save to git on writes');
       } else {
         console.log('[persist] git remote available — data will auto-save to git on writes (WARNING: remote auth check failed — push may fail)');
@@ -784,7 +835,7 @@ function _doPersist() {
 const MAX_PUSH_RETRIES = 2;
 
 function _pushToRemote(repoRoot, attempt, cb) {
-  execFile('git', ['push'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
+  execFile('git', ['push', 'origin', 'main'], { cwd: repoRoot, timeout: 30000 }, (pushErr, pushOut, pushStderr) => {
     try {
       if (!pushErr) {
         cb(true);
@@ -814,9 +865,25 @@ function _pushToRemote(repoRoot, attempt, cb) {
         return;
       }
 
-      // If it's an auth error, report clearly — do not retry endlessly
+      // If it's an auth error, invalidate the cache and re-verify before giving up.
+      // The platform token (gho_) may have been refreshed in .git/config since the
+      // last successful verification.
       if (stderr.includes('Authentication') || stderr.includes('403') || stderr.includes('401') || stderr.includes('could not read Username')) {
-        cb(false, 'authentication failed — GitHub token may have expired');
+        _invalidateAuthCache();
+
+        // Re-verify: does git ls-remote still work?
+        const canRead = _verifyGitAuth(repoRoot, true);
+        if (canRead && attempt < MAX_PUSH_RETRIES) {
+          // Token was refreshed (or the failure was transient) — retry the push
+          console.warn('[persist] push auth failed but ls-remote succeeded — retrying push');
+          _pushToRemote(repoRoot, attempt + 1, cb);
+          return;
+        }
+        if (canRead) {
+          cb(false, 'authentication failed on push but read access works — token may lack write/push permissions');
+        } else {
+          cb(false, 'authentication failed — platform-injected GitHub token has expired or been revoked; the sandbox platform (Daytona/Pivota) needs to refresh it');
+        }
         return;
       }
 
