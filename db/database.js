@@ -797,6 +797,13 @@ function _doPersist() {
                 return;
               }
               console.log('[persist] database committed to git');
+
+              // ── Pre-push diagnostics ──
+              // Run the exact same commands that _pushToRemote will use
+              // (same cwd, same execFile, no env override) so we can compare
+              // ls-remote vs push results if push fails.
+              _runPrePushDiagnostics(repoRoot, () => {
+
               // Push to remote — this is the critical step for cross-sandbox persistence.
               // A push failure means data will NOT survive a sandbox rebuild.
               _pushToRemote(repoRoot, 0, (pushOk, pushErrMsg) => {
@@ -813,6 +820,8 @@ function _doPersist() {
                 }
                 persistInProgress = false;
               });
+
+              }); // end _runPrePushDiagnostics callback
             } catch (e) {
               persistInProgress = false;
             }
@@ -826,6 +835,76 @@ function _doPersist() {
     persistInProgress = false;
     console.warn('[persist] git operations could not be started (non-fatal)');
   }
+}
+
+/**
+ * Run diagnostic git commands immediately before _pushToRemote, using the
+ * identical child-process mechanism (execFile, same cwd, no env override).
+ * Logs results so we can compare ls-remote vs push if push fails.
+ */
+function _runPrePushDiagnostics(repoRoot, done) {
+  const redact = (s) => (s || '')
+    .replace(/AUTHORIZATION[^\n]*/gi, 'AUTHORIZATION: <REDACTED>')
+    .replace(/x-access-token:[^@\s]+/gi, 'x-access-token:***')
+    .replace(/Basic [A-Za-z0-9+/=]+/gi, 'Basic ***');
+
+  const results = {};
+
+  // 1. git rev-parse --show-toplevel
+  execFile('git', ['rev-parse', '--show-toplevel'], { cwd: repoRoot, timeout: 5000 },
+    (err, out, stderr) => {
+      results.toplevel = err ? `ERR(${err.code}): ${(stderr||err.message).split('\n')[0]}` : out.trim();
+
+      // 2. git remote -v
+      execFile('git', ['remote', '-v'], { cwd: repoRoot, timeout: 5000 },
+        (err2, out2, stderr2) => {
+          results.remote = err2 ? `ERR: ${(stderr2||'').split('\n')[0]}` : redact(out2.trim().split('\n')[0]);
+
+          // 3. git config --local --get-regexp '^http\.'
+          execFile('git', ['config', '--local', '--get-regexp', '^http\\.'], { cwd: repoRoot, timeout: 5000 },
+            (err3, out3, stderr3) => {
+              if (err3 && err3.code === 1) {
+                results.httpConfig = '(none)';
+              } else if (err3) {
+                results.httpConfig = `ERR(${err3.code}): ${(stderr3||err3.message).split('\n')[0]}`;
+              } else {
+                results.httpConfig = redact(out3.trim());
+              }
+
+              // 4. git ls-remote --quiet --exit-code origin HEAD
+              execFile('git', ['ls-remote', '--quiet', '--exit-code', 'origin', 'HEAD'],
+                { cwd: repoRoot, timeout: 15000 },
+                (err4, out4, stderr4) => {
+                  if (!err4) {
+                    results.lsRemote = `OK (exit 0)`;
+                  } else {
+                    results.lsRemote = `FAIL (exit ${err4.code}): ${redact((stderr4||err4.message).split('\n')[0])}`;
+                  }
+
+                  // 5. git push --dry-run origin HEAD
+                  execFile('git', ['push', '--dry-run', 'origin', 'HEAD'],
+                    { cwd: repoRoot, timeout: 30000 },
+                    (err5, out5, stderr5) => {
+                      if (!err5) {
+                        results.pushDryRun = `OK: ${(stderr5||out5||'').trim().split('\n')[0]}`;
+                      } else {
+                        results.pushDryRun = `FAIL (exit ${err5.code}): ${redact((stderr5||err5.message).split('\n')[0])}`;
+                      }
+
+                      // Log all results
+                      console.log('[persist][diag] pre-push diagnostics (same cwd + execFile):');
+                      console.log('[persist][diag]   toplevel:', results.toplevel);
+                      console.log('[persist][diag]   remote:', results.remote);
+                      console.log('[persist][diag]   http config:', results.httpConfig);
+                      console.log('[persist][diag]   ls-remote:', results.lsRemote);
+                      console.log('[persist][diag]   push --dry-run:', results.pushDryRun);
+
+                      done();
+                    });
+                });
+            });
+        });
+    });
 }
 
 /**
